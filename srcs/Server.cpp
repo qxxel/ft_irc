@@ -1,0 +1,268 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Server.cpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ibjean-b <ibjean-b@student.42.fr>          #+#  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025-03-26 15:18:46 by ibjean-b          #+#    #+#             */
+/*   Updated: 2025-03-26 15:18:46 by ibjean-b         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "Server.hpp"
+#include "defines.hpp"
+#include <cstdlib>
+#include <cstring>
+#include <sys/socket.h>
+#include <fcntl.h>
+#include <netinet/in.h>
+#include <sys/epoll.h>
+#include <cerrno>
+#include <unistd.h>
+#include "Request.hpp"
+
+Server::~Server()
+{
+	std::vector<Client*>::iterator	it;
+	for (it = _clients.begin(); it != _clients.end(); it++)
+		delete *it;
+}
+
+Server::Server(std::string port, std::string password)
+{
+	try
+	{
+		_pwd = password;
+		_running = true;
+		setPort(parsePort(port));
+		std::cout << *this;
+		start();
+	}
+	catch(const std::exception& e)
+	{
+		throw ;
+	}
+}
+
+int	Server::parsePort(std::string port)
+{
+	for (size_t i = 0; i < port.size(); i++)
+	{
+		if (!std::isdigit(port[i]))
+			throw (std::runtime_error("Error: invalid port"));
+	}
+	return (atoi(port.c_str()));
+}
+
+void	Server::start(void)
+{
+	int	fd_socket = socket(AF_INET, SOCK_STREAM, 0);
+	if (fd_socket == -1)
+		throw (std::runtime_error("Error: socket failed: " + std::string(strerror(errno))));
+
+	int	opt = 1;
+	if (setsockopt(fd_socket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(int)) == -1)
+		throw (std::runtime_error("Error: setsockopt failed: " + std::string(strerror(errno))));
+
+	if (fcntl(fd_socket, F_SETFL, O_NONBLOCK) == -1)
+		throw (std::runtime_error("Error: fcntl failed: " + std::string(strerror(errno))));
+
+	sockaddr_in	network;
+	network.sin_family = AF_INET;
+	network.sin_port = htons(_port);
+	network.sin_addr.s_addr = INADDR_ANY;
+
+	if (bind(fd_socket, (struct sockaddr*)&network, sizeof(network)) == -1)
+		throw (std::runtime_error("Error: bind failed: " + std::string(strerror(errno))));
+
+	if (listen(fd_socket, SOMAXCONN) == -1)
+		throw (std::runtime_error("Error: listen failed: " + std::string(strerror(errno))));
+
+	try
+	{
+		run(fd_socket);
+	}
+	catch(const std::exception& e)
+	{
+		throw ;
+	}
+}
+
+void	Server::run(int sock)
+{
+	int				epfd = epoll_create1(0);
+	epoll_event		ev, events[MAX_EVENTS];
+
+	if (epfd == -1)
+		throw (std::runtime_error("Error: epoll_create failed: " + std::string(strerror(errno))));
+
+	ev.data.fd = sock;
+	ev.events = EPOLLIN | EPOLLRDHUP | EPOLLOUT;
+	if (epoll_ctl(epfd, EPOLL_CTL_ADD, sock, &ev) == -1)
+		throw (std::runtime_error("Error: epoll_ctl failed: " + std::string(strerror(errno))));
+
+	int nfds;
+	while (_running)
+	{
+		nfds = epoll_wait(epfd, events, MAX_EVENTS, -1);
+		if (nfds == -1)
+			throw (std::runtime_error("Error: epoll_wait failed: " + std::string(strerror(errno))));
+		
+		try
+		{
+			for (int i = 0; i < nfds; i++)
+			{
+				if (events[i].data.fd == sock)
+					acceptClient(sock, epfd);
+				else if (events[i].events & EPOLLIN)
+					clientRequest(events[i].data.fd, epfd);
+				else if (events[i].events & EPOLLRDHUP)
+					disconnectClient(events[i].data.fd, epfd);
+			}
+		}
+		catch(const std::exception& e)
+		{
+			throw ;
+		}
+	}
+}
+
+void	Server::disconnectClient(int client, int epfd)
+{
+	if (epoll_ctl(epfd, EPOLL_CTL_DEL, client, NULL) == -1)
+		throw (std::runtime_error("Error: deleting client from epoll failed: " + std::string(strerror(errno))));
+	if (close(client) == -1)
+		throw (std::runtime_error("Error: closing client socket failed: " + std::string(strerror(errno))));
+	std::cout << "Client " << client << " disconnected" << std::endl;
+}
+
+void	Server::executeCommand(Client *client, Command *cmd)
+{
+	(void)client;
+	(void)cmd;
+	std::cerr << "client tries a command :(\n";
+}
+
+void	Server::sendClient(int client, std::string msg)
+{
+	if (send(client, msg.c_str(), msg.size(), 0) == -1)
+		throw (std::runtime_error("Error: sending data to clients failed: " + std::string(strerror(errno))));
+}
+
+void	Server::clientRequest(int client, int epfd)
+{
+	char		buffer[MAX_BODY_SIZE + 2];
+	ssize_t		n;
+
+	memset(buffer, 0, MAX_BODY_SIZE + 2);
+	n = recv(client, &buffer, MAX_BODY_SIZE + 1, 0);
+	if (n == -1)
+		return (void)(std::cerr << ("Error: recv failed: " + std::string(strerror(errno))));
+
+	std::cout << "\n------------SERVER RECEIVED-------------\n\n" << buffer << std::endl; //debug
+	std::cout << "\n----------------------------------------" << std::endl; //debug
+	try
+	{
+		if (n == 0)
+			return (disconnectClient(client, epfd));
+		if (strlen(buffer) > MAX_BODY_SIZE)
+			return (void)(std::cerr << "Error: client request too big: max " << MAX_BODY_SIZE << " characters" << std::endl);
+
+		Request	req = Request(buffer);
+		// Client	*tp = findClient(client);
+		// std::vector<Command>::iterator	it;
+
+		// for (it = req.getArr().begin(); it != req.getArr().end() ; it++)
+		// {
+		// 	std::cerr << "/test: " << (&(*it)) << std::endl;
+		// 	if (tp->getWaitFlag() || tp->getNick().empty() || tp->getUser().empty())
+		// 	{
+		// 		waitRoom(tp, &(*it));
+		// 		if (!tp->getWaitFlag() && !tp->getNick().empty() && !tp->getUser().empty())
+		// 		{
+		// 			sendClient(tp->getFd(), WELCOME);
+		// 			sendClient(tp->getFd(), LST_CMDS);
+		// 		}
+		// 	}
+			// else
+				// executeCommand(tp, &(*it));
+		// }
+	}
+	catch(const std::exception& e)
+	{
+		throw ;
+	}
+	
+}
+
+int	Server::acceptClient(int sock, int epfd)
+{
+	epoll_event	ev;
+	sockaddr_in	client;
+	socklen_t	client_size = sizeof(client);
+	int			fd = accept(sock, (struct sockaddr*)&client, &client_size);
+
+	ev.data.fd = fd;
+	ev.events = EPOLLIN | EPOLLRDHUP | EPOLLOUT;
+	if (fd == -1)
+		throw (std::runtime_error("Error: accept failed: " + std::string(strerror(errno))));
+
+	if (fcntl(fd, F_SETFL, O_NONBLOCK) == -1)
+		throw (std::runtime_error("Error: fcntl failed: " + std::string(strerror(errno))));
+
+	if (epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &ev) == -1)
+		throw (std::runtime_error("Error: epoll_ctl failed: " + std::string(strerror(errno))));
+
+	try
+	{
+		Client	*tp = new Client(fd);
+		_clients.push_back(tp);
+		sendClient(tp->getFd(), WELCOME_01);
+		std::cout << "\nNew client connected !\n";
+	}
+	catch(const std::exception& e)
+	{
+		throw ;
+	}
+	
+	return (fd);
+}
+
+void	Server::setPwd(std::string pwd)
+{
+	_pwd = pwd;
+}
+
+void	Server::setRunning(bool running)
+{
+	_running = running;
+}
+
+void	Server::setPort(int port)
+{
+	_port = port;
+}
+
+int	Server::getPort(void)
+{
+	return (_port);
+}
+
+bool	Server::getRunning(void)
+{
+	return (_running);
+}
+
+std::string	Server::getPwd(void)
+{
+	return (_pwd);
+}
+
+std::ostream &	operator<<(std::ostream &o, Server &serv)
+{
+	o << "-----------------SERVER-----------------"<< std::endl;
+	o << "\tport: " << serv.getPort() << "\n\tpwd: " << serv.getPwd() << std::endl;
+	o << "----------------------------------------\n"<< std::endl;
+	return (o);
+}
