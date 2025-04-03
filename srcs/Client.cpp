@@ -63,9 +63,10 @@ std::string	Client::getUser(void)
 
 std::ostream &	operator<<(std::ostream &o, Client &client)
 {
-	o << "\tuser: " << client.getUser() << std::endl;
-	o << "\tnick: " << client.getNick() << std::endl;
-	o << "\tclfd: " << client.getFd() << std::endl;
-	o << "\tpwd : " << client.getPwd() << std::endl;
+	o << "-----------Client-----------\n";
+	o << "user: " << client.getUser() << std::endl;
+	o << "nick: " << client.getNick() << std::endl;
+	o << "clfd: " << client.getFd() << std::endl;
+	o << "pwd : " << client.getPwd() << std::endl;
 	return (o);
 }

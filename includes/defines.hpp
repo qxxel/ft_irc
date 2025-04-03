@@ -16,13 +16,13 @@
 # define MAX_EVENTS	4096
 # define MAX_BODY_SIZE	5000
 
-# define WELCOME_01 "Welcome to cri_ft !\n"
-
-// # define ERR_PWD "Enter server password: PASS <password>\n"
+# define SERVER_WELCOME "Welcome to cri_ft !\n"
+# define ENTER_PWD "Enter server password: PASS <password>\n"
+# define GOOD_PWD "GOOD PASSWORD !\n"
+# define ENTER_NCK_USR "Please enter a username or a nickname: USER <username> <*> <0> or NICK <nickname>\n"
 // # define INV_PWD "Invalid password !\n"
 // # define ERR_USR "Enter a username: USER <username>\n"
 // # define ERR_NCK "Enter a nickname: NICK <nickname>\n"
-// # define ERR_NCK_USR "Please enter a username or a nickname: USER <username> or NICK <nickname>\n"
 // # define CHARS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_#:"
 // # define FIELD_SET "This field has already been set\n"
 // # define IS_TAKEN "Another user already has this name\n"

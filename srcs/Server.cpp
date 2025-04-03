@@ -22,6 +22,8 @@
 #include <unistd.h>
 #include "Request.hpp"
 
+// ---------------------------------------------SERVER SETUP---------------------------------------------
+
 Server::~Server()
 {
 	std::vector<Client*>::iterator	it;
@@ -89,6 +91,7 @@ void	Server::start(void)
 	}
 }
 
+// ---------------------------------------------SERVER RUNNING---------------------------------------------
 void	Server::run(int sock)
 {
 	int				epfd = epoll_create1(0);
@@ -128,73 +131,7 @@ void	Server::run(int sock)
 	}
 }
 
-void	Server::disconnectClient(int client, int epfd)
-{
-	if (epoll_ctl(epfd, EPOLL_CTL_DEL, client, NULL) == -1)
-		throw (std::runtime_error("Error: deleting client from epoll failed: " + std::string(strerror(errno))));
-	if (close(client) == -1)
-		throw (std::runtime_error("Error: closing client socket failed: " + std::string(strerror(errno))));
-	std::cout << "Client " << client << " disconnected" << std::endl;
-}
-
-void	Server::executeCommand(Client *client, Command *cmd)
-{
-	(void)client;
-	(void)cmd;
-	std::cerr << "client tries a command :(\n";
-}
-
-void	Server::sendClient(int client, std::string msg)
-{
-	if (send(client, msg.c_str(), msg.size(), 0) == -1)
-		throw (std::runtime_error("Error: sending data to clients failed: " + std::string(strerror(errno))));
-}
-
-void	Server::clientRequest(int client, int epfd)
-{
-	char		buffer[MAX_BODY_SIZE + 2];
-	ssize_t		n;
-
-	memset(buffer, 0, MAX_BODY_SIZE + 2);
-	n = recv(client, &buffer, MAX_BODY_SIZE + 1, 0);
-	if (n == -1)
-		return (void)(std::cerr << ("Error: recv failed: " + std::string(strerror(errno))));
-
-	std::cout << "\n------------SERVER RECEIVED-------------\n\n" << buffer << std::endl; //debug
-	std::cout << "\n----------------------------------------" << std::endl; //debug
-	try
-	{
-		if (n == 0)
-			return (disconnectClient(client, epfd));
-		if (strlen(buffer) > MAX_BODY_SIZE)
-			return (void)(std::cerr << "Error: client request too big: max " << MAX_BODY_SIZE << " characters" << std::endl);
-
-		Request	req = Request(buffer);
-		// Client	*tp = findClient(client);
-		// std::vector<Command>::iterator	it;
-
-		// for (it = req.getArr().begin(); it != req.getArr().end() ; it++)
-		// {
-		// 	std::cerr << "/test: " << (&(*it)) << std::endl;
-		// 	if (tp->getWaitFlag() || tp->getNick().empty() || tp->getUser().empty())
-		// 	{
-		// 		waitRoom(tp, &(*it));
-		// 		if (!tp->getWaitFlag() && !tp->getNick().empty() && !tp->getUser().empty())
-		// 		{
-		// 			sendClient(tp->getFd(), WELCOME);
-		// 			sendClient(tp->getFd(), LST_CMDS);
-		// 		}
-		// 	}
-			// else
-				// executeCommand(tp, &(*it));
-		// }
-	}
-	catch(const std::exception& e)
-	{
-		throw ;
-	}
-	
-}
+// ---------------------------------------------SERVER ACTIONS---------------------------------------------
 
 int	Server::acceptClient(int sock, int epfd)
 {
@@ -218,7 +155,8 @@ int	Server::acceptClient(int sock, int epfd)
 	{
 		Client	*tp = new Client(fd);
 		_clients.push_back(tp);
-		sendClient(tp->getFd(), WELCOME_01);
+		sendClient(tp->getFd(), SERVER_WELCOME);
+		sendClient(tp->getFd(), ENTER_PWD);
 		std::cout << "\nNew client connected !\n";
 	}
 	catch(const std::exception& e)
@@ -228,6 +166,105 @@ int	Server::acceptClient(int sock, int epfd)
 	
 	return (fd);
 }
+
+void	Server::disconnectClient(int client, int epfd)
+{
+	if (epoll_ctl(epfd, EPOLL_CTL_DEL, client, NULL) == -1)
+		throw (std::runtime_error("Error: deleting client from epoll failed: " + std::string(strerror(errno))));
+	if (close(client) == -1)
+		throw (std::runtime_error("Error: closing client socket failed: " + std::string(strerror(errno))));
+	delete findClient(client);
+	std::cout << "Client " << client << " disconnected" << std::endl;	
+}	
+
+void	Server::sendClient(int client, std::string msg)
+{
+	if (send(client, msg.c_str(), msg.size(), 0) == -1)
+	throw (std::runtime_error("Error: sending data to clients failed: " + std::string(strerror(errno))));
+}		
+
+void	Server::clientRequest(int client, int epfd)
+{
+	char		buffer[MAX_BODY_SIZE + 2];
+	ssize_t		n;
+	
+	memset(buffer, 0, MAX_BODY_SIZE + 2);
+	n = recv(client, &buffer, MAX_BODY_SIZE + 1, 0);
+	if (n == -1)
+	return (void)(std::cerr << ("Error: recv failed: " + std::string(strerror(errno))));
+	
+	std::cout << "\n------------SERVER RECEIVED-------------\n\n" << buffer << std::endl; //debug	
+	try
+	{
+		if (n == 0)
+			return (disconnectClient(client, epfd));
+		if (strlen(buffer) > MAX_BODY_SIZE)
+		{
+			sendClient(client, "Error: input too big (max_body_size = 5000)\n");
+			return (void)(std::cerr << "Error: client request too big: max " << MAX_BODY_SIZE << " characters" << std::endl);
+		}	
+		
+		
+		Request	req = Request(buffer);
+		Client	*tp = findClient(client);
+		std::vector<Command>::iterator	it;
+
+		for (it = req.getArr().begin(); it != req.getArr().end() ; it++)
+			executeCommand(tp, &(*it));
+	}			
+	catch(const std::exception& e)
+	{
+		throw ;
+	}
+}	
+
+Client	*Server::findClient(int fd)
+{
+	std::vector<Client*>::iterator	it;
+
+	for (it = _clients.begin(); it != _clients.end(); it++)
+	{
+		if ((*it)->getFd() == fd)
+			return (*it);
+	}
+	return (0);
+}
+
+void	Server::executeCommand(Client *client, Command *cmd)
+{
+	if (!client->getPwd() || client->getUser().empty() || client->getNick().empty())
+		auth_client(client, cmd);
+	else
+		std::cout << "Client excutes a command !\n";
+}
+
+void	Server::auth_client(Client *client, Command *cmd)
+{
+	try
+	{
+		if (!client->getPwd())
+		{
+			if (cmd->getName().compare("PASS"))
+			{
+				if (cmd->getArgs().size() == 2 && !(cmd->getArgs().at(0).compare(_pwd)))
+				{
+					client->setPwd(true);
+					sendClient(client->getFd(), "Good password !\n");
+					return (sendClient(client->getFd(), ENTER_NCK_USR));
+				}
+			}
+		}
+		else if (cmd->getName().compare("PASS"))
+			return (sendClient(client->getFd(), "Error: password has already been given !"));
+		
+	}
+	catch(const std::exception& e)
+	{
+		throw ;
+	}
+}
+
+// ---------------------------------------------SERVER SETTERS AND GETTERS---------------------------------------------
 
 void	Server::setPwd(std::string pwd)
 {
