@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ibjean-b <ibjean-b@student.42.fr>          #+#  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025-03-26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025-03-26 15:18:46 by ibjean-b         ###   ########.fr       */
+/*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
+/*   Updated: 2025/04/09 15:35:06 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ void	Server::start(void)
 	int	opt = 1;
 	if (setsockopt(fd_socket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(int)) == -1)
 		throw (std::runtime_error("Error: setsockopt failed: " + std::string(strerror(errno))));
-
+	
 	if (fcntl(fd_socket, F_SETFL, O_NONBLOCK) == -1)
 		throw (std::runtime_error("Error: fcntl failed: " + std::string(strerror(errno))));
 
