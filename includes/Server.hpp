@@ -21,8 +21,8 @@
 class Server
 {
 private:
+	static bool				_running;
 	int						_port;
-	bool					_running;
 	std::string				_pwd;
 	std::vector<Client*>	_clients;
 public:
@@ -33,17 +33,17 @@ public:
 	int		parsePort(std::string port);
 	void	start(void);
 	void	run(int sock);
-	void	sendClient(int client, std::string msg);
 	int		acceptClient(int sock, int epfd);
 	void	disconnectClient(int client, int epfd);
 	void	clientRequest(int client, int epfd);
 	Client	*findClient(int fd);
-	void	executeCommand(Client *client, Command *cmd);
-	void	auth_client(Client *client, Command *cmd);
 
-	void	setPwd(std::string pwd);
-	void	setPort(int port);
-	void	setRunning(bool running);
+	static void	exit(void);
+	static void	sendClient(int client, std::string msg);
+
+	void		setRunning(bool running);
+	void		setPwd(std::string pwd);
+	void		setPort(int port);
 	int			getPort(void);
 	bool		getRunning(void);
 	std::string	getPwd(void);

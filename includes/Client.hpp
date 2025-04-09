@@ -20,6 +20,7 @@ class Client
 {
 private:
 	int			_fd;
+	bool		_auth;
 	bool		_pwd;
 	std::string	_user;
 	std::string	_nick;
@@ -31,8 +32,10 @@ public:
 	void	setFd(int fd);
 	void	setUser(std::string user);
 	void	setNick(std::string nick);
-	void	setPwd(bool trueOrFalse);
+	void	setAuth(bool auth);
+	void	setPwd(bool pwd);
 
+	bool		getAuth(void);
 	bool		getPwd(void);
 	int			getFd(void);
 	std::string	getUser(void);

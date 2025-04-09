@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "Command.hpp"
+#include "Server.hpp"
 
 Command::Command(std::string raw) : _raw(raw), _name("")
 {
@@ -78,4 +79,28 @@ std::ostream &	operator<<(std::ostream &o, Command &cmd)
 		o << i << ": " << vec[i] << std::endl;
 	}
 	return (o);
+}
+
+
+void Command::executeCommand(Client *client, Command *cmd)
+{
+	std::vector<std::string>	args = cmd->getArgs();
+	try
+	{
+		if (cmd->getName().compare("PASS"))
+			handlePass(client, &args);
+		else
+			Server::sendClient(client->getFd(), "unknown command: " + cmd->getName());
+	}
+	catch(const std::exception& e)
+	{
+		throw ;
+	}
+}
+
+void	Command::handlePass(Client *client, std::vector<std::string> *args)
+{
+	(void)client;
+	(void)args;
+	std::cout << "handlePASS called \n";
 }

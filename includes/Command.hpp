@@ -15,6 +15,7 @@
 
 #include <iostream>
 #include <vector>
+#include "Client.hpp"
 
 class Command
 {
@@ -33,6 +34,12 @@ public:
 	std::vector<std::string>	getArgs();
 	void						setName(std::string name);
 	void						setArgs(std::vector<std::string> args);
+
+	static void	executeCommand(Client *client, Command *cmd);
+	static void	handlePass(Client *client, std::vector<std::string> *args);
+	static void	handleNick(Client *client, std::vector<std::string> *args);
+	static void	handleUser(Client *client, std::vector<std::string> *args);
+	static void	handleJoin(Client *client, std::vector<std::string> *args);
 };
 
 std::ostream &	operator<<(std::ostream &o, Command &cmd);
