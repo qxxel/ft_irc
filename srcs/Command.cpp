@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ibjean-b <ibjean-b@student.42.fr>          #+#  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025-04-02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025-04-02 16:30:49 by ibjean-b         ###   ########.fr       */
+/*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
+/*   Updated: 2025/04/10 18:09:24 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,8 @@ void	Command::parse()
 	{
 		while (i < _raw.size() && isspace(_raw[i]))
 			i++;
+		if (i == _raw.size())
+			break ;
 		j = i;
 		while (i < _raw.size() && isascii(_raw[i]) && !isspace(_raw[i]))
 			i++;
@@ -70,9 +72,10 @@ std::ostream &	operator<<(std::ostream &o, Command &cmd)
 {
 	o << "--------------COMMAND--------------\n";
 	o << "name: " << cmd.getName() << std::endl;
-	o << "args: ";
+	if (!cmd.getArgs().empty())
+		o << "args: ";
 	std::vector<std::string>	vec = cmd.getArgs();
-	for (size_t i = 0; i < vec.size() - 1; i++)
+	for (size_t i = 0; i < vec.size(); i++)
 	{
 		if (i)
 			o << "\t";
