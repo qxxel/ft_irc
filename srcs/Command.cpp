@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/10 20:12:11 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/10 22:19:55 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ void	Command::parse()
 	setArgs(args);
 }
 
+
 std::vector<std::string>	Command::getArgs()
 {
 	return (_args);
@@ -84,7 +85,6 @@ std::ostream &	operator<<(std::ostream &o, Command &cmd)
 	return (o);
 }
 
-
 void Command::executeCommand(Client *client, Command *cmd)
 {
 	std::vector<std::string>	args = cmd->getArgs();
@@ -97,7 +97,7 @@ void Command::executeCommand(Client *client, Command *cmd)
 		else if (!cmd->getName().compare("USER"))
 			cmd->handleUser(client, &args);
 		else if (!cmd->getName().compare("JOIN"))
-			cmd->handleJoin(client, &args);
+			cmd->handleJoin(serv, client, &args);
 		else if (!cmd->getName().compare("KICK"))
 			cmd->handleKick(client, &args);
 		else if (!cmd->getName().compare("INVITE"))
@@ -134,15 +134,33 @@ void	Command::handleUser(Client *client, std::vector<std::string> *args)
 	(void)args;
 	std::cout << "handle user called \n";
 }
-void	Command::handleJoin(Client *client, std::vector<std::string> *args)
+void	Command::handleJoin(Server *serv, Client *client, std::vector<std::string> *args)
 {
 	if (args->size() != 1)
-		std::cout << "handle join failed" << std::endl; /* /!\ handle error => join one by one /!\ */
-	
-	try {
-		
-	} catch (std::exception &e) {
-		std::cout << "handle join exception: " << e.what() << std::endl; /* /!\ error => name isn't valid /!\ */
+	{
+		std::cout << "handle join failed => join one by one" << std::endl;
+		return ;
+	}
+
+	if (client->getCurrentChannel()->getName() == args->at(0))
+	{
+		std::cout << "handle join failed => client already in this channel" << std::endl;
+		return ;
+	}
+
+	try
+	{
+		Channel	channel(args->at(0), client);
+		serv->addChannel(channel);
+	}
+	catch (Channel::NameIsntValid &e)
+	{
+		std::cout << "handle join exception: " << e.what() << std::endl;
+		return ;
+	}
+	catch (Server::ChannelAlreadyExists &)
+	{
+		client->setCurrentChannel(serv->searchChannel(args->at(0)));
 	}
 
 	std::cout << "handle join successfully called" << std::endl;

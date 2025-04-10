@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ibjean-b <ibjean-b@student.42.fr>          #+#  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025-03-27 16:04:15 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025-03-27 16:04:15 by ibjean-b         ###   ########.fr       */
+/*   Created: 2025/03/27 16:04:15 by ibjean-b          #+#    #+#             */
+/*   Updated: 2025/04/10 22:17:41 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,27 +46,34 @@ void	Client::setPwd(bool pwd)
 	_pwd = pwd;
 }
 
-int		Client::getFd(void)
+void	Client::setCurrentChannel(Channel *channel)
+{
+	if (!channel)
+		return ;
+	this->_currentChannel = channel;
+}
+
+int		Client::getFd()
 {
 	return (_fd);
 }
 
-bool	Client::getAuth(void)
+bool	Client::getAuth()
 {
 	return (_auth);
 }
 
-bool	Client::getPwd(void)
+bool	Client::getPwd()
 {
 	return (_pwd);
 }
 
-std::string	Client::getNick(void)
+std::string	Client::getNick()
 {
 	return (_nick);
 }
 
-std::string	Client::getUser(void)
+std::string	Client::getUser()
 {
 	return (_user);
 }

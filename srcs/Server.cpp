@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/09 15:35:06 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/10 22:19:37 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -237,6 +237,23 @@ void	Server::exit(void)
 	Server::_running = false;
 }
 
+void	Server::addChannel(Channel &channel) throw()
+{
+	if (this->searchChannel(channel.getName()))
+		throw ChannelAlreadyExists();
+	this->_channels.push_back(&channel);
+}
+
+Channel	*Server::searchChannel(std::string name)
+{
+	for (std::vector<Channel*>::iterator it = this->_channels.begin(); it < this->_channels.end(); it++)
+	{
+		if ((*it)->getName() == name)
+			return (*it);
+	}
+	return (NULL);
+}
+
 // ---------------------------------------------SERVER SETTERS AND GETTERS---------------------------------------------
 
 void	Server::setPwd(std::string pwd)
@@ -267,6 +284,11 @@ bool	Server::getRunning(void)
 std::string	Server::getPwd(void)
 {
 	return (_pwd);
+}
+
+std::vector<Channel*>	Server::getChannels() const
+{
+	return (this->_channels);
 }
 
 std::ostream &	operator<<(std::ostream &o, Server &serv)

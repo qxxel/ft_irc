@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ibjean-b <ibjean-b@student.42.fr>          #+#  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025-04-02 16:30:13 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025-04-02 16:30:13 by ibjean-b         ###   ########.fr       */
+/*   Created: 2025/04/02 16:30:13 by ibjean-b          #+#    #+#             */
+/*   Updated: 2025/04/10 20:16:43 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ public:
 	void	handlePass(Client *client, std::vector<std::string> *args);
 	void	handleNick(Client *client, std::vector<std::string> *args);
 	void	handleUser(Client *client, std::vector<std::string> *args);
-	void	handleJoin(Client *client, std::vector<std::string> *args);
+	void	handleJoin(Server *serv, Client *client, std::vector<std::string> *args);
 	void	handleKick(Client *client, std::vector<std::string> *args);
 	void	handleInvite(Client *client, std::vector<std::string> *args);
 	void	handleTopic(Client *client, std::vector<std::string> *args);

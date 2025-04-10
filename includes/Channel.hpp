@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:48 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/04/10 19:56:02 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/10 20:34:38 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,12 +29,6 @@ class Channel
 		int						_maxUsers;
 		bool					_invOnly;
 
-		class	NameIsntValid: public std::exception
-		{
-			public:
-				const char*	what() { return ("the name isn't valid"); };
-		};
-
 	public:
 		Channel(std::string name, Client *creator);
 		~Channel();
@@ -56,4 +50,11 @@ class Channel
 
 		void		parseName(std::string name) const throw();
 		const bool	isValidChar(char c) const;
+
+		class	NameIsntValid: public std::exception
+		{
+			public:
+				const char*	what() { return ("the name isn't valid"); };
+		};
+
 };
