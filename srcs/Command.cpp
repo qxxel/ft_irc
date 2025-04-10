@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/10 18:09:24 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/10 20:12:11 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,10 +136,18 @@ void	Command::handleUser(Client *client, std::vector<std::string> *args)
 }
 void	Command::handleJoin(Client *client, std::vector<std::string> *args)
 {
-	(void)client;
-	(void)args;
-	std::cout << "handle join called \n";
+	if (args->size() != 1)
+		std::cout << "handle join failed" << std::endl; /* /!\ handle error => join one by one /!\ */
+	
+	try {
+		
+	} catch (std::exception &e) {
+		std::cout << "handle join exception: " << e.what() << std::endl; /* /!\ error => name isn't valid /!\ */
+	}
+
+	std::cout << "handle join successfully called" << std::endl;
 }
+
 void	Command::handleKick(Client *client, std::vector<std::string> *args)
 {
 	(void)client;

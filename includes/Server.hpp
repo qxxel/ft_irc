@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ibjean-b <ibjean-b@student.42.fr>          #+#  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025-03-26 15:18:07 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025-03-26 15:18:07 by ibjean-b         ###   ########.fr       */
+/*   Created: 2025/03/26 15:18:07 by ibjean-b          #+#    #+#             */
+/*   Updated: 2025/04/10 20:04:58 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 #include <iostream>
 #include <vector>
+#include "Channel.hpp"
 #include "Client.hpp"
 #include "Request.hpp"
 
@@ -25,6 +26,7 @@ private:
 	int						_port;
 	std::string				_pwd;
 	std::vector<Client*>	_clients;
+	std::vector<Channel*>	_channels;
 public:
 	~Server();
 	Server(std::string port, std::string password);
