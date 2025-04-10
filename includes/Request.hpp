@@ -17,6 +17,8 @@
 #include <vector>
 #include "Command.hpp"
 
+class Command;
+
 class Request
 {
 private:
@@ -26,7 +28,7 @@ public:
 	Request(char *raw);
 
 	void					setArr(std::vector<Command> arr);
-	std::vector<Command>	getArr();
+	std::vector<Command>	&getArr();
 };
 
 #endif

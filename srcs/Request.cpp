@@ -34,7 +34,7 @@ Request::Request(char *raw) : _arr()
 	}
 }
 
-std::vector<Command>	Request::getArr()
+std::vector<Command>	&Request::getArr()
 {
 	return (_arr);
 }

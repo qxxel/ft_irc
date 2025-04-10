@@ -212,7 +212,7 @@ void	Server::clientRequest(int client, int epfd)
 		std::vector<Command>::iterator	it;
 
 		for (it = req.getArr().begin(); it != req.getArr().end() ; it++)
-			Command::executeCommand(tp, &(*it));
+			Command::executeCommand(*this, tp, &(*it));
 	}			
 	catch(const std::exception& e)
 	{

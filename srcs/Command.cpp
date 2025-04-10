@@ -12,6 +12,7 @@
 
 #include "Command.hpp"
 #include "Server.hpp"
+#include "defines.hpp"
 
 Command::Command(std::string raw) : _raw(raw), _name("")
 {
@@ -84,14 +85,15 @@ std::ostream &	operator<<(std::ostream &o, Command &cmd)
 	return (o);
 }
 
-
-void Command::executeCommand(Client *client, Command *cmd)
+void Command::executeCommand(Server &serv, Client *client, Command *cmd)
 {
 	std::vector<std::string>	args = cmd->getArgs();
 	try
 	{
+		std::cout << "serv_pwd: " << serv.getPwd() << "    pwd_size: " << serv.getPwd().size() << std::endl;
+		std::cout << "cmd_arg : " << cmd->getArgs().at(0) << "      cmd_size: " << cmd->getArgs().at(0).size() << std::endl; 
 		if (!cmd->getName().compare("PASS"))
-			cmd->handlePass(client, &args);
+			cmd->handlePass(serv, client, &args);
 		else if (!cmd->getName().compare("NICK"))
 			cmd->handleNick(client, &args);
 		else if (!cmd->getName().compare("USER"))
@@ -115,11 +117,37 @@ void Command::executeCommand(Client *client, Command *cmd)
 	}
 }
 
-void	Command::handlePass(Client *client, std::vector<std::string> *args)
+void	Command::handlePass(Server &serv, Client *client, std::vector<std::string> *args)
 {
-	(void)client;
-	(void)args;
-	std::cout << "handlePASS called \n";
+	try
+	{
+		if (!client->getPwd())
+		{
+			std::cout << "serv_pwd: " << serv.getPwd() << "    pwd_size: " << serv.getPwd().size() << std::endl;
+			std::cout << "cmd_arg : " << args->at(0) << "      cmd_size: " << args->at(0).size() << std::endl; 
+			if (args->empty() || args->size() != 1)
+				return (Server::sendClient(client->getFd(), std::string(INV_FORMAT, ENTER_PWD)));
+			else if (!(args->at(0).compare(serv.getPwd())))
+			{
+				client->setPwd(true);
+				if (!client->getAuth() && !client->getNick().empty() && !client->getUser().empty())
+				{
+					client->setAuth(true);
+					return (Server::sendClient(client->getFd(), std::string(PWD_GOOD, AUTHY_GOOD)));
+				}
+				else
+					return (Server::sendClient(client->getFd(), std::string(PWD_GOOD, ENTER_NCK_USR)));
+			}
+			else
+				return (Server::sendClient(client->getFd(), INV_PWD));
+		}
+		else
+			return (Server::sendClient(client->getFd(), PWD_SET));
+	}
+	catch(const std::exception& e)
+	{
+		throw ;
+	}
 }
 
 void	Command::handleNick(Client *client, std::vector<std::string> *args)

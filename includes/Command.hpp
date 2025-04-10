@@ -16,6 +16,9 @@
 #include <iostream>
 #include <vector>
 #include "Client.hpp"
+#include "Server.hpp"
+
+class Server;
 
 class Command
 {
@@ -35,8 +38,8 @@ public:
 	void						setName(std::string name);
 	void						setArgs(std::vector<std::string> args);
 
-	static void	executeCommand(Client *client, Command *cmd);
-	void	handlePass(Client *client, std::vector<std::string> *args);
+	static void	executeCommand(Server &serv, Client *client, Command *cmd);
+	void	handlePass(Server &serv, Client *client, std::vector<std::string> *args);
 	void	handleNick(Client *client, std::vector<std::string> *args);
 	void	handleUser(Client *client, std::vector<std::string> *args);
 	void	handleJoin(Client *client, std::vector<std::string> *args);
