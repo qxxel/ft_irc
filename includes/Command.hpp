@@ -36,10 +36,14 @@ public:
 	void						setArgs(std::vector<std::string> args);
 
 	static void	executeCommand(Client *client, Command *cmd);
-	static void	handlePass(Client *client, std::vector<std::string> *args);
-	static void	handleNick(Client *client, std::vector<std::string> *args);
-	static void	handleUser(Client *client, std::vector<std::string> *args);
-	static void	handleJoin(Client *client, std::vector<std::string> *args);
+	void	handlePass(Client *client, std::vector<std::string> *args);
+	void	handleNick(Client *client, std::vector<std::string> *args);
+	void	handleUser(Client *client, std::vector<std::string> *args);
+	void	handleJoin(Client *client, std::vector<std::string> *args);
+	void	handleKick(Client *client, std::vector<std::string> *args);
+	void	handleInvite(Client *client, std::vector<std::string> *args);
+	void	handleTopic(Client *client, std::vector<std::string> *args);
+	void	handleMode(Client *client, std::vector<std::string> *args);
 };
 
 std::ostream &	operator<<(std::ostream &o, Command &cmd);

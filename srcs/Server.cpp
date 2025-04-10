@@ -197,7 +197,7 @@ void	Server::clientRequest(int client, int epfd)
 	if (n == -1)
 		return (void)(std::cerr << ("Error: recv failed: " + std::string(strerror(errno))));
 	
-	std::cout << "\n------------SERVER RECEIVED-------------\n\n" << buffer << std::endl; //debug	
+	// std::cout << "\n------------SERVER RECEIVED-------------\n\n" << buffer << std::endl; //debug	
 	try
 	{
 		if (n == 0)
@@ -207,12 +207,12 @@ void	Server::clientRequest(int client, int epfd)
 			sendClient(client, "Error: input too big (max_body_size = 5000)\n");
 			return (void)(std::cerr << "Error: client request too big: max " << MAX_BODY_SIZE << " characters" << std::endl);
 		}
-		// Request	req = Request(buffer);
-		// Client	*tp = findClient(client);
-		// std::vector<Command>::iterator	it;
+		Request	req = Request(buffer);
+		Client	*tp = findClient(client);
+		std::vector<Command>::iterator	it;
 
-		// for (it = req.getArr().begin(); it != req.getArr().end() ; it++)
-		// 	Command::executeCommand(tp, &(*it));
+		for (it = req.getArr().begin(); it != req.getArr().end() ; it++)
+			Command::executeCommand(tp, &(*it));
 	}			
 	catch(const std::exception& e)
 	{

@@ -87,10 +87,24 @@ void Command::executeCommand(Client *client, Command *cmd)
 	std::vector<std::string>	args = cmd->getArgs();
 	try
 	{
-		if (cmd->getName().compare("PASS"))
-			handlePass(client, &args);
+		if (!cmd->getName().compare("PASS"))
+			cmd->handlePass(client, &args);
+		else if (!cmd->getName().compare("NICK"))
+			cmd->handleNick(client, &args);
+		else if (!cmd->getName().compare("USER"))
+			cmd->handleUser(client, &args);
+		else if (!cmd->getName().compare("JOIN"))
+			cmd->handleJoin(client, &args);
+		else if (!cmd->getName().compare("KICK"))
+			cmd->handleKick(client, &args);
+		else if (!cmd->getName().compare("INVITE"))
+			cmd->handleInvite(client, &args);
+		else if (!cmd->getName().compare("TOPIC"))
+			cmd->handleTopic(client, &args);
+		else if (!cmd->getName().compare("MODE"))
+			cmd->handleMode(client, &args);
 		else
-			Server::sendClient(client->getFd(), "unknown command: " + cmd->getName());
+			Server::sendClient(client->getFd(), "Unknown command: " + cmd->getName() + "\n");
 	}
 	catch(const std::exception& e)
 	{
@@ -103,4 +117,48 @@ void	Command::handlePass(Client *client, std::vector<std::string> *args)
 	(void)client;
 	(void)args;
 	std::cout << "handlePASS called \n";
+}
+
+void	Command::handleNick(Client *client, std::vector<std::string> *args)
+{
+	(void)client;
+	(void)args;
+	std::cout << "handle nick called \n";
+}
+void	Command::handleUser(Client *client, std::vector<std::string> *args)
+{
+	(void)client;
+	(void)args;
+	std::cout << "handle user called \n";
+}
+void	Command::handleJoin(Client *client, std::vector<std::string> *args)
+{
+	(void)client;
+	(void)args;
+	std::cout << "handle join called \n";
+}
+void	Command::handleKick(Client *client, std::vector<std::string> *args)
+{
+	(void)client;
+	(void)args;
+	std::cout << "handle Kick called \n";
+}
+void	Command::handleInvite(Client *client, std::vector<std::string> *args)
+{
+	(void)client;
+	(void)args;
+	std::cout << "handle Invite called \n";
+}
+void	Command::handleTopic(Client *client, std::vector<std::string> *args)
+{
+	(void)client;
+	(void)args;
+	std::cout << "handle Topic called \n";
+}
+
+void	Command::handleMode(Client *client, std::vector<std::string> *args)
+{
+	(void)client;
+	(void)args;
+	std::cout << "handle Mode called \n";
 }
