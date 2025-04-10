@@ -17,7 +17,7 @@ Client::~Client()
 {
 }
 
-Client::Client(int fd) : _fd(fd), _pwd(false), _user(""), _nick("")
+Client::Client(int fd) : _fd(fd), _auth(false),  _pwd(false), _user(""), _nick("")
 {
 }
 
@@ -36,14 +36,24 @@ void	Client::setUser(std::string user)
 	_user = user;
 }
 
-void	Client::setPwd(bool trueOrFalse)
+void	Client::setAuth(bool auth)
 {
-	_pwd = trueOrFalse;
+	_auth = auth;
+}
+
+void	Client::setPwd(bool pwd)
+{
+	_pwd = pwd;
 }
 
 int		Client::getFd(void)
 {
 	return (_fd);
+}
+
+bool	Client::getAuth(void)
+{
+	return (_auth);
 }
 
 bool	Client::getPwd(void)
@@ -67,6 +77,6 @@ std::ostream &	operator<<(std::ostream &o, Client &client)
 	o << "user: " << client.getUser() << std::endl;
 	o << "nick: " << client.getNick() << std::endl;
 	o << "clfd: " << client.getFd() << std::endl;
-	o << "pwd : " << client.getPwd() << std::endl;
+	o << "auth: " << client.getAuth() << std::endl;
 	return (o);
 }
