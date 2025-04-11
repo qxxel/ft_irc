@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/10 22:19:37 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/11 13:16:18 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -212,7 +212,7 @@ void	Server::clientRequest(int client, int epfd)
 		std::vector<Command>::iterator	it;
 
 		for (it = req.getArr().begin(); it != req.getArr().end() ; it++)
-			Command::executeCommand(tp, &(*it));
+			Command::executeCommand(*this, tp, &(*it));
 	}			
 	catch(const std::exception& e)
 	{
@@ -237,7 +237,7 @@ void	Server::exit(void)
 	Server::_running = false;
 }
 
-void	Server::addChannel(Channel &channel) throw()
+void	Server::addChannel(Channel &channel)
 {
 	if (this->searchChannel(channel.getName()))
 		throw ChannelAlreadyExists();

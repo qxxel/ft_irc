@@ -6,12 +6,13 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/10 22:19:55 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/11 14:41:19 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Command.hpp"
 #include "Server.hpp"
+#include "defines.hpp"
 
 Command::Command(std::string raw) : _raw(raw), _name("")
 {
@@ -85,13 +86,15 @@ std::ostream &	operator<<(std::ostream &o, Command &cmd)
 	return (o);
 }
 
-void Command::executeCommand(Client *client, Command *cmd)
+void Command::executeCommand(Server &serv, Client *client, Command *cmd)
 {
 	std::vector<std::string>	args = cmd->getArgs();
 	try
 	{
+		std::cout << "serv_pwd: " << serv.getPwd() << "    pwd_size: " << serv.getPwd().size() << std::endl;
+		std::cout << "cmd_arg : " << cmd->getArgs().at(0) << "      cmd_size: " << cmd->getArgs().at(0).size() << std::endl;
 		if (!cmd->getName().compare("PASS"))
-			cmd->handlePass(client, &args);
+			cmd->handlePass(serv, client, &args);
 		else if (!cmd->getName().compare("NICK"))
 			cmd->handleNick(client, &args);
 		else if (!cmd->getName().compare("USER"))
@@ -115,11 +118,37 @@ void Command::executeCommand(Client *client, Command *cmd)
 	}
 }
 
-void	Command::handlePass(Client *client, std::vector<std::string> *args)
+void	Command::handlePass(Server &serv, Client *client, std::vector<std::string> *args)
 {
-	(void)client;
-	(void)args;
-	std::cout << "handlePASS called \n";
+	try
+	{
+		if (!client->getPwd())
+		{
+			std::cout << "serv_pwd: " << serv.getPwd() << "    pwd_size: " << serv.getPwd().size() << std::endl;
+			std::cout << "cmd_arg : " << args->at(0) << "      cmd_size: " << args->at(0).size() << std::endl; 
+			if (args->empty() || args->size() != 1)
+				return (Server::sendClient(client->getFd(), std::string(INV_FORMAT, ENTER_PWD)));
+			else if (!(args->at(0).compare(serv.getPwd())))
+			{
+				client->setPwd(true);
+				if (!client->getAuth() && !client->getNick().empty() && !client->getUser().empty())
+				{
+					client->setAuth(true);
+					return (Server::sendClient(client->getFd(), std::string(PWD_GOOD, AUTHY_GOOD)));
+				}
+				else
+					return (Server::sendClient(client->getFd(), std::string(PWD_GOOD, ENTER_NCK_USR)));
+			}
+			else
+				return (Server::sendClient(client->getFd(), INV_PWD));
+		}
+		else
+			return (Server::sendClient(client->getFd(), PWD_SET));
+	}
+	catch(const std::exception& e)
+	{
+		throw ;
+	}
 }
 
 void	Command::handleNick(Client *client, std::vector<std::string> *args)
@@ -134,7 +163,7 @@ void	Command::handleUser(Client *client, std::vector<std::string> *args)
 	(void)args;
 	std::cout << "handle user called \n";
 }
-void	Command::handleJoin(Server *serv, Client *client, std::vector<std::string> *args)
+void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> *args)
 {
 	if (args->size() != 1)
 	{
@@ -142,8 +171,10 @@ void	Command::handleJoin(Server *serv, Client *client, std::vector<std::string> 
 		return ;
 	}
 
-	if (client->getCurrentChannel()->getName() == args->at(0))
+	if (client->getCurrentChannel() && !(client->getCurrentChannel()->getName().compare(args->at(0))))
 	{
+		std::cerr << "debug3" << std::endl;
+		Server::sendClient(client->getFd(), ALRDY_IN_CHNL);
 		std::cout << "handle join failed => client already in this channel" << std::endl;
 		return ;
 	}
@@ -151,7 +182,7 @@ void	Command::handleJoin(Server *serv, Client *client, std::vector<std::string> 
 	try
 	{
 		Channel	channel(args->at(0), client);
-		serv->addChannel(channel);
+		serv.addChannel(channel);
 	}
 	catch (Channel::NameIsntValid &e)
 	{
@@ -160,7 +191,7 @@ void	Command::handleJoin(Server *serv, Client *client, std::vector<std::string> 
 	}
 	catch (Server::ChannelAlreadyExists &)
 	{
-		client->setCurrentChannel(serv->searchChannel(args->at(0)));
+		client->setCurrentChannel(serv.searchChannel(args->at(0)));
 	}
 
 	std::cout << "handle join successfully called" << std::endl;

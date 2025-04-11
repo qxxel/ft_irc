@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:05 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/04/10 20:00:29 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/11 14:43:05 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ Channel::Channel(std::string name, Client *creator): _oldestClient(NULL), _maxUs
 
 Channel::~Channel() { }
 
-void	Channel::parseName(std::string name) const throw()
+void	Channel::parseName(std::string name) const
 {
 	if (name.size() < 2 || 50 < name.size() || name[0] != '#')
 		throw NameIsntValid();
@@ -33,7 +33,7 @@ void	Channel::parseName(std::string name) const throw()
 	}
 }
 
-const bool	Channel::isValidChar(char c) const
+bool	Channel::isValidChar(char c) const
 {
 	if (c == 0 || c == 7 || c == '\r' || c == '\n' || c == ' ' || c == ',' || c == ':')
 		return (false);

@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:48 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/04/10 20:34:38 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/11 14:25:37 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include <map>
 # include "Client.hpp"
 
+class Client;
 
 class Channel
 {
@@ -48,13 +49,13 @@ class Channel
 		void	setMaxUsers(int maxUsers);
 		void	setInvOnly(bool invOnly);
 
-		void		parseName(std::string name) const throw();
-		const bool	isValidChar(char c) const;
+		void	parseName(std::string name) const;
+		bool	isValidChar(char c) const;
 
 		class	NameIsntValid: public std::exception
 		{
 			public:
-				const char*	what() { return ("the name isn't valid"); };
+				const char*	what() const throw() { return ("the name isn't valid"); }
 		};
 
 };

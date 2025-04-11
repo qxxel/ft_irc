@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:13 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/10 20:16:43 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/11 14:26:56 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,10 @@
 #include <iostream>
 #include <vector>
 #include "Client.hpp"
+#include "Server.hpp"
+
+class Server;
+class Client;
 
 class Command
 {
@@ -35,11 +39,11 @@ public:
 	void						setName(std::string name);
 	void						setArgs(std::vector<std::string> args);
 
-	static void	executeCommand(Client *client, Command *cmd);
-	void	handlePass(Client *client, std::vector<std::string> *args);
+	static void	executeCommand(Server &serv, Client *client, Command *cmd);
+	void	handlePass(Server &serv, Client *client, std::vector<std::string> *args);
 	void	handleNick(Client *client, std::vector<std::string> *args);
 	void	handleUser(Client *client, std::vector<std::string> *args);
-	void	handleJoin(Server *serv, Client *client, std::vector<std::string> *args);
+	void	handleJoin(Server &serv, Client *client, std::vector<std::string> *args);
 	void	handleKick(Client *client, std::vector<std::string> *args);
 	void	handleInvite(Client *client, std::vector<std::string> *args);
 	void	handleTopic(Client *client, std::vector<std::string> *args);

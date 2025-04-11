@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 16:04:15 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/10 22:17:41 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/11 14:43:02 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ Client::~Client()
 {
 }
 
-Client::Client(int fd) : _fd(fd), _auth(false),  _pwd(false), _user(""), _nick("")
+Client::Client(int fd) : _fd(fd), _auth(false),  _pwd(false), _user(""), _nick(""), _currentChannel(NULL)
 {
 }
 
@@ -76,6 +76,11 @@ std::string	Client::getNick()
 std::string	Client::getUser()
 {
 	return (_user);
+}
+
+Channel		*Client::getCurrentChannel()
+{
+	return (this->_currentChannel);
 }
 
 std::ostream &	operator<<(std::ostream &o, Client &client)

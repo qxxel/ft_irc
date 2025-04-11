@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:07 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/10 22:19:18 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/11 13:16:24 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ class Server
 	
 		static void	exit(void);
 		static void	sendClient(int client, std::string msg);
-		void		addChannel(Channel &channel) throw();
+		void		addChannel(Channel &channel);
 		Channel		*searchChannel(std::string name);
 
 		void					setRunning(bool running);
@@ -58,7 +58,7 @@ class Server
 		class	ChannelAlreadyExists: public std::exception
 		{
 			public:
-				const char*	what() { return ("the channel already exists"); };
+				const char*	what() const throw() { return ("the channel already exists"); };
 		};
 };
 
