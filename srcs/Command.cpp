@@ -127,13 +127,14 @@ void	Command::handlePass(Server &serv, Client *client, std::vector<std::string> 
 			else if (!(args->at(0).compare(serv.getPwd())))
 			{
 				client->setPwd(true);
-				if (!client->getAuth() && !client->getNick().empty() && !client->getUser().empty())
+				Server::sendClient(client->getFd(), PWD_GOOD);
+				if (!client->getAuth() && client->getNick().compare("") && client->getUser().compare(""))
 				{
 					client->setAuth(true);
-					return (Server::sendClient(client->getFd(), std::string(PWD_GOOD, AUTHY_GOOD)));
+					return ;
 				}
 				else
-					return (Server::sendClient(client->getFd(), std::string(PWD_GOOD, ENTER_NCK_USR)));
+					return (Server::sendClient(client->getFd(), ENTER_NCK_USR));
 			}
 			else
 				return (Server::sendClient(client->getFd(), INV_PWD));
@@ -151,8 +152,12 @@ void	Command::handleNick(Client *client, std::vector<std::string> *args)
 {
 	try
 	{
-		(void)client;
-		(void)args;
+		if (args->size() != 1)
+			return (Server::sendClient(client->getFd(), ENTER_NICK));
+		else
+		{
+			std::cout << "In sontruction !\n";	
+		}
 	}
 	catch(const std::exception& e)
 	{

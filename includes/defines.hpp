@@ -26,7 +26,8 @@
 # define ENTER_NCK_USR "Please enter a username or a nickname: USER <username> <*> <0> or NICK <nickname>\n"
 # define ALRDY_IN_CHNL "you're already in this channel\n"
 # define UKWN_CMD "Unknown command: "
-
+# define ENTER_NICK "Enter a server nickname: NICK <nickname>"
+# define ENTER_NICK "Enter a server username: USER <username> <*> <0>"
 # define USR_NAME "Username: "
 # define NICK_NAME "Nickname: "
 
