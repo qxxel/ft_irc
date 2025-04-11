@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ibjean-b <ibjean-b@student.42.fr>          #+#  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025-03-27 16:04:15 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025-03-27 16:04:15 by ibjean-b         ###   ########.fr       */
+/*   Created: 2025/03/27 16:04:15 by ibjean-b          #+#    #+#             */
+/*   Updated: 2025/04/11 14:43:02 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ Client::~Client()
 {
 }
 
-Client::Client(int fd) : _fd(fd), _pwd(false), _user(""), _nick("")
+Client::Client(int fd) : _fd(fd), _auth(false),  _pwd(false), _user(""), _nick(""), _currentChannel(NULL)
 {
 }
 
@@ -36,29 +36,51 @@ void	Client::setUser(std::string user)
 	_user = user;
 }
 
-void	Client::setPwd(bool trueOrFalse)
+void	Client::setAuth(bool auth)
 {
-	_pwd = trueOrFalse;
+	_auth = auth;
 }
 
-int		Client::getFd(void)
+void	Client::setPwd(bool pwd)
+{
+	_pwd = pwd;
+}
+
+void	Client::setCurrentChannel(Channel *channel)
+{
+	if (!channel)
+		return ;
+	this->_currentChannel = channel;
+}
+
+int		Client::getFd()
 {
 	return (_fd);
 }
 
-bool	Client::getPwd(void)
+bool	Client::getAuth()
+{
+	return (_auth);
+}
+
+bool	Client::getPwd()
 {
 	return (_pwd);
 }
 
-std::string	Client::getNick(void)
+std::string	Client::getNick()
 {
 	return (_nick);
 }
 
-std::string	Client::getUser(void)
+std::string	Client::getUser()
 {
 	return (_user);
+}
+
+Channel		*Client::getCurrentChannel()
+{
+	return (this->_currentChannel);
 }
 
 std::ostream &	operator<<(std::ostream &o, Client &client)
@@ -67,6 +89,6 @@ std::ostream &	operator<<(std::ostream &o, Client &client)
 	o << "user: " << client.getUser() << std::endl;
 	o << "nick: " << client.getNick() << std::endl;
 	o << "clfd: " << client.getFd() << std::endl;
-	o << "pwd : " << client.getPwd() << std::endl;
+	o << "auth: " << client.getAuth() << std::endl;
 	return (o);
 }

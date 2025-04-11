@@ -8,7 +8,7 @@ FLAGS = -Wall -Werror -Wextra -std=c++98
 
 DFLAGS = -MD -MP
 
-SRC = 	main.cpp Server.cpp Client.cpp Request.cpp Command.cpp
+SRC = 	main.cpp Server.cpp Client.cpp Request.cpp Command.cpp Channel.cpp signals.cpp
 
 SRC_PATH = srcs/
 

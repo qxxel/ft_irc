@@ -1,34 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Request.hpp                                        :+:      :+:    :+:   */
+/*   signals.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ibjean-b <ibjean-b@student.42.fr>          #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025-04-01 14:50:56 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025-04-01 14:50:56 by ibjean-b         ###   ########.fr       */
+/*   Created: 2025-04-09 16:46:28 by ibjean-b          #+#    #+#             */
+/*   Updated: 2025-04-09 16:46:28 by ibjean-b         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef REQUEST_HPP
-#define REQUEST_HPP
+#include "Server.hpp"
+#include <csignal>
 
-#include <iostream>
-#include <vector>
-#include "Command.hpp"
-
-class Command;
-
-class Request
+void	handleSignals(int signal)
 {
-private:
-	std::vector<Command>	_arr;
-public:
-	~Request();
-	Request(char *raw);
+	(void)signal;
+	Server::exit();
+}
 
-	void					setArr(std::vector<Command> arr);
-	std::vector<Command>	&getArr();
-};
-
-#endif
+void	setupSignals(void)
+{
+	signal(SIGINT, handleSignals);
+	signal(SIGTERM, handleSignals);
+	signal(SIGQUIT, handleSignals);
+}

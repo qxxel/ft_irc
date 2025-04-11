@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ibjean-b <ibjean-b@student.42.fr>          #+#  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025-03-26 15:18:07 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025-03-26 15:18:07 by ibjean-b         ###   ########.fr       */
+/*   Created: 2025/03/26 15:18:07 by ibjean-b          #+#    #+#             */
+/*   Updated: 2025/04/11 13:16:24 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,38 +15,51 @@
 
 #include <iostream>
 #include <vector>
+#include "Channel.hpp"
 #include "Client.hpp"
 #include "Request.hpp"
 
 class Server
 {
-private:
-	int						_port;
-	bool					_running;
-	std::string				_pwd;
-	std::vector<Client*>	_clients;
-public:
-	~Server();
-	Server(std::string port, std::string password);
+	private:
+		static bool				_running;
+		int						_port;
+		std::string				_pwd;
+		std::vector<Client*>	_clients;
+		std::vector<Channel*>	_channels;
+	
+	public:
+		~Server();
+		Server(std::string port, std::string password);
+	
+	
+		int		parsePort(std::string port);
+		void	start(void);
+		void	run(int sock);
+		int		acceptClient(int sock, int epfd);
+		void	disconnectClient(int client, int epfd);
+		void	clientRequest(int client, int epfd);
+		Client	*findClient(int fd);
+	
+		static void	exit(void);
+		static void	sendClient(int client, std::string msg);
+		void		addChannel(Channel &channel);
+		Channel		*searchChannel(std::string name);
 
-
-	int		parsePort(std::string port);
-	void	start(void);
-	void	run(int sock);
-	void	sendClient(int client, std::string msg);
-	int		acceptClient(int sock, int epfd);
-	void	disconnectClient(int client, int epfd);
-	void	clientRequest(int client, int epfd);
-	Client	*findClient(int fd);
-	void	executeCommand(Client *client, Command *cmd);
-	void	auth_client(Client *client, Command *cmd);
-
-	void	setPwd(std::string pwd);
-	void	setPort(int port);
-	void	setRunning(bool running);
-	int			getPort(void);
-	bool		getRunning(void);
-	std::string	getPwd(void);
+		void					setRunning(bool running);
+		void					setPwd(std::string pwd);
+		void					setPort(int port);
+		int						getPort(void);
+		bool					getRunning(void);
+		std::string				getPwd(void);
+		std::vector<Channel*>	getChannels() const;
+	
+	
+		class	ChannelAlreadyExists: public std::exception
+		{
+			public:
+				const char*	what() const throw() { return ("the channel already exists"); };
+		};
 };
 
 std::ostream &	operator<<(std::ostream &o, Server &serv);

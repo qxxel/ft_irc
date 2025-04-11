@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   defines.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ibjean-b <ibjean-b@student.42.fr>          #+#  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025-03-26 16:12:51 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025-03-26 16:12:51 by ibjean-b         ###   ########.fr       */
+/*   Created: 2025/03/26 16:12:51 by ibjean-b          #+#    #+#             */
+/*   Updated: 2025/04/11 13:10:22 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,16 @@
 # define MAX_BODY_SIZE	5000
 
 # define SERVER_WELCOME "Welcome to cri_ft !\n"
+# define INV_FORMAT "Invalid format !\n"
 # define ENTER_PWD "Enter server password: PASS <password>\n"
-# define GOOD_PWD "GOOD PASSWORD !\n"
+# define PWD_SET "Password was already given !\n"
+# define PWD_GOOD "Good password !\n"
+# define INV_PWD "Invalid password !\n"
+# define AUTHY_GOOD "Finished authentification !\n"
 # define ENTER_NCK_USR "Please enter a username or a nickname: USER <username> <*> <0> or NICK <nickname>\n"
-// # define INV_PWD "Invalid password !\n"
+# define ALRDY_IN_CHNL "you're already in this channel"
+
+
 // # define ERR_USR "Enter a username: USER <username>\n"
 // # define ERR_NCK "Enter a nickname: NICK <nickname>\n"
 // # define CHARS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_#:"

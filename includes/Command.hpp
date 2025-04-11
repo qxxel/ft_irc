@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ibjean-b <ibjean-b@student.42.fr>          #+#  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025-04-02 16:30:13 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025-04-02 16:30:13 by ibjean-b         ###   ########.fr       */
+/*   Created: 2025/04/02 16:30:13 by ibjean-b          #+#    #+#             */
+/*   Updated: 2025/04/11 14:26:56 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,11 @@
 
 #include <iostream>
 #include <vector>
+#include "Client.hpp"
+#include "Server.hpp"
+
+class Server;
+class Client;
 
 class Command
 {
@@ -33,6 +38,16 @@ public:
 	std::vector<std::string>	getArgs();
 	void						setName(std::string name);
 	void						setArgs(std::vector<std::string> args);
+
+	static void	executeCommand(Server &serv, Client *client, Command *cmd);
+	void	handlePass(Server &serv, Client *client, std::vector<std::string> *args);
+	void	handleNick(Client *client, std::vector<std::string> *args);
+	void	handleUser(Client *client, std::vector<std::string> *args);
+	void	handleJoin(Server &serv, Client *client, std::vector<std::string> *args);
+	void	handleKick(Client *client, std::vector<std::string> *args);
+	void	handleInvite(Client *client, std::vector<std::string> *args);
+	void	handleTopic(Client *client, std::vector<std::string> *args);
+	void	handleMode(Client *client, std::vector<std::string> *args);
 };
 
 std::ostream &	operator<<(std::ostream &o, Command &cmd);

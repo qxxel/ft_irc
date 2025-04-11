@@ -13,6 +13,8 @@
 #include <iostream>
 #include "Server.hpp"
 
+void	setupSignals();
+
 int main(int argc, char const *argv[])
 {
 	if (argc != 3)
@@ -22,7 +24,8 @@ int main(int argc, char const *argv[])
 	}
 	try
 	{
-		Server ircserv = Server(argv[1], argv[2]);
+		setupSignals();
+		Server	ircserv = Server(argv[1], argv[2]);
 	}
 	catch(const std::exception& e)
 	{
