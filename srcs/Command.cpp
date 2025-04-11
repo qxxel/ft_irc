@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/11 14:41:19 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/11 15:15:06 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,8 +173,7 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 
 	if (client->getCurrentChannel() && !(client->getCurrentChannel()->getName().compare(args->at(0))))
 	{
-		std::cerr << "debug3" << std::endl;
-		Server::sendClient(client->getFd(), ALRDY_IN_CHNL);
+			Server::sendClient(client->getFd(), ALRDY_IN_CHNL);
 		std::cout << "handle join failed => client already in this channel" << std::endl;
 		return ;
 	}
@@ -183,15 +182,19 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 	{
 		Channel	channel(args->at(0), client);
 		serv.addChannel(channel);
+		client->setCurrentChannel(&channel);
+		Server::sendClient(client->getFd(), CHNL_CREATE);
 	}
 	catch (Channel::NameIsntValid &e)
 	{
 		std::cout << "handle join exception: " << e.what() << std::endl;
+		Server::sendClient(client->getFd(), INV_CHNL_NAME);
 		return ;
 	}
 	catch (Server::ChannelAlreadyExists &)
 	{
 		client->setCurrentChannel(serv.searchChannel(args->at(0)));
+		Server::sendClient(client->getFd(), std::string(CHNL_JOIN));
 	}
 
 	std::cout << "handle join successfully called" << std::endl;

@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 16:12:51 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/11 13:10:22 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/11 15:05:08 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # define MAX_EVENTS	4096
 # define MAX_BODY_SIZE	5000
 
+
 # define SERVER_WELCOME "Welcome to cri_ft !\n"
 # define INV_FORMAT "Invalid format !\n"
 # define ENTER_PWD "Enter server password: PASS <password>\n"
@@ -24,8 +25,10 @@
 # define INV_PWD "Invalid password !\n"
 # define AUTHY_GOOD "Finished authentification !\n"
 # define ENTER_NCK_USR "Please enter a username or a nickname: USER <username> <*> <0> or NICK <nickname>\n"
-# define ALRDY_IN_CHNL "you're already in this channel"
-
+# define ALRDY_IN_CHNL "You're already in this channel\n"
+# define INV_CHNL_NAME "The name of the channel isn't valid\n"
+# define CHNL_CREATE "Channel created\n"
+# define CHNL_JOIN "Channel joined\n"
 
 // # define ERR_USR "Enter a username: USER <username>\n"
 // # define ERR_NCK "Enter a nickname: NICK <nickname>\n"

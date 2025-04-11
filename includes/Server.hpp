@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:07 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/11 13:16:24 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/11 17:35:32 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,11 +40,14 @@ class Server
 		void	disconnectClient(int client, int epfd);
 		void	clientRequest(int client, int epfd);
 		Client	*findClient(int fd);
+		void		addChannel(Channel &channel);
+		Channel		*searchChannel(std::string name);
 	
 		static void	exit(void);
 		static void	sendClient(int client, std::string msg);
-		void		addChannel(Channel &channel);
-		Channel		*searchChannel(std::string name);
+		static bool	isValidChar(char c);
+
+
 
 		void					setRunning(bool running);
 		void					setPwd(std::string pwd);
