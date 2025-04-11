@@ -11,6 +11,8 @@
 /* ************************************************************************** */
 
 #include "Client.hpp"
+#include "Server.hpp"
+#include "defines.hpp"
 
 
 Client::~Client()
@@ -38,6 +40,8 @@ void	Client::setUser(std::string user)
 
 void	Client::setAuth(bool auth)
 {
+	if (auth)
+		Server::sendClient(_fd, std::string("test\n"));
 	_auth = auth;
 }
 

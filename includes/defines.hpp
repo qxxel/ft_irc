@@ -22,9 +22,13 @@
 # define PWD_SET "Password was already given !\n"
 # define PWD_GOOD "Good password !\n"
 # define INV_PWD "Invalid password !\n"
-# define AUTHY_GOOD "Finished authentification !\n"
+# define AUTHY_GOOD "Finished authentification !\n\n"
 # define ENTER_NCK_USR "Please enter a username or a nickname: USER <username> <*> <0> or NICK <nickname>\n"
-# define ALRDY_IN_CHNL "you're already in this channel"
+# define ALRDY_IN_CHNL "you're already in this channel\n"
+# define UKWN_CMD "Unknown command: "
+
+# define USR_NAME "Username: "
+# define NICK_NAME "Nickname: "
 
 
 // # define ERR_USR "Enter a username: USER <username>\n"

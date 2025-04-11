@@ -91,8 +91,6 @@ void Command::executeCommand(Server &serv, Client *client, Command *cmd)
 	std::vector<std::string>	args = cmd->getArgs();
 	try
 	{
-		std::cout << "serv_pwd: " << serv.getPwd() << "    pwd_size: " << serv.getPwd().size() << std::endl;
-		std::cout << "cmd_arg : " << cmd->getArgs().at(0) << "      cmd_size: " << cmd->getArgs().at(0).size() << std::endl;
 		if (!cmd->getName().compare("PASS"))
 			cmd->handlePass(serv, client, &args);
 		else if (!cmd->getName().compare("NICK"))
@@ -110,7 +108,7 @@ void Command::executeCommand(Server &serv, Client *client, Command *cmd)
 		else if (!cmd->getName().compare("MODE"))
 			cmd->handleMode(client, &args);
 		else
-			Server::sendClient(client->getFd(), "Unknown command: " + cmd->getName() + "\n");
+			Server::sendClient(client->getFd(), UKWN_CMD + cmd->getName() + "\n");
 	}
 	catch(const std::exception& e)
 	{
@@ -124,8 +122,6 @@ void	Command::handlePass(Server &serv, Client *client, std::vector<std::string> 
 	{
 		if (!client->getPwd())
 		{
-			std::cout << "serv_pwd: " << serv.getPwd() << "    pwd_size: " << serv.getPwd().size() << std::endl;
-			std::cout << "cmd_arg : " << args->at(0) << "      cmd_size: " << args->at(0).size() << std::endl; 
 			if (args->empty() || args->size() != 1)
 				return (Server::sendClient(client->getFd(), std::string(INV_FORMAT, ENTER_PWD)));
 			else if (!(args->at(0).compare(serv.getPwd())))
@@ -153,9 +149,15 @@ void	Command::handlePass(Server &serv, Client *client, std::vector<std::string> 
 
 void	Command::handleNick(Client *client, std::vector<std::string> *args)
 {
-	(void)client;
-	(void)args;
-	std::cout << "handle nick called \n";
+	try
+	{
+		(void)client;
+		(void)args;
+	}
+	catch(const std::exception& e)
+	{
+		throw ;
+	}
 }
 void	Command::handleUser(Client *client, std::vector<std::string> *args)
 {
