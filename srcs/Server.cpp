@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/11 17:37:14 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/12 19:17:18 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,7 +177,7 @@ void	Server::disconnectClient(int client, int epfd)
 		throw (std::runtime_error("Error: deleting client from epoll failed: " + std::string(strerror(errno))));
 	if (close(client) == -1)
 		throw (std::runtime_error("Error: closing client socket failed: " + std::string(strerror(errno))));
-	delete (findClient(client));
+	delete (findClientFd(client));
 	std::cout << "Client " << client << " disconnected" << std::endl;	
 }	
 
@@ -213,7 +213,7 @@ void	Server::clientRequest(int client, int epfd)
 			return (void)(std::cerr << "Error: client request too big: max " << MAX_BODY_SIZE << " characters" << std::endl);
 		}
 		Request	req = Request(buffer);
-		Client	*tp = findClient(client);
+		Client	*tp = findClientFd(client);
 		std::vector<Command>::iterator	it;
 
 		for (it = req.getArr().begin(); it != req.getArr().end() ; it++)
@@ -225,7 +225,7 @@ void	Server::clientRequest(int client, int epfd)
 	}
 }	
 
-Client	*Server::findClient(int fd)
+Client	*Server::findClientFd(int fd)
 {
 	std::vector<Client*>::iterator	it;
 
@@ -234,7 +234,19 @@ Client	*Server::findClient(int fd)
 		if ((*it)->getFd() == fd)
 			return (*it);
 	}
-	return (0);
+	return (NULL);
+}
+
+Client	*Server::findClientName(std::string name)
+{
+	std::vector<Client*>::iterator	it;
+
+	for (it = this->_clients.begin(); it != this->_clients.end(); it++)
+	{
+		if ((*it)->getUser() == name)
+			return ((*it));
+	}
+	return (NULL);
 }
 
 void	Server::exit(void)

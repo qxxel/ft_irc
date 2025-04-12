@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:05 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/04/11 17:38:25 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/12 17:35:05 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,18 @@ void	Channel::parseName(std::string name) const
 		if (!Server::isValidChar(*it))
 			throw NameIsntValid();
 	}
+}
+
+Client	*Channel::findClientName(std::string name)
+{
+	std::map<Client*, bool>::iterator	it;
+
+	for (it = this->_clientsList.begin(); it != this->_clientsList.end(); it++)
+	{
+		if ((*it).first->getUser() == name)
+			return ((*it).first);
+	}
+	return (NULL);
 }
 
 // ---------------------------------------------CHANNEL SETTERS AND GETTERS---------------------------------------------
@@ -70,6 +82,11 @@ bool	Channel::getInvOnly() const
 	return (this->_invOnly);
 }
 
+bool	Channel::getLockTopic() const
+{
+	return (this->_lockTopic);
+}
+
 void	Channel::setOldestClient(Client *oldestClient)
 {
 	this->_oldestClient = oldestClient;
@@ -98,4 +115,9 @@ void	Channel::setMaxUsers(int maxUsers)
 void	Channel::setInvOnly(bool invOnly)
 {
 	this->_invOnly = invOnly;
+}
+
+void	Channel::setLockTopic(bool lockTopic)
+{
+	this->_lockTopic = lockTopic;
 }

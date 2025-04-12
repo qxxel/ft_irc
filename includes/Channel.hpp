@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:48 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/04/11 17:38:52 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/12 17:34:05 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ class Channel
 		std::string				_pwd;
 		int						_maxUsers;
 		bool					_invOnly;
+		bool					_lockTopic;
 
 	public:
 		Channel(std::string name, Client *creator);
@@ -44,15 +45,17 @@ class Channel
 		const std::string		&getPwd() const;
 		int						getMaxUsers() const;
 		bool					getInvOnly() const;
+		bool					getLockTopic() const;
 		void	setOldestClient(Client *oldestClient);
 		void	setName(const std::string &name);
 		void	setTopic(const std::string &topic);
 		void	setPwd(const std::string &pwd);
 		void	setMaxUsers(int maxUsers);
 		void	setInvOnly(bool invOnly);
+		void	setLockTopic(bool lockTopic);
 
 		void	parseName(std::string name) const;
-		bool	isValidChar(char c) const;
+		Client	*findClientName(std::string name);
 
 		class	NameIsntValid: public std::exception
 		{

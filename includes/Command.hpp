@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:13 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/11 14:26:56 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/12 19:10:10 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,9 @@ private:
 public:
 	Command(std::string raw);
 	~Command();
-	
+
+	static std::string joinStrings(const std::vector<std::string>& vec);
+
 	void	parse();
 
 	//Setters and getters
@@ -45,8 +47,8 @@ public:
 	void	handleUser(Client *client, std::vector<std::string> *args);
 	void	handleJoin(Server &serv, Client *client, std::vector<std::string> *args);
 	void	handleKick(Client *client, std::vector<std::string> *args);
-	void	handleInvite(Client *client, std::vector<std::string> *args);
-	void	handleTopic(Client *client, std::vector<std::string> *args);
+	void	handleInvite(Server &serv, Client *client, std::vector<std::string> *args);
+	void	handleTopic(Server &serv, Client *client, std::vector<std::string> *args);
 	void	handleMode(Client *client, std::vector<std::string> *args);
 };
 
