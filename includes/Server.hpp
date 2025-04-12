@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:07 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/12 19:15:20 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/13 00:27:31 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,10 +39,11 @@ class Server
 		int		acceptClient(int sock, int epfd);
 		void	disconnectClient(int client, int epfd);
 		void	clientRequest(int client, int epfd);
+		void	addChannel(Channel *channel);
+		void	deleteChannel(Channel *channel);
 		Client	*findClientFd(int fd);
 		Client	*findClientName(std::string name);
-		void		addChannel(Channel &channel);
-		Channel		*searchChannel(std::string name);
+		Channel	*searchChannel(std::string name);
 	
 		static void	exit(void);
 		static void	sendClient(int client, std::string msg);
@@ -56,6 +57,7 @@ class Server
 		int						getPort(void);
 		bool					getRunning(void);
 		std::string				getPwd(void);
+		std::vector<Client*>	getClients() const;
 		std::vector<Channel*>	getChannels() const;
 	
 	

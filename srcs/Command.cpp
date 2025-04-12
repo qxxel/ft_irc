@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/12 19:24:09 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/13 00:19:59 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,6 +115,8 @@ void Command::executeCommand(Server &serv, Client *client, Command *cmd)
 			cmd->handleUser(client, &args);
 		else if (!cmd->getName().compare("JOIN"))
 			cmd->handleJoin(serv, client, &args);
+		else if (!cmd->getName().compare("PART"))
+			cmd->handlePart(client, &args);
 		else if (!cmd->getName().compare("KICK"))
 			cmd->handleKick(client, &args);
 		else if (!cmd->getName().compare("INVITE"))
@@ -171,12 +173,15 @@ void	Command::handleNick(Client *client, std::vector<std::string> *args)
 	(void)args;
 	std::cout << "handle nick called \n";
 }
+
 void	Command::handleUser(Client *client, std::vector<std::string> *args)
 {
 	(void)client;
 	(void)args;
 	std::cout << "handle user called \n";
 }
+
+// JOIN CHANNEL
 void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> *args) // have to handle on invonly and pwd modes
 {
 	if (!args || args->size() != 1)
@@ -195,9 +200,14 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 
 	try
 	{
-		Channel	channel(args->at(0), client);
+		Channel *channel = new Channel(args->at(0), client);
+
+		// DELETE OLD CHANNEL IF EMPTY
+		if (client->getCurrentChannel() && client->getCurrentChannel()->getClientsList().size() == 1)
+			delete client->getCurrentChannel();
+
 		serv.addChannel(channel);
-		client->setCurrentChannel(&channel);
+		client->setCurrentChannel(channel);
 		Server::sendClient(client->getFd(), CHNL_CREATE);
 	}
 	catch (Channel::NameIsntValid &e)
@@ -215,6 +225,40 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 	std::cout << "handle JOIN successfully called" << std::endl;
 }
 
+// LEAVE CHANNEL
+void	Command::handlePart(Client *client, std::vector<std::string> *args)
+{
+	if (!args || args->empty() || args->size() != 1)
+	{
+		Server::sendClient(client->getFd(), INV_FORMAT);
+		std::cout << "handle PART failed => wrong format" << std::endl;
+		return ;
+	}
+
+	if (!client->getCurrentChannel())
+	{
+		Server::sendClient(client->getFd(), NO_CHNL_IN);
+		std::cout << "handle PART failed => not in a channel" << std::endl;
+		return ;
+	}
+
+	if (client->getCurrentChannel()->getName() != args->at(0))
+	{
+		Server::sendClient(client->getFd(), NO_CHNL_ASK);
+		std::cout << "handle PART failed => client isn't in the channel asked" << std::endl;
+		return ;
+	}
+
+	// DELETE OLD CHANNEL IF EMPTY
+	if (client->getCurrentChannel() && client->getCurrentChannel()->getClientsList().size() == 1)
+		delete client->getCurrentChannel();
+
+	client->setCurrentChannel(NULL);
+	Server::sendClient(client->getFd(), CHNL_LEFT);
+	std::cout << "handle PART successfuly called" << std::endl;
+}
+
+// KICK USER ON THE CURRENT CHANNEL
 void	Command::handleKick(Client *client, std::vector<std::string> *args)
 {
 	Channel	*channel = client->getCurrentChannel();
@@ -225,7 +269,7 @@ void	Command::handleKick(Client *client, std::vector<std::string> *args)
 		return ;
 	}
 
-	if (!channel->getClientsList().find(client)->second)
+	if (!channel->isOpName(client->getUser()))
 	{
 		Server::sendClient(client->getFd(), NO_PERM);
 		std::cout << "handle KICK failed => client isn't moderator" << std::endl;
@@ -242,19 +286,9 @@ void	Command::handleKick(Client *client, std::vector<std::string> *args)
 	Client	*target = channel->findClientName(args->at(0));
 	if (target)
 	{
-		std::map<Client*, bool>::iterator it = channel->getClientsList().find(target);
-		if (it != channel->getClientsList().end())
-		{
-   			channel->getClientsList().erase(it);
-			target->setCurrentChannel(NULL);
-			Server::sendClient(client->getFd(), TRGT_KICK);
-		}
-		else
-		{
-			Server::sendClient(client->getFd(), BAD_TRGT);
-			std::cout << "handle KICK failed => target isn't in the channel" << std::endl;
-			return ;
-		}
+		channel->suppClientName(target->getUser());
+		target->setCurrentChannel(NULL);
+		Server::sendClient(client->getFd(), TRGT_KICK);
 	}
 	else
 	{
@@ -265,6 +299,8 @@ void	Command::handleKick(Client *client, std::vector<std::string> *args)
 
 	std::cout << "handle KICK successfully called\n";
 }
+
+// INVITE USER IN CURRENT CHANNEL
 void	Command::handleInvite(Server &serv, Client *client, std::vector<std::string> *args)
 {
 	if (!args || args->empty() || args->size() != 1)
@@ -297,20 +333,20 @@ void	Command::handleInvite(Server &serv, Client *client, std::vector<std::string
 		return ;
 	}
 
-	if (channel->getInvOnly() && !channel->getClientsList().find(target)->second)
+	if (channel->getInvOnly() && !channel->isOpName(target->getUser()))
 	{
 		Server::sendClient(client->getFd(), NO_PERM);
 		std::cout << "handle INVITE failed => client isn't moderator" << std::endl;
 		return ;
 	}
 
-	// ADAPT
-	Server::sendClient(client->getFd(), NO_PERM);
-	std::cout << "handle INVITE failed => client isn't moderator" << std::endl;
-	return ;
+	// ADAPT FOR INVITE
+	// Server::sendClient(client->getFd(), NO_PERM);
 
 	std::cout << "handle INVITE successfuly called \n";
 }
+
+// VIEW OR SET TOPIC OF THE CURRENT CHANNEL
 void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string> *args)
 {
 	if (!args || args->empty())
@@ -346,7 +382,7 @@ void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string>
 			return ;
 		}
 
-		if (channel->getLockTopic() && !channel->getClientsList().find(client)->second)
+		if (channel->getLockTopic() && !channel->isOpName(client->getUser()))
 		{
 			Server::sendClient(client->getFd(), NO_PERM);
 			std::cout << "handle TOPIC failed => client isn't moderator" << std::endl;
@@ -360,6 +396,7 @@ void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string>
 	std::cout << "handle TOPIC successfully called\n";
 }
 
+// SET OR UNSET MODES ON CURRENT CHANNEL
 void	Command::handleMode(Client *client, std::vector<std::string> *args)
 {
 	(void)client;

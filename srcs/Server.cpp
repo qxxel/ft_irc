@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/12 19:17:18 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/13 00:39:47 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,7 +179,7 @@ void	Server::disconnectClient(int client, int epfd)
 		throw (std::runtime_error("Error: closing client socket failed: " + std::string(strerror(errno))));
 	delete (findClientFd(client));
 	std::cout << "Client " << client << " disconnected" << std::endl;	
-}	
+}
 
 void	Server::sendClient(int client, std::string msg)
 {
@@ -254,11 +254,39 @@ void	Server::exit(void)
 	Server::_running = false;
 }
 
-void	Server::addChannel(Channel &channel)
+void	Server::addChannel(Channel *channel)
 {
-	if (this->searchChannel(channel.getName()))
+	if (!channel)
+		return ;
+	if (this->searchChannel(channel->getName()))
 		throw ChannelAlreadyExists();
-	this->_channels.push_back(&channel);
+	this->_channels.push_back(channel);
+}
+
+void	Server::deleteChannel(Channel *channel)
+{
+	// CHECK ALL CLIENTS JOINABLE CHANNELS TO ERASE
+	for (std::vector<Client*>::iterator it1 = this->_clients.begin(); it1 != this->_clients.end(); it1++)
+	{
+		for (std::vector<Channel*>::iterator it2 = (*it1)->getJoinableChannels().begin(); it2 != (*it1)->getJoinableChannels().end(); it2++)
+		{
+			if ((*it2) == channel)
+			{
+				(*it1)->getJoinableChannels().erase(it2);
+				break ;
+			}
+		}
+	}
+
+	// CHECK ALL CHANNELS TO ERASE
+	for (std::vector<Channel*>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
+	{
+		if ((*it) == channel)
+		{
+			this->_channels.erase(it);
+			return ;
+		}
+	}
 }
 
 Channel	*Server::searchChannel(std::string name)
@@ -301,6 +329,11 @@ bool	Server::getRunning(void)
 std::string	Server::getPwd(void)
 {
 	return (_pwd);
+}
+
+std::vector<Client*>	Server::getClients() const
+{
+	return (this->_clients);
 }
 
 std::vector<Channel*>	Server::getChannels() const

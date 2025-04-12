@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 16:03:22 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/11 13:11:46 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/13 00:31:57 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,13 @@ class Channel;
 class Client
 {
 private:
-	int			_fd;
-	bool		_auth;
-	bool		_pwd;
-	std::string	_user;
-	std::string	_nick;
-	Channel		*_currentChannel;
+	int						_fd;
+	bool					_auth;
+	bool					_pwd;
+	std::string				_user;
+	std::string				_nick;
+	Channel					*_currentChannel;
+	std::vector<Channel*>	_joinableChannels;
 
 public:
 	Client(int fd);
@@ -41,12 +42,13 @@ public:
 	void	setPwd(bool pwd);
 	void	setCurrentChannel(Channel *channel);
 
-	bool		getAuth();
-	bool		getPwd();
-	int			getFd();
-	std::string	getUser();
-	std::string	getNick();
-	Channel		*getCurrentChannel();
+	bool					getAuth();
+	bool					getPwd();
+	int						getFd();
+	std::string				getUser();
+	std::string				getNick();
+	Channel					*getCurrentChannel();
+	std::vector<Channel*>	getJoinableChannels();
 };
 
 std::ostream &	operator<<(std::ostream &o, Client &client);

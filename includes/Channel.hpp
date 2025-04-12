@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:48 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/04/12 17:34:05 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/12 23:50:39 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,8 @@ class Server;
 class Channel
 {
 	private:
-		std::map<Client*, bool>	_clientsList;
+		std::vector<Client*>	_clientsList;
+		std::vector<Client*>	_opList;
 		Client					*_oldestClient;
 		std::string				_name;
 		std::string				_topic;
@@ -38,7 +39,8 @@ class Channel
 		~Channel();
 
 		// GETTERS AND SETTERS
-		std::map<Client*, bool>	getClientsList() const;
+		std::vector<Client*>	getClientsList() const;
+		std::vector<Client*>	getOpList() const;
 		Client					*getOldestClient() const;
 		const std::string		&getName() const;
 		const std::string		&getTopic() const;
@@ -56,6 +58,8 @@ class Channel
 
 		void	parseName(std::string name) const;
 		Client	*findClientName(std::string name);
+		void	suppClientName(std::string name);
+		Client	*isOpName(std::string name);
 
 		class	NameIsntValid: public std::exception
 		{

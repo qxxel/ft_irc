@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 16:04:15 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/11 14:43:02 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/13 00:32:35 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,11 @@ std::string	Client::getUser()
 Channel		*Client::getCurrentChannel()
 {
 	return (this->_currentChannel);
+}
+
+std::vector<Channel*>	Client::getJoinableChannels()
+{
+	return (this->_joinableChannels);
 }
 
 std::ostream &	operator<<(std::ostream &o, Client &client)

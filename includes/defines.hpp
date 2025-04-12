@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 16:12:51 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/12 19:18:12 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/13 00:07:45 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@
 # define NO_CHNL "Channel don't exist\n"
 # define NO_TPC "No topic is set\n"
 # define NO_CHNL_ASK "You're not on that channel\n"
+# define CHNL_LEFT "Channel left\n"
 
 // # define ERR_USR "Enter a username: USER <username>\n"
 // # define ERR_NCK "Enter a nickname: NICK <nickname>\n"

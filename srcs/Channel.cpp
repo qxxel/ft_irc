@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:05 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/04/12 17:35:05 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/13 00:21:22 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,14 @@ Channel::Channel(std::string name, Client *creator): _oldestClient(NULL), _maxUs
 {
 	this->parseName(name);
 	this->_name = name;
-	this->_clientsList.insert(std::make_pair(creator, true));
+	this->_clientsList.push_back(creator);
+	this->_opList.push_back(creator);
 }
 
-Channel::~Channel() { }
+Channel::~Channel()
+{
+	Server::
+}
 
 void	Channel::parseName(std::string name) const
 {
@@ -35,22 +39,52 @@ void	Channel::parseName(std::string name) const
 
 Client	*Channel::findClientName(std::string name)
 {
-	std::map<Client*, bool>::iterator	it;
+	std::vector<Client*>::iterator	it;
 
 	for (it = this->_clientsList.begin(); it != this->_clientsList.end(); it++)
 	{
-		if ((*it).first->getUser() == name)
-			return ((*it).first);
+		if ((*it)->getUser() == name)
+			return ((*it));
+	}
+	return (NULL);
+}
+
+void	Channel::suppClientName(std::string name)
+{
+	for (std::vector<Client*>::iterator it = this->_clientsList.begin(); it < this->_clientsList.end(); it++)
+	{
+		if ((*it)->getUser() == name)
+		{
+			this->_clientsList.erase(it);
+			return ;
+		}
+	}
+}
+
+Client	*Channel::isOpName(std::string name)
+{
+	std::vector<Client*>::iterator	it;
+
+	for (it = this->_opList.begin(); it != this->_opList.end(); it++)
+	{
+		if ((*it)->getUser() == name)
+			return ((*it));
 	}
 	return (NULL);
 }
 
 // ---------------------------------------------CHANNEL SETTERS AND GETTERS---------------------------------------------
 
-std::map<Client*, bool>	Channel::getClientsList() const
+std::vector<Client*>	Channel::getClientsList() const
 {
 	return (this->_clientsList);
 }
+
+std::vector<Client*>	Channel::getOpList() const
+{
+	return (this->_opList);
+}
+
 
 Client	*Channel::getOldestClient() const
 {
