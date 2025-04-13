@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/13 19:44:27 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/13 19:51:54 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -296,6 +296,9 @@ void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> 
 	// DELETE OLD CHANNEL IF EMPTY
 	if (channel->getClientsList().size() == 1)
 		this->deleteChannel(serv, channel);
+
+	if (channel->getOpList().size() == 1 && channel->isOpName(client->getUser()))
+		channel->getOpList().push_back(channel->getOldestClient()); // Handle oldest client
 
 	channel->sendClients(client->getUser() + " PART " + Command::joinStrings(*args));
 	channel->delClientName(client->getUser());
