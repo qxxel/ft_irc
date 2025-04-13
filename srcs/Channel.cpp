@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:05 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/04/13 00:21:22 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/13 14:34:26 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,7 @@ Channel::Channel(std::string name, Client *creator): _oldestClient(NULL), _maxUs
 	this->_opList.push_back(creator);
 }
 
-Channel::~Channel()
-{
-	Server::
-}
+Channel::~Channel() { }
 
 void	Channel::parseName(std::string name) const
 {
@@ -49,13 +46,25 @@ Client	*Channel::findClientName(std::string name)
 	return (NULL);
 }
 
-void	Channel::suppClientName(std::string name)
+void	Channel::delClientName(std::string name)
 {
 	for (std::vector<Client*>::iterator it = this->_clientsList.begin(); it < this->_clientsList.end(); it++)
 	{
 		if ((*it)->getUser() == name)
 		{
 			this->_clientsList.erase(it);
+			return ;
+		}
+	}
+}
+
+void	Channel::delOpName(std::string name)
+{
+	for (std::vector<Client*>::iterator it = this->_opList.begin(); it < this->_opList.end(); it++)
+	{
+		if ((*it)->getUser() == name)
+		{
+			this->_opList.erase(it);
 			return ;
 		}
 	}

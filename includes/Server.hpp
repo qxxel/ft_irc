@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:07 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/13 00:27:31 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/13 14:57:54 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ class Server
 		void	disconnectClient(int client, int epfd);
 		void	clientRequest(int client, int epfd);
 		void	addChannel(Channel *channel);
+		void	deleteClient(int client);
 		void	deleteChannel(Channel *channel);
 		Client	*findClientFd(int fd);
 		Client	*findClientName(std::string name);

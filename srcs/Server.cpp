@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/13 00:39:47 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/13 14:58:00 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,17 @@ bool	Server::_running = true;
 
 Server::~Server()
 {
-	std::vector<Client*>::iterator	it;
-	for (it = _clients.begin(); it != _clients.end(); it++)
-		delete *it;
+	// DELETE CLIENTS
+	std::vector<Client*>::iterator	it1;
+	for (it1 = _clients.begin(); it1 != _clients.end(); it1++)
+		delete *it1;
+
+	// DELETE CHANNELS
+	std::vector<Channel*>::iterator	it2;
+	for (it2 = _channels.begin(); it2 != _channels.end(); it2++)
+		delete *it2;
+
+	// CLOSE PORT
 	if (close(_port) == -1)
 		throw (std::runtime_error("Error: close failed: " + std::string(strerror(errno))));
 }
@@ -175,9 +183,13 @@ void	Server::disconnectClient(int client, int epfd)
 {
 	if (epoll_ctl(epfd, EPOLL_CTL_DEL, client, NULL) == -1)
 		throw (std::runtime_error("Error: deleting client from epoll failed: " + std::string(strerror(errno))));
+
 	if (close(client) == -1)
 		throw (std::runtime_error("Error: closing client socket failed: " + std::string(strerror(errno))));
-	delete (findClientFd(client));
+
+	this->deleteClient(client);
+	delete findClientFd(client);
+
 	std::cout << "Client " << client << " disconnected" << std::endl;	
 }
 
@@ -263,8 +275,27 @@ void	Server::addChannel(Channel *channel)
 	this->_channels.push_back(channel);
 }
 
+void	Server::deleteClient(int client)
+{
+	if (!client)
+		return ;
+
+	// CHECK ALL CLIENTS TO ERASE
+	for (std::vector<Client*>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
+	{
+		if ((*it)->getFd() == client)
+		{
+			this->_clients.erase(it);
+			return ;
+		}
+	}
+}
+
 void	Server::deleteChannel(Channel *channel)
 {
+	if (!channel)
+		return ;
+
 	// CHECK ALL CLIENTS JOINABLE CHANNELS TO ERASE
 	for (std::vector<Client*>::iterator it1 = this->_clients.begin(); it1 != this->_clients.end(); it1++)
 	{

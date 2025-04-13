@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/13 00:19:59 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/13 14:27:02 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +116,7 @@ void Command::executeCommand(Server &serv, Client *client, Command *cmd)
 		else if (!cmd->getName().compare("JOIN"))
 			cmd->handleJoin(serv, client, &args);
 		else if (!cmd->getName().compare("PART"))
-			cmd->handlePart(client, &args);
+			cmd->handlePart(serv, client, &args);
 		else if (!cmd->getName().compare("KICK"))
 			cmd->handleKick(client, &args);
 		else if (!cmd->getName().compare("INVITE"))
@@ -204,7 +204,7 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 
 		// DELETE OLD CHANNEL IF EMPTY
 		if (client->getCurrentChannel() && client->getCurrentChannel()->getClientsList().size() == 1)
-			delete client->getCurrentChannel();
+			this->deleteChannel(serv, client->getCurrentChannel());
 
 		serv.addChannel(channel);
 		client->setCurrentChannel(channel);
@@ -226,7 +226,7 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 }
 
 // LEAVE CHANNEL
-void	Command::handlePart(Client *client, std::vector<std::string> *args)
+void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> *args)
 {
 	if (!args || args->empty() || args->size() != 1)
 	{
@@ -251,7 +251,7 @@ void	Command::handlePart(Client *client, std::vector<std::string> *args)
 
 	// DELETE OLD CHANNEL IF EMPTY
 	if (client->getCurrentChannel() && client->getCurrentChannel()->getClientsList().size() == 1)
-		delete client->getCurrentChannel();
+		this->deleteChannel(serv, client->getCurrentChannel());
 
 	client->setCurrentChannel(NULL);
 	Server::sendClient(client->getFd(), CHNL_LEFT);
@@ -286,7 +286,7 @@ void	Command::handleKick(Client *client, std::vector<std::string> *args)
 	Client	*target = channel->findClientName(args->at(0));
 	if (target)
 	{
-		channel->suppClientName(target->getUser());
+		channel->delClientName(target->getUser());
 		target->setCurrentChannel(NULL);
 		Server::sendClient(client->getFd(), TRGT_KICK);
 	}
@@ -402,4 +402,12 @@ void	Command::handleMode(Client *client, std::vector<std::string> *args)
 	(void)client;
 	(void)args;
 	std::cout << "handle Mode called \n";
+}
+
+void	Command::deleteChannel(Server &serv, Channel *channel) const
+{
+	if (!channel)
+		return ;
+	serv.deleteChannel(channel);
+	delete channel;
 }

@@ -6,20 +6,25 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 16:04:15 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/13 00:32:35 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/13 14:52:20 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
 
+Client::Client(int fd) : _fd(fd), _auth(false),  _pwd(false), _user(""), _nick(""), _currentChannel(NULL) { }
 
 Client::~Client()
 {
+	if (this->_currentChannel)
+	{
+		this->_currentChannel->delClientName(this->_user);
+		if (this->_currentChannel->isOpName(this->_user))
+			this->_currentChannel->delOpName(this->_user);
+	}
 }
 
-Client::Client(int fd) : _fd(fd), _auth(false),  _pwd(false), _user(""), _nick(""), _currentChannel(NULL)
-{
-}
+// ---------------------------------------------CLIENT SETTERS AND GETTERS---------------------------------------------
 
 void	Client::setFd(int fd)
 {
