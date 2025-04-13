@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/13 19:29:27 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/13 19:44:27 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -211,7 +211,7 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 		serv.addChannel(newChannel);
 		client->setCurrentChannel(newChannel);
 		Server::sendClient(client->getFd(), client->getUser() + " JOIN " + newChannel->getName());
-		Server::sendClient(client->getFd(), "MODE " + newChannel->getName());
+		Server::sendClient(client->getFd(), "MODE " + newChannel->getName() + " +l");
 	}
 	catch (Channel::NameIsntValid &e)
 	{
@@ -268,21 +268,25 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 // LEAVE CHANNEL
 void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> *args)
 {
-	if (!args || args->empty() || args->size() != 1)
+	if (!args || args->size() < 1)
 	{
 		Server::sendClient(client->getFd(), INV_FORMAT);
 		std::cout << "handle PART failed => wrong format" << std::endl;
 		return ;
 	}
 
-	if (!client->getCurrentChannel())
+	// FIND CHANNEL IN SERVER
+	Channel	*channel = serv.searchChannel(args->at(0));
+	if (!channel)
 	{
-		Server::sendClient(client->getFd(), NO_CHNL_IN);
-		std::cout << "handle PART failed => not in a channel" << std::endl;
+		Server::sendClient(client->getFd(), NO_CHNL);
+		std::cout << "handle PART failed => inexistant channel" << std::endl;
 		return ;
 	}
 
-	if (client->getCurrentChannel()->getName() != args->at(0))
+
+	// CHECK IF CLIENT IS IN THIS CHANNEL
+	if (channel != client->getCurrentChannel())
 	{
 		Server::sendClient(client->getFd(), NO_CHNL_ASK);
 		std::cout << "handle PART failed => client isn't in the channel asked" << std::endl;
@@ -290,11 +294,12 @@ void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> 
 	}
 
 	// DELETE OLD CHANNEL IF EMPTY
-	if (client->getCurrentChannel() && client->getCurrentChannel()->getClientsList().size() == 1)
-		this->deleteChannel(serv, client->getCurrentChannel());
+	if (channel->getClientsList().size() == 1)
+		this->deleteChannel(serv, channel);
 
+	channel->sendClients(client->getUser() + " PART " + Command::joinStrings(*args));
+	channel->delClientName(client->getUser());
 	client->setCurrentChannel(NULL);
-	Server::sendClient(client->getFd(), CHNL_LEFT);
 	std::cout << "handle PART successfuly called" << std::endl;
 }
 
