@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 16:12:51 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/13 19:25:22 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/13 20:44:46 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@
 # define WRNG_PASS "Wrong password\n"
 # define ND_PASS "Need password to join\n"
 # define CHNL_FULL "Channel full\n"
+# define ACTL_TPC "This is the current topic\n"
 
 // # define ERR_USR "Enter a username: USER <username>\n"
 // # define ERR_NCK "Enter a nickname: NICK <nickname>\n"

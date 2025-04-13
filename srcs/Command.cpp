@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/13 20:15:59 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/13 20:49:26 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -476,9 +476,14 @@ void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string>
 		}
 
 		// CHECK IF THE TOPIC IS ALREADY SET
-		if (channel->getTopic() == Command::joinStrings(*args)) // fix join without name
+		if (channel->getTopic() == args->at(1)) // fix parsing for args->at(1) == new topic
+		{
+			Server::sendClient(client->getFd(), ACTL_TPC);
+			std::cout << "handle TOPIC failed => client isn't moderator" << std::endl;
+			return ;
+		}
 
-		channel->setTopic(Command::joinStrings(*args)); // fix join without name
+		channel->setTopic(args->at(1)); // fix parsing for args->at(1) == new topic
 		channel->sendClients(client->getUser() + " TOPIC " + channel->getName() + " :" + channel->getTopic());
 	}
 
