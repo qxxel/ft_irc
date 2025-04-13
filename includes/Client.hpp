@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 16:03:22 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/13 00:31:57 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/13 17:35:49 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,9 @@ private:
 public:
 	Client(int fd);
 	~Client();
+
+	void	setUnjoinableChannel(Channel *channel);
+	bool	isJoinableChannel(Channel *channel);
 
 	//SETTERS AND GETTERS
 	void	setFd(int fd);

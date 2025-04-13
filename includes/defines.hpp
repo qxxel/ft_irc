@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 16:12:51 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/13 00:07:45 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/13 19:25:22 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@
 # define ENTER_NCK_USR "Please enter a username or a nickname: USER <username> <*> <0> or NICK <nickname>\n"
 # define JOIN_USG "Join channels one by one\n"
 # define ALRDY_IN_CHNL "Already in this channel\n"
+# define NOT_ALW "You're not allowed to enter this channel\n"
 # define INV_CHNL_NAME "The name of the channel is invalid\n"
 # define CHNL_CREATE "Channel created\n"
 # define CHNL_JOIN "Channel joined\n"
@@ -39,6 +40,10 @@
 # define NO_TPC "No topic is set\n"
 # define NO_CHNL_ASK "You're not on that channel\n"
 # define CHNL_LEFT "Channel left\n"
+# define INVT_SEND "Invitation sent\n"
+# define WRNG_PASS "Wrong password\n"
+# define ND_PASS "Need password to join\n"
+# define CHNL_FULL "Channel full\n"
 
 // # define ERR_USR "Enter a username: USER <username>\n"
 // # define ERR_NCK "Enter a nickname: NICK <nickname>\n"

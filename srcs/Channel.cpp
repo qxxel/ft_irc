@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:05 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/04/13 14:34:26 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/13 18:48:25 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,17 +70,25 @@ void	Channel::delOpName(std::string name)
 	}
 }
 
-Client	*Channel::isOpName(std::string name)
+bool	Channel::isOpName(std::string name)
 {
 	std::vector<Client*>::iterator	it;
 
 	for (it = this->_opList.begin(); it != this->_opList.end(); it++)
 	{
 		if ((*it)->getUser() == name)
-			return ((*it));
+			return (true);
 	}
-	return (NULL);
+	return (false);
 }
+
+void	Channel::sendClients(std::string message)
+{
+	std::vector<Client*>::iterator it = this->_clientsList.begin();
+	for (it; it != this->_clientsList.end(); it++)
+		Server::sendClient((*it)->getFd(), message);
+}
+
 
 // ---------------------------------------------CHANNEL SETTERS AND GETTERS---------------------------------------------
 

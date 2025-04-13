@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:48 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/04/13 14:34:04 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/13 18:46:36 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,8 @@ class Channel
 		Client	*findClientName(std::string name);
 		void	delClientName(std::string name);
 		void	delOpName(std::string name);
-		Client	*isOpName(std::string name);
+		bool	isOpName(std::string name);
+		void	sendClients(std::string message);
 
 		class	NameIsntValid: public std::exception
 		{

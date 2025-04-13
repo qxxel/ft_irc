@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/13 14:27:02 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/13 19:29:27 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,7 +118,7 @@ void Command::executeCommand(Server &serv, Client *client, Command *cmd)
 		else if (!cmd->getName().compare("PART"))
 			cmd->handlePart(serv, client, &args);
 		else if (!cmd->getName().compare("KICK"))
-			cmd->handleKick(client, &args);
+			cmd->handleKick(serv, client, &args);
 		else if (!cmd->getName().compare("INVITE"))
 			cmd->handleInvite(serv, client, &args);
 		else if (!cmd->getName().compare("TOPIC"))
@@ -184,13 +184,14 @@ void	Command::handleUser(Client *client, std::vector<std::string> *args)
 // JOIN CHANNEL
 void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> *args) // have to handle on invonly and pwd modes
 {
-	if (!args || args->size() != 1)
+	if (!args || args->size() < 1 || 2 < args->size())
 	{
 		Server::sendClient(client->getFd(), JOIN_USG);
 		std::cout << "handle JOIN failed => join one by one" << std::endl;
 		return ;
 	}
 
+	// CHECK IF CLIENT ALREADY IN THE CHANNEL
 	if (client->getCurrentChannel() && !(client->getCurrentChannel()->getName().compare(args->at(0))))
 	{
 		Server::sendClient(client->getFd(), ALRDY_IN_CHNL);
@@ -200,15 +201,17 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 
 	try
 	{
-		Channel *channel = new Channel(args->at(0), client);
+		Channel *newChannel = new Channel(args->at(0), client);
 
 		// DELETE OLD CHANNEL IF EMPTY
 		if (client->getCurrentChannel() && client->getCurrentChannel()->getClientsList().size() == 1)
 			this->deleteChannel(serv, client->getCurrentChannel());
 
-		serv.addChannel(channel);
-		client->setCurrentChannel(channel);
-		Server::sendClient(client->getFd(), CHNL_CREATE);
+		// CREATE CHANNEL
+		serv.addChannel(newChannel);
+		client->setCurrentChannel(newChannel);
+		Server::sendClient(client->getFd(), client->getUser() + " JOIN " + newChannel->getName());
+		Server::sendClient(client->getFd(), "MODE " + newChannel->getName());
 	}
 	catch (Channel::NameIsntValid &e)
 	{
@@ -218,8 +221,45 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 	}
 	catch (Server::ChannelAlreadyExists &)
 	{
-		client->setCurrentChannel(serv.searchChannel(args->at(0)));
-		Server::sendClient(client->getFd(), std::string(CHNL_JOIN));
+		Channel *channel = serv.searchChannel(args->at(0));
+		if (!channel) // maybe adapt
+			return ;
+
+		// CHECK IF CLIENT CAN ACCESS
+		if (channel && channel->getInvOnly() && !(client->isJoinableChannel(channel) || channel->isOpName(client->getUser())))
+		{
+			Server::sendClient(client->getFd(), NOT_ALW);
+			std::cout << "handle JOIN failed => client not allowed in this channel" << std::endl;
+			return ;
+		}
+
+		// CHECK PASSWORD
+		if (!channel->getPwd().empty())
+		{
+			if (args->size() == 1)
+			{
+				Server::sendClient(client->getFd(), ND_PASS);
+				std::cout << "handle JOIN failed => need password to join" << std::endl;
+				return ;
+			}
+			if (channel->getPwd() != args->at(1))
+			{
+				Server::sendClient(client->getFd(), WRNG_PASS);
+				std::cout << "handle JOIN failed => wrong password" << std::endl;
+				return ;
+			}
+		}
+
+		// CHECK IF CHANNEL IS FULL
+		if (!(channel->getClientsList().size() < channel->getMaxUsers()))
+		{
+			Server::sendClient(client->getFd(), CHNL_FULL);
+			std::cout << "handle JOIN failed => channel full" << std::endl;
+			return ;
+		}
+
+		client->setCurrentChannel(channel);
+		channel->sendClients(client->getUser() + " JOIN " + channel->getName());
 	}
 
 	std::cout << "handle JOIN successfully called" << std::endl;
@@ -259,16 +299,33 @@ void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> 
 }
 
 // KICK USER ON THE CURRENT CHANNEL
-void	Command::handleKick(Client *client, std::vector<std::string> *args)
+void	Command::handleKick(Server &serv, Client *client, std::vector<std::string> *args)
 {
-	Channel	*channel = client->getCurrentChannel();
-	if (!channel)
+	if (!args || args->size() < 2)
 	{
-		Server::sendClient(client->getFd(), NO_CHNL_IN);
-		std::cout << "handle KICK failed => client isn't in a channel" << std::endl;
+		Server::sendClient(client->getFd(), KICK_USG);
+		std::cout << "handle KICK failed => kick one by one" << std::endl;
 		return ;
 	}
 
+	// CHECK IF CHANNEL EXIST
+	Channel	*channel = serv.searchChannel(args->at(0));
+	if (!channel)
+	{
+		Server::sendClient(client->getFd(), INV_CHNL_NAME);
+		std::cout << "handle KICK failed => channel don't exist" << std::endl;
+		return ;
+	}
+
+	// FIND CLIENT IN THE CHANNEL
+	if (channel != client->getCurrentChannel())
+	{
+		Server::sendClient(client->getFd(), NO_CHNL_ASK);
+		std::cout << "handle KICK failed => client not in the channel asked" << std::endl;
+		return ;
+	}
+
+	// CHECK IF CLIENT IS OP
 	if (!channel->isOpName(client->getUser()))
 	{
 		Server::sendClient(client->getFd(), NO_PERM);
@@ -276,19 +333,19 @@ void	Command::handleKick(Client *client, std::vector<std::string> *args)
 		return ;
 	}
 
-	if (!args || args->size() != 1)
-	{
-		Server::sendClient(client->getFd(), KICK_USG);
-		std::cout << "handle KICK failed => kick one by one" << std::endl;
-		return ;
-	}
-
-	Client	*target = channel->findClientName(args->at(0));
+	// FIND TARGET IN THE CHANNEL
+	Client	*target = channel->findClientName(args->at(1));
 	if (target)
 	{
 		channel->delClientName(target->getUser());
+
+		// HANDLE FOR INVITATION ONLY
+		if (channel->getInvOnly())
+			target->setUnjoinableChannel(channel);
+
 		target->setCurrentChannel(NULL);
-		Server::sendClient(client->getFd(), TRGT_KICK);
+		channel->sendClients(client->getUser() + " KICK " + Command::joinStrings(*args));
+		Server::sendClient(target->getFd(), client->getUser() + " KICK " + Command::joinStrings(*args));
 	}
 	else
 	{
@@ -310,6 +367,7 @@ void	Command::handleInvite(Server &serv, Client *client, std::vector<std::string
 		return ;
 	}
 
+	// FIND TARGET IN SERVER
 	Client	*target = serv.findClientName(args->at(0));
 	if (!target)
 	{
@@ -318,6 +376,7 @@ void	Command::handleInvite(Server &serv, Client *client, std::vector<std::string
 		return ;
 	}
 
+	// FIND CHANNEL IN SERVER
 	Channel	*channel = serv.searchChannel(args->at(1));
 	if (!channel)
 	{
@@ -326,6 +385,7 @@ void	Command::handleInvite(Server &serv, Client *client, std::vector<std::string
 		return ;
 	}
 
+	// FIND TARGET IN THE CHANNEL
 	if (target->getCurrentChannel() == channel)
 	{
 		Server::sendClient(client->getFd(), ALRDY_IN_CHNL);
@@ -333,16 +393,23 @@ void	Command::handleInvite(Server &serv, Client *client, std::vector<std::string
 		return ;
 	}
 
-	if (channel->getInvOnly() && !channel->isOpName(target->getUser()))
+	// CHECK INVITE ONLY CHANNEL
+	if (channel->getInvOnly())
 	{
-		Server::sendClient(client->getFd(), NO_PERM);
-		std::cout << "handle INVITE failed => client isn't moderator" << std::endl;
-		return ;
+		// CHECK IF CLIENT IS OP
+		if (!channel->isOpName(target->getUser()))
+		{
+			Server::sendClient(client->getFd(), NO_PERM);
+			std::cout << "handle INVITE failed => client isn't moderator" << std::endl;
+			return ;
+		}
+
+		// ADD TARGET TO ACCESS LIST
+		target->getJoinableChannels().push_back(channel);
 	}
 
-	// ADAPT FOR INVITE
-	// Server::sendClient(client->getFd(), NO_PERM);
-
+	Server::sendClient(client->getFd(), client->getUser() + " INVITE " + target->getUser() + " " + channel->getName());
+	Server::sendClient(client->getFd(), "INVITE " + client->getUser() + " " + target->getUser() + " " + channel->getName());
 	std::cout << "handle INVITE successfuly called \n";
 }
 
