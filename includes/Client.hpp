@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 16:03:22 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/13 17:35:49 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/14 16:25:09 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include <iostream>
 # include <map>
+# include <vector>
 # include "Channel.hpp"
 
 class Channel;
@@ -51,7 +52,7 @@ public:
 	std::string				getUser();
 	std::string				getNick();
 	Channel					*getCurrentChannel();
-	std::vector<Channel*>	getJoinableChannels();
+	std::vector<Channel*>	&getJoinableChannels();
 };
 
 std::ostream &	operator<<(std::ostream &o, Client &client);

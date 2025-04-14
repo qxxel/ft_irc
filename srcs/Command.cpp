@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/14 15:59:20 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/14 16:24:49 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -491,12 +491,24 @@ void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string>
 }
 
 template <typename T>
-std::string toString(T value)
+std::string	toString(T value)
 {
 	std::stringstream	ss;
 
 	ss << value;
 	return ss.str();
+}
+
+int	stringToInt(std::string str)
+{
+    std::stringstream ss(str);
+    int num;
+
+    ss >> num;
+    if (ss.fail())
+		throw std::exception();
+
+    return (num);
 }
 
 // SET OR UNSET MODES ON CURRENT CHANNEL
@@ -668,7 +680,16 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 		// ADD CHECK SIZE ARGS
 	// ADD USER LIMIT MODE
 	else if (args->at(1) == "+l")
-		;
+	{
+		if (args->size() != 3)
+		{
+			Server::sendClient(client->getFd(), INV_FORMAT);
+			std::cout << "handle modify MODE failed => invalid format" << std::endl;
+			return ;
+		}
+
+		channel->setMaxUsers(stringToInt(args->at(2)));
+	}
 	// SUPP USER LIMIT MODE
 	else if (args->at(1) == "-l")
 		;

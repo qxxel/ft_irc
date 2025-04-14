@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:07 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/14 14:16:21 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/14 16:24:28 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,9 @@
 # include "Channel.hpp"
 # include "Client.hpp"
 # include "Request.hpp"
+
+class Channel;
+class Client;
 
 class Server
 {
@@ -58,8 +61,8 @@ class Server
 		int						getPort(void);
 		bool					getRunning(void);
 		std::string				getPwd(void);
-		std::vector<Client*>	getClients() const;
-		std::vector<Channel*>	getChannels() const;
+		std::vector<Client*>	&getClients();
+		std::vector<Channel*>	&getChannels();
 	
 	
 		class	ChannelAlreadyExists: public std::exception

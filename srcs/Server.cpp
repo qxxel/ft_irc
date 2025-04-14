@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/14 14:16:15 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/14 16:24:21 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -362,12 +362,12 @@ std::string	Server::getPwd(void)
 	return (_pwd);
 }
 
-std::vector<Client*>	Server::getClients() const
+std::vector<Client*>	&Server::getClients()
 {
 	return (this->_clients);
 }
 
-std::vector<Channel*>	Server::getChannels() const
+std::vector<Channel*>	&Server::getChannels()
 {
 	return (this->_channels);
 }

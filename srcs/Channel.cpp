@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:05 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/04/14 14:41:52 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/14 16:25:45 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,20 +84,20 @@ bool	Channel::isOpName(std::string name)
 
 void	Channel::sendClients(std::string message)
 {
-	std::vector<Client*>::iterator it = this->_clientsList.begin();
-	for (it; it != this->_clientsList.end(); it++)
+	
+	for (std::vector<Client*>::iterator it = this->_clientsList.begin(); it != this->_clientsList.end(); it++)
 		Server::sendClient((*it)->getFd(), message);
 }
 
 
 // ---------------------------------------------CHANNEL SETTERS AND GETTERS---------------------------------------------
 
-std::vector<Client*>	Channel::getClientsList() const
+std::vector<Client*>	&Channel::getClientsList()
 {
 	return (this->_clientsList);
 }
 
-std::vector<Client*>	Channel::getOpList() const
+std::vector<Client*>	&Channel::getOpList()
 {
 	return (this->_opList);
 }

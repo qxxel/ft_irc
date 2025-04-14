@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:48 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/04/14 14:21:10 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/14 16:25:33 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,8 @@ class Channel
 		~Channel();
 
 		// GETTERS AND SETTERS
-		std::vector<Client*>	getClientsList() const;
-		std::vector<Client*>	getOpList() const;
+		std::vector<Client*>	&getClientsList();
+		std::vector<Client*>	&getOpList();
 		Client					*getOldestClient() const;
 		const std::string		&getName() const;
 		const std::string		&getTopic() const;

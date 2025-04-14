@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 16:04:15 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/13 17:36:17 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/14 16:22:37 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,7 @@ void	Client::setUnjoinableChannel(Channel *channel)
 	if (!channel)
 		return ;
 
-	std::vector<Channel*>::iterator	it = this->_joinableChannels.begin();
-	for (it; it != this->_joinableChannels.end(); it++)
+	for (std::vector<Channel*>::iterator	it = this->_joinableChannels.begin(); it != this->_joinableChannels.end(); it++)
 	{
 		if ((*it) == channel)
 		{
@@ -43,10 +42,9 @@ void	Client::setUnjoinableChannel(Channel *channel)
 bool	Client::isJoinableChannel(Channel *channel)
 {
 	if (!channel)
-		return ;
+		return (false);
 
-	std::vector<Channel*>::iterator	it = this->_joinableChannels.begin();
-	for (it; it != this->_joinableChannels.end(); it++)
+	for (std::vector<Channel*>::iterator	it = this->_joinableChannels.begin(); it != this->_joinableChannels.end(); it++)
 	{
 		if ((*it) == channel)
 			return (true);
@@ -119,7 +117,7 @@ Channel		*Client::getCurrentChannel()
 	return (this->_currentChannel);
 }
 
-std::vector<Channel*>	Client::getJoinableChannels()
+std::vector<Channel*>	&Client::getJoinableChannels()
 {
 	return (this->_joinableChannels);
 }
