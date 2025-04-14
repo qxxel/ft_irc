@@ -6,18 +6,19 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:07 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/13 14:57:54 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/14 14:16:21 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVER_HPP
-#define SERVER_HPP
+# define SERVER_HPP
 
-#include <iostream>
-#include <vector>
-#include "Channel.hpp"
-#include "Client.hpp"
-#include "Request.hpp"
+# include <iostream>
+# include <sstream>
+# include <vector>
+# include "Channel.hpp"
+# include "Client.hpp"
+# include "Request.hpp"
 
 class Server
 {
@@ -46,10 +47,9 @@ class Server
 		Client	*findClientName(std::string name);
 		Channel	*searchChannel(std::string name);
 	
-		static void	exit(void);
-		static void	sendClient(int client, std::string msg);
-		static bool	isValidChar(char c);
-
+		static void			exit(void);
+		static void			sendClient(int client, std::string msg);
+		static bool			isValidChar(char c);
 
 
 		void					setRunning(bool running);

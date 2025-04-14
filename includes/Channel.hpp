@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:48 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/04/13 18:46:36 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/14 14:21:10 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ class Channel
 		std::string				_name;
 		std::string				_topic;
 		std::string				_pwd;
+		time_t					_modeSetTimestamp;
 		int						_maxUsers;
 		bool					_invOnly;
 		bool					_lockTopic;
@@ -45,6 +46,7 @@ class Channel
 		const std::string		&getName() const;
 		const std::string		&getTopic() const;
 		const std::string		&getPwd() const;
+		time_t					getModeSetTimestamp() const;
 		int						getMaxUsers() const;
 		bool					getInvOnly() const;
 		bool					getLockTopic() const;
@@ -52,9 +54,11 @@ class Channel
 		void	setName(const std::string &name);
 		void	setTopic(const std::string &topic);
 		void	setPwd(const std::string &pwd);
+		void	setModeSetTimestamp(time_t modeSetTimestamp);
 		void	setMaxUsers(int maxUsers);
 		void	setInvOnly(bool invOnly);
 		void	setLockTopic(bool lockTopic);
+
 
 		void	parseName(std::string name) const;
 		Client	*findClientName(std::string name);

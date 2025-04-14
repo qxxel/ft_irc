@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/13 20:49:26 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/14 15:59:20 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,7 +124,7 @@ void Command::executeCommand(Server &serv, Client *client, Command *cmd)
 		else if (!cmd->getName().compare("TOPIC"))
 			cmd->handleTopic(serv, client, &args);
 		else if (!cmd->getName().compare("MODE"))
-			cmd->handleMode(client, &args);
+			cmd->handleMode(serv, client, &args);
 		else
 			Server::sendClient(client->getFd(), "Unknown command: " + cmd->getName() + "\n");
 	}
@@ -490,12 +490,190 @@ void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string>
 	std::cout << "handle TOPIC successfully called\n";
 }
 
-// SET OR UNSET MODES ON CURRENT CHANNEL
-void	Command::handleMode(Client *client, std::vector<std::string> *args)
+template <typename T>
+std::string toString(T value)
 {
-	(void)client;
-	(void)args;
-	std::cout << "handle Mode called \n";
+	std::stringstream	ss;
+
+	ss << value;
+	return ss.str();
+}
+
+// SET OR UNSET MODES ON CURRENT CHANNEL
+void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> *args)
+{
+	if (!args || args->size() < 1)
+	{
+		Server::sendClient(client->getFd(), INV_FORMAT);
+		std::cout << "handle MODE failed => invalid format" << std::endl;
+		return ;
+	}
+
+	// FIND CHANNEL IN SERVER
+	Channel	*channel = serv.searchChannel(args->at(0));
+	if (!channel)
+	{
+		Server::sendClient(client->getFd(), NO_CHNL);
+		std::cout << "handle TOPIC failed => channel don't exist" << std::endl;
+		return ;
+	}
+
+	// FIND CLIENT IN THE CHANNEL
+	if (client->getCurrentChannel() != channel)
+	{
+		Server::sendClient(client->getFd(), NO_CHNL_ASK);
+		std::cout << "handle TOPIC failed => client isn't in the channel asked" << std::endl;
+		return ;
+	}
+
+	// SEND ACTIVE MODES
+	if (args->size() == 1)
+	{
+		std::string	modes = " +";
+		std::string	modesArgs;
+		
+		if (channel->getInvOnly())
+			modes += "i";
+		else if (!channel->getTopic().empty())
+		{
+			modes += "t";
+			modesArgs += " " + channel->getTopic(); 
+		}
+		else if (!channel->getPwd().empty())
+			modes += "k";
+		else if (channel->getMaxUsers())
+		{
+			modes += "l";
+			modesArgs += " " + toString(channel->getMaxUsers());
+		}
+		else
+			modes = "";
+
+		Server::sendClient(client->getFd(), client->getNick() + " " + channel->getName() + modes + modesArgs);
+		Server::sendClient(client->getFd(), client->getNick() + " " + channel->getName() + " " + toString(channel->getModeSetTimestamp()));
+		std::cout << "handle ask MODE successfuly called\n";
+		return ;
+	}
+
+	// CHECK IF CLIENT IS OP
+	if (!channel->isOpName(client->getUser()))
+	{
+		Server::sendClient(client->getFd(), NO_PERM);
+		std::cout << "handle modify MODE failed => client isn't moderator" << std::endl;
+		return ;
+	}
+
+		// ADD CHECK SIZE ARGS
+	// ADD INVITE ONLY MODE
+	if (args->at(1) == "+i")
+	{
+		channel->setInvOnly(true);
+		channel->setModeSetTimestamp(time(NULL));
+		// ADD CHANNEL IN CURRENT CLIENTS' JOINABLE CHANNELS
+		for (std::vector<Client*>::iterator it = channel->getClientsList().begin(); it != channel->getClientsList().end(); it++)
+			(*it)->getJoinableChannels().push_back(channel);
+	}
+	// SUPP INVITE ONLY MODE
+	if (args->at(1) == "-i")
+	{
+		channel->setInvOnly(false);
+		channel->setModeSetTimestamp(time(NULL));
+		// ERASE CHANNEL IN ALL CLIENTS' JOINABLE CHANNELS
+		for (std::vector<Client*>::iterator it1 = serv.getClients().begin(); it1 != serv.getClients().end(); it1++)
+		{
+			for (std::vector<Channel*>::iterator it2 = (*it1)->getJoinableChannels().begin(); it2 != (*it1)->getJoinableChannels().end(); it2++)
+			{
+				if ((*it2) == channel)
+				{
+					(*it1)->getJoinableChannels().erase(it2);
+					break ;
+				}
+			}
+		}
+	}
+
+		// ADD CHECK SIZE ARGS
+	// ADD LOCKED TOPIC MODE
+	if (args->at(1) == "+t")
+	{
+		channel->setLockTopic(true);
+		channel->setModeSetTimestamp(time(NULL));
+		channel->sendClients(client->getUser() + " MODE " + channel->getName() + " +t");
+	}
+	// SUPP LOCKED TOPIC MODE
+	else if (args->at(1) == "-t")
+	{
+		channel->setLockTopic(false);
+		channel->setModeSetTimestamp(time(NULL));
+		channel->sendClients(client->getUser() + " MODE " + channel->getName() + " -t");
+	}
+	
+		// ADD CHECK SIZE ARGS
+	// ADD PASSWORD MODE
+	else if (args->at(1) == "+k")
+	{
+		channel->setPwd(args->at(2));
+		channel->setModeSetTimestamp(time(NULL));
+		channel->sendClients(client->getUser() + " MODE " + channel->getName() + " +k");
+	}
+	// SUPP PASSWORD MODE
+	else if (args->at(1) == "-k")
+	{
+		if (args->at(2) != channel->getPwd())
+		{
+			Server::sendClient(client->getFd(), WRNG_PASS);
+			std::cout << "handle modify MODE failed => wrong password" << std::endl;
+			return ;
+		}
+
+		channel->setPwd("");
+		channel->setModeSetTimestamp(time(NULL));
+		channel->sendClients(client->getUser() + " MODE " + channel->getName() + " -k");
+	}
+
+		// ADD CHECK SIZE ARGS
+	// SET OP TARGET
+	else if (args->at(1) == "+o")
+	{
+		Client	*target = channel->findClientName(args->at(2));
+
+		if (channel->isOpName(target->getUser()))
+		{
+			Server::sendClient(client->getFd(), ALRD_OP);
+			std::cout << "handle modify MODE failed => target already op" << std::endl;
+			return ;
+		}
+		
+		channel->getOpList().push_back(target);
+		channel->setModeSetTimestamp(time(NULL));
+		channel->sendClients(client->getUser() + " MODE " + channel->getName() + " +o " + target->getUser());
+	}
+	// UNSET OP TARGET
+	else if (args->at(1) == "-o")
+	{
+		Client	*target = channel->findClientName(args->at(2));
+
+		if (!channel->isOpName(target->getUser()))
+		{
+			Server::sendClient(client->getFd(), ISNT_OP);
+			std::cout << "handle modify MODE failed => target isn't op" << std::endl;
+			return ;
+		}
+		
+		channel->delOpName(target->getUser());
+		channel->setModeSetTimestamp(time(NULL));
+		channel->sendClients(client->getUser() + " MODE " + channel->getName() + " -o " + target->getUser());
+	}
+
+		// ADD CHECK SIZE ARGS
+	// ADD USER LIMIT MODE
+	else if (args->at(1) == "+l")
+		;
+	// SUPP USER LIMIT MODE
+	else if (args->at(1) == "-l")
+		;
+
+	std::cout << "handle modify MODE successfuly called\n";
 }
 
 void	Command::deleteChannel(Server &serv, Channel *channel) const

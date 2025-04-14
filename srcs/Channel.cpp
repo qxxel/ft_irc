@@ -6,13 +6,13 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:05 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/04/13 18:48:25 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/14 14:41:52 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Channel.hpp"
 
-Channel::Channel(std::string name, Client *creator): _oldestClient(NULL), _maxUsers(100), _invOnly(false)
+Channel::Channel(std::string name, Client *creator): _oldestClient(NULL), _modeSetTimestamp(time(NULL)), _maxUsers(100), _invOnly(false)
 {
 	this->parseName(name);
 	this->_name = name;
@@ -123,6 +123,11 @@ const std::string	&Channel::getPwd() const
 	return (this->_pwd);
 }
 
+time_t	Channel::getModeSetTimestamp() const
+{
+	return (this->_modeSetTimestamp);
+}
+
 int	Channel::getMaxUsers() const
 {
 	return (this->_maxUsers);
@@ -156,6 +161,11 @@ void	Channel::setTopic(const std::string &topic)
 void	Channel::setPwd(const std::string &pwd)
 {
 	this->_pwd = pwd;
+}
+
+void	Channel::setModeSetTimestamp(time_t modeSetTimestamp)
+{
+	this->_modeSetTimestamp = modeSetTimestamp;
 }
 
 void	Channel::setMaxUsers(int maxUsers)
