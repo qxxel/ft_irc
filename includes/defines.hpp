@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 16:12:51 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/11 15:05:08 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/14 15:58:20 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,10 +35,28 @@
 # define HAS_INVALID_CHARS "This field can not contain any of these characters: '\\0', '\\r', '\\a', '\\n', 'space', ',', ';'\n"
 # define IS_TAKEN "This name is unavailable !\n"
 
-# define ALRDY_IN_CHNL "You're already in this channel\n"
-# define INV_CHNL_NAME "The name of the channel isn't valid\n"
+# define JOIN_USG "Join channels one by one\n"
+# define ALRDY_IN_CHNL "Already in this channel\n"
+# define NOT_ALW "You're not allowed to enter this channel\n"
+# define INV_CHNL_NAME "The name of the channel is invalid\n"
 # define CHNL_CREATE "Channel created\n"
 # define CHNL_JOIN "Channel joined\n"
+# define NO_CHNL_IN "Not in a channel\n"
+# define NO_PERM "You're not channel operator\n"
+# define KICK_USG "Kick users one by one\n"
+# define BAD_TRGT "No user found channel\n"
+# define TRGT_KICK "Target kicked\n"
+# define NO_CHNL "Channel don't exist\n"
+# define NO_TPC "No topic is set\n"
+# define NO_CHNL_ASK "You're not on that channel\n"
+# define CHNL_LEFT "Channel left\n"
+# define INVT_SEND "Invitation sent\n"
+# define WRNG_PASS "Wrong password\n"
+# define ND_PASS "Need password to join\n"
+# define CHNL_FULL "Channel full\n"
+# define ACTL_TPC "This is the current topic\n"
+# define ALRD_OP "Already op in this channel\n"
+# define ISNT_OP "Target isn't op in this channel\n"
 
 // # define ERR_USR "Enter a username: USER <username>\n"
 // # define ERR_NCK "Enter a nickname: NICK <nickname>\n"

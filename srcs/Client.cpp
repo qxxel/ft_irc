@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 16:04:15 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/11 14:43:02 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/14 16:22:37 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,48 @@
 #include "Server.hpp"
 #include "defines.hpp"
 
+Client::Client(int fd) : _fd(fd), _auth(false),  _pwd(false), _user(""), _nick(""), _currentChannel(NULL) { }
 
 Client::~Client()
 {
+	if (this->_currentChannel)
+	{
+		this->_currentChannel->delClientName(this->_user);
+		if (this->_currentChannel->isOpName(this->_user))
+			this->_currentChannel->delOpName(this->_user);
+	}
 }
 
-Client::Client(int fd) : _fd(fd), _auth(false),  _pwd(false), _user(""), _nick(""), _currentChannel(NULL)
+void	Client::setUnjoinableChannel(Channel *channel)
 {
+	if (!channel)
+		return ;
+
+	for (std::vector<Channel*>::iterator	it = this->_joinableChannels.begin(); it != this->_joinableChannels.end(); it++)
+	{
+		if ((*it) == channel)
+		{
+			this->_joinableChannels.erase(it);
+			return ;
+		}
+	}
 }
+
+bool	Client::isJoinableChannel(Channel *channel)
+{
+	if (!channel)
+		return (false);
+
+	for (std::vector<Channel*>::iterator	it = this->_joinableChannels.begin(); it != this->_joinableChannels.end(); it++)
+	{
+		if ((*it) == channel)
+			return (true);
+	}
+	return (false);
+}
+
+
+// ---------------------------------------------CLIENT SETTERS AND GETTERS---------------------------------------------
 
 void	Client::setFd(int fd)
 {
@@ -95,6 +129,11 @@ std::string	Client::getUser()
 Channel		*Client::getCurrentChannel()
 {
 	return (this->_currentChannel);
+}
+
+std::vector<Channel*>	&Client::getJoinableChannels()
+{
+	return (this->_joinableChannels);
 }
 
 std::ostream &	operator<<(std::ostream &o, Client &client)

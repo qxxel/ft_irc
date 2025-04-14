@@ -6,18 +6,22 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:07 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/11 17:35:32 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/14 16:24:28 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVER_HPP
-#define SERVER_HPP
+# define SERVER_HPP
 
-#include <iostream>
-#include <vector>
-#include "Channel.hpp"
-#include "Client.hpp"
-#include "Request.hpp"
+# include <iostream>
+# include <sstream>
+# include <vector>
+# include "Channel.hpp"
+# include "Client.hpp"
+# include "Request.hpp"
+
+class Channel;
+class Client;
 
 class Channel;
 class Client;
@@ -42,13 +46,17 @@ class Server
 		int		acceptClient(int sock, int epfd);
 		void	disconnectClient(int client, int epfd);
 		void	clientRequest(int client, int epfd);
-		Client	*findClient(int fd);
-		void		addChannel(Channel &channel);
-		Channel		*searchChannel(std::string name);
+		void	addChannel(Channel *channel);
+		void	deleteClient(int client);
+		void	deleteChannel(Channel *channel);
+		Client	*findClientFd(int fd);
+		Client	*findClientName(std::string name);
+		Channel	*searchChannel(std::string name);
 	
-		static void	exit(void);
-		static void	sendClient(int client, std::string msg);
-		static bool	isValidChar(char c);
+		static void			exit(void);
+		static void			sendClient(int client, std::string msg);
+		static bool			isValidChar(char c);
+
 
 		void					setRunning(bool running);
 		void					setPwd(std::string pwd);
@@ -56,8 +64,8 @@ class Server
 		int						getPort(void);
 		bool					getRunning(void);
 		std::string				getPwd(void);
-		std::vector<Channel*>	getChannels() const;
 		std::vector<Client*>	&getClients();
+		std::vector<Channel*>	&getChannels();
 	
 	
 		class	ChannelAlreadyExists: public std::exception

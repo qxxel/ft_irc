@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:13 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/11 14:26:56 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/14 16:22:00 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 
 class Server;
 class Client;
+class Channel;
 
 class Command
 {
@@ -30,7 +31,9 @@ private:
 public:
 	Command(std::string raw);
 	~Command();
-	
+
+	static std::string joinStrings(const std::vector<std::string>& vec);
+
 	void	parse();
 	bool	parse_arg(std::string arg);
 	bool	is_available(Server &serv, std::string name);
@@ -46,10 +49,12 @@ public:
 	void	handleNick(Client *client, std::vector<std::string> *args);
 	void	handleUser(Server &serv, Client *client, std::vector<std::string> *args);
 	void	handleJoin(Server &serv, Client *client, std::vector<std::string> *args);
-	void	handleKick(Client *client, std::vector<std::string> *args);
-	void	handleInvite(Client *client, std::vector<std::string> *args);
-	void	handleTopic(Client *client, std::vector<std::string> *args);
-	void	handleMode(Client *client, std::vector<std::string> *args);
+	void	handlePart(Server &serv, Client *client, std::vector<std::string> *args);
+	void	handleKick(Server &serv, Client *client, std::vector<std::string> *args);
+	void	handleInvite(Server &serv, Client *client, std::vector<std::string> *args);
+	void	handleTopic(Server &serv, Client *client, std::vector<std::string> *args);
+	void	handleMode(Server &serv, Client *client, std::vector<std::string> *args);
+	void	deleteChannel(Server &serv, Channel *channel) const;
 };
 
 std::ostream &	operator<<(std::ostream &o, Command &cmd);
