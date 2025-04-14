@@ -57,6 +57,7 @@ class Server
 		bool					getRunning(void);
 		std::string				getPwd(void);
 		std::vector<Channel*>	getChannels() const;
+		std::vector<Client*>	&getClients();
 	
 	
 		class	ChannelAlreadyExists: public std::exception

@@ -59,6 +59,17 @@ void	Command::parse()
 	setArgs(args);
 }
 
+bool	Command::is_available(Server &serv, std::string name)
+{
+	std::vector<Client*>::const_iterator	it;
+	for (it = serv.getClients().begin(); it != serv.getClients().end(); it++)
+	{
+		if (!(*it)->getUser().compare(name))
+			return (false);
+	}
+	return (true);
+}
+
 std::vector<std::string>	Command::getArgs()
 {
 	return (_args);
@@ -105,7 +116,7 @@ void Command::executeCommand(Server &serv, Client *client, Command *cmd)
 		else if (!cmd->getName().compare("NICK"))
 			cmd->handleNick(client, &args);
 		else if (!cmd->getName().compare("USER"))
-			cmd->handleUser(client, &args);
+			cmd->handleUser(serv, client, &args);
 		else if (!cmd->getName().compare("JOIN"))
 			cmd->handleJoin(serv, client, &args);
 		else if (!cmd->getName().compare("KICK"))
@@ -131,8 +142,10 @@ void	Command::handlePass(Server &serv, Client *client, std::vector<std::string> 
 	{
 		if (!client->getPwd())
 		{
-			if (args->empty() || args->size() != 1)
-				return (Server::sendClient(client->getFd(), std::string(INV_FORMAT, ENTER_PWD)));
+			if (args->size() != 1)
+			{
+				return (Server::sendClient(client->getFd(), INV_FORMAT ENTER_PWD));
+			}
 			else if (!(args->at(0).compare(serv.getPwd())))
 			{
 				client->setPwd(true);
@@ -171,21 +184,61 @@ void	Command::handleNick(Client *client, std::vector<std::string> *args)
 		else
 		{
 			if (parse_arg(args->at(0)))
+			{
 				client->setNick(args->at(0));
+				Server::sendClient(client->getFd(), NICK_NAME + client->getNick() + "\n");
+			}
 			else
 				return (Server::sendClient(client->getFd(), HAS_INVALID_CHARS));
 		}
+		if (!client->getNick().empty() && !client->getUser().empty() && client->getPwd())
+			client->setAuth(true);
+		else if (!client->getUser().compare(""))
+			return (Server::sendClient(client->getFd(), ENTER_USER));
 	}
 	catch(const std::exception& e)
 	{
 		throw ;
 	}
 }
-void	Command::handleUser(Client *client, std::vector<std::string> *args)
+void	Command::handleUser(Server &serv, Client *client, std::vector<std::string> *args)
 {
-	(void)client;
-	(void)args;
-	std::cout << "handle user called \n";
+	try
+	{
+		if (!client->getPwd())
+			return (Server::sendClient(client->getFd(), ENTER_PWD));
+		else if (args->size() != 3 || args->at(1).compare("0") || args->at(2).compare("*"))
+			return (Server::sendClient(client->getFd(), ENTER_USER));
+		else if (!client->getUser().empty())
+		{
+			Server::sendClient(client->getFd(), CANT_USER);
+			Server::sendClient(client->getFd(), USR_NAME + client->getUser() + "\n");
+			return ;
+		}
+		else
+		{
+			if (parse_arg(args->at(0)))
+			{
+				if (is_available(serv, args->at(0)))
+				{
+					client->setUser(args->at(0));
+					Server::sendClient(client->getFd(), USR_NAME + client->getUser() + "\n");
+				}
+				else
+					return (Server::sendClient(client->getFd(), IS_TAKEN ENTER_USER));
+			}
+			else
+				return (Server::sendClient)(client->getFd(), HAS_INVALID_CHARS);
+		}
+		if (!client->getNick().empty() && !client->getUser().empty() && client->getPwd())
+			client->setAuth(true);
+		else if (!client->getNick().compare(""))
+			return (Server::sendClient(client->getFd(), ENTER_NICK));
+	}
+	catch(const std::exception& e)
+	{
+		throw ;
+	}
 }
 void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> *args)
 {

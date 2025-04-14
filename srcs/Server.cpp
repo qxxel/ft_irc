@@ -296,6 +296,11 @@ std::vector<Channel*>	Server::getChannels() const
 	return (this->_channels);
 }
 
+std::vector<Client*>	&Server::getClients()
+{
+	return (_clients);
+}
+
 std::ostream &	operator<<(std::ostream &o, Server &serv)
 {
 	o << "-----------------SERVER-----------------"<< std::endl;

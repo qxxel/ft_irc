@@ -24,13 +24,16 @@
 # define PWD_GOOD "Good password !\n"
 # define INV_PWD "Invalid password !\n"
 # define AUTHY_GOOD "Finished authentification !\n\n"
-# define ENTER_NCK_USR "Please enter a username or a nickname: USER <username> <*> <0> or NICK <nickname>\n"
+# define ENTER_NCK_USR "Please enter a username or a nickname: USER <username> <0> <*> or NICK <nickname>\n"
 # define UKWN_CMD "Unknown command: "
-# define ENTER_NICK "Enter a server username: USER <username> <*> <0>"
+# define ENTER_NICK "Enter a server nickname: NICK <nickname>\n"
+# define ENTER_USER "Enter a server username: USER <username> <0> <*>\n"
 # define USR_NAME "Username: "
 # define NICK_NAME "Nickname: "
 # define CANT_NICK "Can not change nickname !\n"
+# define CANT_USER "Can not change username !\n"
 # define HAS_INVALID_CHARS "This field can not contain any of these characters: '\\0', '\\r', '\\a', '\\n', 'space', ',', ';'\n"
+# define IS_TAKEN "This name is unavailable !\n"
 
 # define ALRDY_IN_CHNL "You're already in this channel\n"
 # define INV_CHNL_NAME "The name of the channel isn't valid\n"
@@ -41,7 +44,6 @@
 // # define ERR_NCK "Enter a nickname: NICK <nickname>\n"
 // # define CHARS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_#:"
 // # define FIELD_SET "This field has already been set\n"
-// # define IS_TAKEN "Another user already has this name\n"
 // # define LST_CMDS "1. LIST(usage: LIST): displays all available commands\n2. JOIN(usage: JOIN #<chanel_name>): if <channel_name> exists, joins it. creates it and joins it otherwise\n"
 
 #endif
