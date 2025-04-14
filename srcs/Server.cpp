@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/11 13:16:18 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/11 17:37:14 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -186,6 +186,11 @@ void	Server::sendClient(int client, std::string msg)
 	if (send(client, msg.c_str(), msg.size(), 0) == -1)
 		throw (std::runtime_error("Error: sending data to clients failed: " + std::string(strerror(errno))));
 }		
+
+bool	Server::isValidChar(char c)
+{
+	return (!(c == 0 || c == 7 || c == '\r' || c == '\n' || c == ' ' || c == ',' || c == ':'));
+}
 
 void	Server::clientRequest(int client, int epfd)
 {

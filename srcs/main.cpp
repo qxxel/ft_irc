@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ibjean-b <ibjean-b@student.42.fr>          #+#  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025-03-26 15:16:26 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025-03-26 15:16:26 by ibjean-b         ###   ########.fr       */
+/*   Created: 2025/03/26 15:16:26 by ibjean-b          #+#    #+#             */
+/*   Updated: 2025/04/11 15:14:59 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,14 +22,15 @@ int main(int argc, char const *argv[])
 		std::cerr << "Usage: " << argv[0] << " <port> <password>" << std::endl;
 		return (0);
 	}
+
 	try
 	{
 		setupSignals();
 		Server	ircserv = Server(argv[1], argv[2]);
 	}
-	catch(const std::exception& e)
+	catch (const std::exception& e)
 	{
-		std::cerr << e.what() << '\n';
+		std::cerr << e.what() << std::endl;
 	}
 	return (0);
 }

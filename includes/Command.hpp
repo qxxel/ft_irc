@@ -32,6 +32,7 @@ public:
 	~Command();
 	
 	void	parse();
+	bool	parse_arg(std::string arg);
 
 	//Setters and getters
 	std::string					getName();

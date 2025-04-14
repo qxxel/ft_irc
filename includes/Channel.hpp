@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:48 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/04/11 14:25:37 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/11 17:38:52 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,10 @@
 # include <iostream>
 # include <map>
 # include "Client.hpp"
+# include "Server.hpp"
 
 class Client;
+class Server;
 
 class Channel
 {
