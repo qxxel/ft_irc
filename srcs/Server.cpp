@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/11 13:16:18 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/11 19:52:16 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ void	Server::start(void)
 	int	opt = 1;
 	if (setsockopt(fd_socket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(int)) == -1)
 		throw (std::runtime_error("Error: setsockopt failed: " + std::string(strerror(errno))));
-	
+
 	if (fcntl(fd_socket, F_SETFL, O_NONBLOCK) == -1)
 		throw (std::runtime_error("Error: fcntl failed: " + std::string(strerror(errno))));
 
@@ -115,7 +115,7 @@ void	Server::run(int sock)
 		nfds = epoll_wait(epfd, events, MAX_EVENTS, -1);
 		if (nfds == -1)
 			throw (std::runtime_error("Error: epoll_wait failed: " + std::string(strerror(errno))));
-		
+
 		try
 		{
 			for (int i = 0; i < nfds; i++)
@@ -167,7 +167,7 @@ int	Server::acceptClient(int sock, int epfd)
 	{
 		throw ;
 	}
-	
+
 	return (fd);
 }
 
@@ -178,26 +178,26 @@ void	Server::disconnectClient(int client, int epfd)
 	if (close(client) == -1)
 		throw (std::runtime_error("Error: closing client socket failed: " + std::string(strerror(errno))));
 	delete (findClient(client));
-	std::cout << "Client " << client << " disconnected" << std::endl;	
-}	
+	std::cout << "Client " << client << " disconnected" << std::endl;
+}
 
 void	Server::sendClient(int client, std::string msg)
 {
 	if (send(client, msg.c_str(), msg.size(), 0) == -1)
 		throw (std::runtime_error("Error: sending data to clients failed: " + std::string(strerror(errno))));
-}		
+}
 
 void	Server::clientRequest(int client, int epfd)
 {
 	char		buffer[MAX_BODY_SIZE + 2];
 	ssize_t		n;
-	
+
 	memset(buffer, 0, MAX_BODY_SIZE + 2);
 	n = recv(client, &buffer, MAX_BODY_SIZE + 1, 0);
 	if (n == -1)
 		return (void)(std::cerr << ("Error: recv failed: " + std::string(strerror(errno))));
-	
-	// std::cout << "\n------------SERVER RECEIVED-------------\n\n" << buffer << std::endl; //debug	
+
+	// std::cout << "\n------------SERVER RECEIVED-------------\n\n" << buffer << std::endl; //debug
 	try
 	{
 		if (n == 0)
@@ -207,18 +207,23 @@ void	Server::clientRequest(int client, int epfd)
 			sendClient(client, "Error: input too big (max_body_size = 5000)\n");
 			return (void)(std::cerr << "Error: client request too big: max " << MAX_BODY_SIZE << " characters" << std::endl);
 		}
-		Request	req = Request(buffer);
-		Client	*tp = findClient(client);
-		std::vector<Command>::iterator	it;
 
-		for (it = req.getArr().begin(); it != req.getArr().end() ; it++)
-			Command::executeCommand(*this, tp, &(*it));
-	}			
+
+		Client	*tp = findClient(client);
+		tp->getRequest()->append(buffer, n);
+		if (buffer[n - 1] == '\n')
+		{
+			tp->getRequest()->split_Request();
+			for (std::vector<Command>::iterator	 it = tp->getRequest()->getArr().begin(); it != tp->getRequest()->getArr().end() ; it++)
+				Command::executeCommand(*this, tp, &(*it));
+			tp->getRequest()->clear();
+		}
+	}
 	catch(const std::exception& e)
 	{
 		throw ;
 	}
-}	
+}
 
 Client	*Server::findClient(int fd)
 {

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 16:04:15 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/11 14:43:02 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/11 19:40:56 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,10 @@
 
 Client::~Client()
 {
+	delete _req;
 }
 
-Client::Client(int fd) : _fd(fd), _auth(false),  _pwd(false), _user(""), _nick(""), _currentChannel(NULL)
+Client::Client(int fd) : _fd(fd), _auth(false),  _pwd(false), _user(""), _nick(""), _currentChannel(NULL) , _req(new Request())
 {
 }
 
@@ -81,6 +82,11 @@ std::string	Client::getUser()
 Channel		*Client::getCurrentChannel()
 {
 	return (this->_currentChannel);
+}
+
+Request		*Client::getRequest()
+{
+	return _req;
 }
 
 std::ostream &	operator<<(std::ostream &o, Client &client)

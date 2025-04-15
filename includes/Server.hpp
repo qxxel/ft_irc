@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:07 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/11 13:16:24 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/11 18:22:16 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,9 @@
 #include "Client.hpp"
 #include "Request.hpp"
 
+class Client;
+class Channel;
+
 class Server
 {
 	private:
@@ -27,12 +30,12 @@ class Server
 		std::string				_pwd;
 		std::vector<Client*>	_clients;
 		std::vector<Channel*>	_channels;
-	
+
 	public:
 		~Server();
 		Server(std::string port, std::string password);
-	
-	
+
+
 		int		parsePort(std::string port);
 		void	start(void);
 		void	run(int sock);
@@ -40,7 +43,7 @@ class Server
 		void	disconnectClient(int client, int epfd);
 		void	clientRequest(int client, int epfd);
 		Client	*findClient(int fd);
-	
+
 		static void	exit(void);
 		static void	sendClient(int client, std::string msg);
 		void		addChannel(Channel &channel);
@@ -53,8 +56,8 @@ class Server
 		bool					getRunning(void);
 		std::string				getPwd(void);
 		std::vector<Channel*>	getChannels() const;
-	
-	
+
+
 		class	ChannelAlreadyExists: public std::exception
 		{
 			public:

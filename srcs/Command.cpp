@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/11 14:52:05 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/04/15 13:40:20 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,11 +34,16 @@ void	Command::parse()
 	{
 		while (i < _raw.size() && isspace(_raw[i]))
 			i++;
-		if (i >= _raw.size())
+		if (i == _raw.size())
 			break;
 		j = i;
-		while (i < _raw.size() && isascii(_raw[i]) && !isspace(_raw[i]))
-			i++;
+		if (_raw[i] == ':')
+			i = _raw.size();
+		else
+		{
+			while (i < _raw.size() && isascii(_raw[i]) && !isspace(_raw[i]))
+				i++;
+		}
 		str = _raw.substr(j, i - j);
 		if (_name.empty())
 			_name = str;
@@ -93,8 +98,8 @@ void Command::executeCommand(Server &serv, Client *client, Command *cmd)
 	std::vector<std::string>	args = cmd->getArgs();
 	try
 	{
-		std::cout << "serv_pwd: " << serv.getPwd() << "    pwd_size: " << serv.getPwd().size() << std::endl;
-		std::cout << "cmd_arg : " << cmd->getArgs().at(0) << "      cmd_size: " << cmd->getArgs().at(0).size() << std::endl;
+		// std::cout << "serv_pwd: " << serv.getPwd() << "    pwd_size: " << serv.getPwd().size() << std::endl;
+		// std::cout << "cmd_arg : " << cmd->getArgs().at(0) << "      cmd_size: " << cmd->getArgs().at(0).size() << std::endl;
 		if (!cmd->getName().compare("PASS"))
 			cmd->handlePass(serv, client, &args);
 		else if (!cmd->getName().compare("NICK"))
@@ -126,8 +131,8 @@ void	Command::handlePass(Server &serv, Client *client, std::vector<std::string> 
 	{
 		if (!client->getPwd())
 		{
-			std::cout << "serv_pwd: " << serv.getPwd() << "    pwd_size: " << serv.getPwd().size() << std::endl;
-			std::cout << "cmd_arg : " << args->at(0) << "      cmd_size: " << args->at(0).size() << std::endl;
+			// std::cout << "serv_pwd: " << serv.getPwd() << "    pwd_size: " << serv.getPwd().size() << std::endl;
+			// std::cout << "cmd_arg : " << args->at(0) << "      cmd_size: " << args->at(0).size() << std::endl;
 			if (args->empty() || args->size() != 1)
 				return (Server::sendClient(client->getFd(), std::string(INV_FORMAT, ENTER_PWD)));
 			else if (!(args->at(0).compare(serv.getPwd())))
