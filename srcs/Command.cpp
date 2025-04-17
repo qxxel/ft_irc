@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/14 16:24:49 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/17 13:09:10 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -171,20 +171,20 @@ void	Command::handleNick(Client *client, std::vector<std::string> *args)
 {
 	(void)client;
 	(void)args;
-	std::cout << "handle nick called \n";
+	std::cout << "handle nick called\n";
 }
 
 void	Command::handleUser(Client *client, std::vector<std::string> *args)
 {
 	(void)client;
 	(void)args;
-	std::cout << "handle user called \n";
+	std::cout << "handle user called\n";
 }
 
 // JOIN CHANNEL
 void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> *args) // have to handle on invonly and pwd modes
 {
-	if (!args || args->size() < 1 || 2 < args->size())
+	if (!args || args->empty() || args->size() < 1 || 2 < args->size())
 	{
 		Server::sendClient(client->getFd(), JOIN_USG);
 		std::cout << "handle JOIN failed => join one by one" << std::endl;
@@ -192,7 +192,7 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 	}
 
 	// CHECK IF CLIENT ALREADY IN THE CHANNEL
-	if (client->getCurrentChannel() && !(client->getCurrentChannel()->getName().compare(args->at(0))))
+	if (client->isCurrentChannel(args->at(0)))
 	{
 		Server::sendClient(client->getFd(), ALRDY_IN_CHNL);
 		std::cout << "handle JOIN failed => client already in this channel" << std::endl;
@@ -201,17 +201,13 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 
 	try
 	{
-		Channel *newChannel = new Channel(args->at(0), client);
-
-		// DELETE OLD CHANNEL IF EMPTY
-		if (client->getCurrentChannel() && client->getCurrentChannel()->getClientsList().size() == 1)
-			this->deleteChannel(serv, client->getCurrentChannel());
+		Channel *newChannel = new Channel(args->at(0), client); // CHECK IF EXCEPTION DELETE
 
 		// CREATE CHANNEL
 		serv.addChannel(newChannel);
-		client->setCurrentChannel(newChannel);
-		Server::sendClient(client->getFd(), client->getUser() + " JOIN " + newChannel->getName());
-		Server::sendClient(client->getFd(), "MODE " + newChannel->getName() + " +l");
+		client->getCurrentsChannels().push_back(newChannel);
+		Server::sendClient(client->getFd(), client->getUser() + " JOIN " + newChannel->getName() + "\n");
+		Server::sendClient(client->getFd(), "MODE " + newChannel->getName() + " +l\n");
 	}
 	catch (Channel::NameIsntValid &e)
 	{
@@ -221,7 +217,7 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 	}
 	catch (Server::ChannelAlreadyExists &)
 	{
-		Channel *channel = serv.searchChannel(args->at(0));
+		Channel	*channel = serv.searchChannel(args->at(0));
 		if (!channel) // maybe adapt
 			return ;
 
@@ -237,6 +233,7 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 		if (!channel->getPwd().empty() && !client->isJoinableChannel(channel))
 		{
 			if (args->size() == 1)
+		// ADD CHECK SIZE ARGS
 			{
 				Server::sendClient(client->getFd(), ND_PASS);
 				std::cout << "handle JOIN failed => need password to join" << std::endl;
@@ -251,15 +248,15 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 		}
 
 		// CHECK IF CHANNEL IS FULL
-		if (!(channel->getClientsList().size() < channel->getMaxUsers()))
+		if (channel->getMaxUsers() != 0 && !(channel->getClientsList().size() < channel->getMaxUsers()))
 		{
 			Server::sendClient(client->getFd(), CHNL_FULL);
 			std::cout << "handle JOIN failed => channel full" << std::endl;
 			return ;
 		}
 
-		client->setCurrentChannel(channel);
-		channel->sendClients(client->getUser() + " JOIN " + channel->getName());
+		client->getCurrentsChannels().push_back(channel);
+		channel->sendClients(client->getUser() + " JOIN " + channel->getName() + "\n");
 	}
 
 	std::cout << "handle JOIN successfully called" << std::endl;
@@ -286,7 +283,7 @@ void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> 
 
 
 	// CHECK IF CLIENT IS IN THIS CHANNEL
-	if (channel != client->getCurrentChannel())
+	if (!client->isCurrentChannel(channel->getName()))
 	{
 		Server::sendClient(client->getFd(), NO_CHNL_ASK);
 		std::cout << "handle PART failed => client isn't in the channel asked" << std::endl;
@@ -300,9 +297,9 @@ void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> 
 	if (channel->getOpList().size() == 1 && channel->isOpName(client->getUser()))
 		channel->getOpList().push_back(channel->getOldestClient()); // Handle oldest client
 
-	channel->sendClients(client->getUser() + " PART " + Command::joinStrings(*args));
+	channel->sendClients(client->getUser() + " PART " + Command::joinStrings(*args) + "\n");
 	channel->delClientName(client->getUser());
-	client->setCurrentChannel(NULL);
+	client->delCurrentChannel(channel);
 	std::cout << "handle PART successfuly called" << std::endl;
 }
 
@@ -326,7 +323,7 @@ void	Command::handleKick(Server &serv, Client *client, std::vector<std::string> 
 	}
 
 	// FIND CLIENT IN THE CHANNEL
-	if (channel != client->getCurrentChannel())
+	if (!client->isCurrentChannel(channel->getName()))
 	{
 		Server::sendClient(client->getFd(), NO_CHNL_ASK);
 		std::cout << "handle KICK failed => client not in the channel asked" << std::endl;
@@ -349,9 +346,9 @@ void	Command::handleKick(Server &serv, Client *client, std::vector<std::string> 
 
 		// HANDLE FOR INVITATION ONLY
 		if (channel->getInvOnly())
-			target->setUnjoinableChannel(channel);
+			target->delJoinableChannel(channel);
 
-		target->setCurrentChannel(NULL);
+		target->delCurrentChannel(channel);
 		channel->sendClients(client->getUser() + " KICK " + Command::joinStrings(*args));
 		Server::sendClient(target->getFd(), client->getUser() + " KICK " + Command::joinStrings(*args));
 	}
@@ -394,7 +391,7 @@ void	Command::handleInvite(Server &serv, Client *client, std::vector<std::string
 	}
 
 	// FIND CLIENT IN THE CHANNEL
-	if (client->getCurrentChannel() != channel)
+	if (!client->isCurrentChannel(channel->getName()))
 	{
 		Server::sendClient(client->getFd(), NO_CHNL_ASK);
 		std::cout << "handle INVITE failed => client isn't in the channel" << std::endl;
@@ -402,7 +399,7 @@ void	Command::handleInvite(Server &serv, Client *client, std::vector<std::string
 	}
 
 	// FIND TARGET IN THE CHANNEL
-	if (target->getCurrentChannel() == channel)
+	if (target->isCurrentChannel(channel->getName()))
 	{
 		Server::sendClient(client->getFd(), ALRDY_IN_CHNL);
 		std::cout << "handle INVITE failed => target already in the channel" << std::endl;
@@ -426,7 +423,7 @@ void	Command::handleInvite(Server &serv, Client *client, std::vector<std::string
 
 	Server::sendClient(target->getFd(), client->getUser() + " INVITE " + target->getUser() + " " + channel->getName());
 	Server::sendClient(client->getFd(), "INVITE " + client->getUser() + " " + target->getUser() + " " + channel->getName());
-	std::cout << "handle INVITE successfuly called \n";
+	std::cout << "handle INVITE successfuly called\n";
 }
 
 // VIEW OR SET TOPIC OF THE CURRENT CHANNEL
@@ -460,7 +457,7 @@ void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string>
 	else
 	{
 		// FIND CLIENT IN THE CHANNEL
-		if (client->getCurrentChannel() != channel)
+		if (!client->isCurrentChannel(channel->getName()))
 		{
 			Server::sendClient(client->getFd(), NO_CHNL_ASK);
 			std::cout << "handle TOPIC failed => client isn't in the channel asked" << std::endl;
@@ -531,7 +528,7 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 	}
 
 	// FIND CLIENT IN THE CHANNEL
-	if (client->getCurrentChannel() != channel)
+	if (!client->isCurrentChannel(channel->getName()))
 	{
 		Server::sendClient(client->getFd(), NO_CHNL_ASK);
 		std::cout << "handle TOPIC failed => client isn't in the channel asked" << std::endl;
@@ -579,6 +576,13 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 	// ADD INVITE ONLY MODE
 	if (args->at(1) == "+i")
 	{
+		if (args->size() != 2)
+		{
+			Server::sendClient(client->getFd(), INV_FORMAT);
+			std::cout << "handle modify MODE failed => invalid format" << std::endl;
+			return ;
+		}
+
 		channel->setInvOnly(true);
 		channel->setModeSetTimestamp(time(NULL));
 		// ADD CHANNEL IN CURRENT CLIENTS' JOINABLE CHANNELS
@@ -588,6 +592,13 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 	// SUPP INVITE ONLY MODE
 	if (args->at(1) == "-i")
 	{
+		if (args->size() != 2)
+		{
+			Server::sendClient(client->getFd(), INV_FORMAT);
+			std::cout << "handle modify MODE failed => invalid format" << std::endl;
+			return ;
+		}
+
 		channel->setInvOnly(false);
 		channel->setModeSetTimestamp(time(NULL));
 		// ERASE CHANNEL IN ALL CLIENTS' JOINABLE CHANNELS
@@ -608,6 +619,13 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 	// ADD LOCKED TOPIC MODE
 	if (args->at(1) == "+t")
 	{
+		if (args->size() != 2)
+		{
+			Server::sendClient(client->getFd(), INV_FORMAT);
+			std::cout << "handle modify MODE failed => invalid format" << std::endl;
+			return ;
+		}
+
 		channel->setLockTopic(true);
 		channel->setModeSetTimestamp(time(NULL));
 		channel->sendClients(client->getUser() + " MODE " + channel->getName() + " +t");
@@ -615,6 +633,13 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 	// SUPP LOCKED TOPIC MODE
 	else if (args->at(1) == "-t")
 	{
+		if (args->size() != 2)
+		{
+			Server::sendClient(client->getFd(), INV_FORMAT);
+			std::cout << "handle modify MODE failed => invalid format" << std::endl;
+			return ;
+		}
+
 		channel->setLockTopic(false);
 		channel->setModeSetTimestamp(time(NULL));
 		channel->sendClients(client->getUser() + " MODE " + channel->getName() + " -t");
@@ -624,6 +649,23 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 	// ADD PASSWORD MODE
 	else if (args->at(1) == "+k")
 	{
+		if (args->size() != 3)
+		{
+			Server::sendClient(client->getFd(), INV_FORMAT);
+			std::cout << "handle modify MODE failed => invalid format" << std::endl;
+			return ;
+		}
+
+		for (std::string::iterator it = args->at(2).begin(); it != args->at(2).end(); it++)
+		{
+			if (!Server::isValidChar(*it))
+			{
+				Server::sendClient(client->getFd(), INV_PASS_FRMT);
+				std::cout << "handle modify MODE failed => invalid password format" << std::endl;
+				return ;
+			}
+		}
+
 		channel->setPwd(args->at(2));
 		channel->setModeSetTimestamp(time(NULL));
 		channel->sendClients(client->getUser() + " MODE " + channel->getName() + " +k");
@@ -631,6 +673,13 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 	// SUPP PASSWORD MODE
 	else if (args->at(1) == "-k")
 	{
+		if (args->size() != 3)
+		{
+			Server::sendClient(client->getFd(), INV_FORMAT);
+			std::cout << "handle modify MODE failed => invalid format" << std::endl;
+			return ;
+		}
+
 		if (args->at(2) != channel->getPwd())
 		{
 			Server::sendClient(client->getFd(), WRNG_PASS);
@@ -643,10 +692,16 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 		channel->sendClients(client->getUser() + " MODE " + channel->getName() + " -k");
 	}
 
-		// ADD CHECK SIZE ARGS
 	// SET OP TARGET
 	else if (args->at(1) == "+o")
 	{
+		if (args->size() != 3)
+		{
+			Server::sendClient(client->getFd(), INV_FORMAT);
+			std::cout << "handle modify MODE failed => invalid format" << std::endl;
+			return ;
+		}
+
 		Client	*target = channel->findClientName(args->at(2));
 
 		if (channel->isOpName(target->getUser()))
@@ -663,6 +718,13 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 	// UNSET OP TARGET
 	else if (args->at(1) == "-o")
 	{
+		if (args->size() != 3)
+		{
+			Server::sendClient(client->getFd(), INV_FORMAT);
+			std::cout << "handle modify MODE failed => invalid format" << std::endl;
+			return ;
+		}
+
 		Client	*target = channel->findClientName(args->at(2));
 
 		if (!channel->isOpName(target->getUser()))
@@ -688,11 +750,39 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 			return ;
 		}
 
+		if (args->at(2)) 			/*		/!\ CHECK IF ISDIGIT !! /!\		*/
+		{
+			Server::sendClient(client->getFd(), ISNT_NB);
+			std::cout << "handle modify MODE failed => invalid input (nan)" << std::endl;
+			return ;
+		}
+
 		channel->setMaxUsers(stringToInt(args->at(2)));
+		channel->setModeSetTimestamp(time(NULL));
+		channel->sendClients(client->getUser() + " MODE " + channel->getName() + " +l " + args->at(2));
 	}
 	// SUPP USER LIMIT MODE
 	else if (args->at(1) == "-l")
-		;
+	{
+		if (args->size() != 2)
+		{
+			Server::sendClient(client->getFd(), INV_FORMAT);
+			std::cout << "handle modify MODE failed => invalid format" << std::endl;
+			return ;
+		}
+
+		channel->setMaxUsers(0);
+		channel->setModeSetTimestamp(time(NULL));
+		channel->sendClients(client->getUser() + " MODE " + channel->getName() + " -l");
+	}
+
+	// OTHERS USAGES
+	else
+	{
+		Server::sendClient(client->getFd(), LST_MODES);
+		std::cout << "handle modify MODE failed => not an existant flag" << std::endl;
+		return ;
+	}
 
 	std::cout << "handle modify MODE successfuly called\n";
 }

@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/14 16:24:21 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/14 17:16:54 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -224,6 +224,7 @@ void	Server::clientRequest(int client, int epfd)
 			sendClient(client, "Error: input too big (max_body_size = 5000)\n");
 			return (void)(std::cerr << "Error: client request too big: max " << MAX_BODY_SIZE << " characters" << std::endl);
 		}
+
 		Request	req = Request(buffer);
 		Client	*tp = findClientFd(client);
 		std::vector<Command>::iterator	it;

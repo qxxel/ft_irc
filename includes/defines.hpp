@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 16:12:51 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/14 15:58:20 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/17 13:08:15 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,11 @@
 # define ACTL_TPC "This is the current topic\n"
 # define ALRD_OP "Already op in this channel\n"
 # define ISNT_OP "Target isn't op in this channel\n"
+# define ISNT_NB "Argument isn't a number\n"
+# define INV_PASS_FRMT "The password is invalid\n"
+# define LST_MODES "MODE flags are -+iktop one by one\n"
+
+
 
 // # define ERR_USR "Enter a username: USER <username>\n"
 // # define ERR_NCK "Enter a nickname: NICK <nickname>\n"
