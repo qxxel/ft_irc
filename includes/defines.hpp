@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 16:12:51 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/28 15:17:17 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/28 16:03:00 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@
 # define TRGT_KICK "Target kicked\n"
 # define NO_CHNL "Channel don't exist\n"
 # define NO_TPC "No topic is set\n"
+# define TRGT_NOT_FOUND "Target not found\n"
 # define NO_CHNL_ASK "You're not on that channel\n"
 # define CHNL_LEFT "Channel left\n"
 # define INVT_SEND "Invitation sent\n"
