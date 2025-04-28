@@ -34,7 +34,7 @@ class Server
 	private:
 		static bool				_running;
 		int						_port;
-		std::string				_pwd;
+		long					_pwd;
 		std::vector<Client*>	_clients;
 		std::vector<Channel*>	_channels;
 
@@ -57,16 +57,16 @@ class Server
 		Channel	*searchChannel(std::string name);
 
 		static void			exit(void);
-		static void			sendClient(int client, std::string msg);
 		static bool			isValidChar(char c);
-
+		static void			sendClient(int client, std::string msg);
+		static long			simpleHash(std::string const &clear_text);
 
 		void					setRunning(bool running);
-		void					setPwd(std::string pwd);
+		void					setPwd(long pwd);
 		void					setPort(int port);
 		int						getPort(void);
 		bool					getRunning(void);
-		std::string				getPwd(void);
+		long					getPwd(void);
 		std::vector<Client*>	&getClients();
 		std::vector<Channel*>	&getChannels();
 

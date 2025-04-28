@@ -169,7 +169,7 @@ void	Command::handlePass(Server &serv, Client *client, std::vector<std::string> 
 			{
 				return (Server::sendClient(client->getFd(), INV_FORMAT ENTER_PWD));
 			}
-			else if (!(args->at(0).compare(serv.getPwd())))
+			else if (Server::simpleHash(args->at(0)) == serv.getPwd())
 			{
 				client->setPwd(true);
 				Server::sendClient(client->getFd(), PWD_GOOD);
@@ -230,7 +230,7 @@ try
 	{
 		if (!client->getPwd())
 			return (Server::sendClient(client->getFd(), ENTER_PWD));
-		else if (args->size() != 3 || args->at(1).compare("0") || args->at(2).compare("*"))
+		else if (args->size() < 3 || args->size() > 4 || args->at(1).compare("0") || args->at(2).compare("*"))
 			return (Server::sendClient(client->getFd(), ENTER_USER));
 		else if (!client->getUser().empty())
 		{
