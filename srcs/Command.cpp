@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/28 16:23:31 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/28 17:23:38 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -270,6 +270,12 @@ void	Command::handlePrivMsg(Server &serv, Client *client, std::vector<std::strin
 		return ;
 	}
 
+	// SEARCH FOR ':' IN MESSAGE
+	if (args->at(1)[0] != ':')
+	{
+		
+	}
+
 	// TRY TO FIND A CHANNEL
 	Channel	*channel = serv.searchChannel(args->at(0));
 	if (!channel)
@@ -297,6 +303,9 @@ void	Command::handlePrivMsg(Server &serv, Client *client, std::vector<std::strin
 
 		channel->sendClients(client->getUser(), client->getUser() + " PRIVMSG " + channel->getName() + " " + args->at(1) + "\n");
 	}
+
+	std::cout << "handle PRIVMSG successfuly called" << std::endl;
+
 }
 
 // JOIN CHANNEL
