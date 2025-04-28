@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 16:12:51 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/28 16:03:00 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/28 17:25:06 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@
 # define PWD_SET "Password was already given !\n"
 # define PWD_GOOD "Good password !\n"
 # define INV_PWD "Invalid password !\n"
-# define JOIN_USG "Join channels one by one\n"
 # define NOT_ALW "You're not allowed to enter this channel\n"
 # define AUTHY_GOOD "Finished authentification !\n\n"
 # define ENTER_NCK_USR "Please enter a username or a nickname: USER <username> <0> <*> or NICK <nickname>\n"
@@ -37,8 +36,10 @@
 # define HAS_INVALID_CHARS "This field can not contain any of these characters: '\\0', '\\r', '\\a', '\\n', 'space', ',', ';'\n"
 # define IS_TAKEN "This name is unavailable !\n"
 
-# define ALRDY_IN_CHNL "You're already in this channel\n"
-# define INV_CHNL_NAME "The name of the channel isn't valid\n"
+# define JOIN_USG "Join channels one by one\n"
+# define ALRDY_IN_CHNL "Already in this channel\n"
+# define NOT_ALW "You're not allowed to enter this channel\n"
+# define INV_CHNL_NAME "The name of the channel is invalid\n"
 # define CHNL_CREATE "Channel created\n"
 # define CHNL_JOIN "Channel joined\n"
 # define NO_CHNL_IN "Not in a channel\n"

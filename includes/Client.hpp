@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 16:03:22 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/17 12:49:50 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/28 17:31:11 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,10 @@
 # include <map>
 # include <vector>
 # include "Channel.hpp"
+#include "Request.hpp"
 
 class Channel;
+class Request;
 
 class Client
 {
@@ -28,6 +30,7 @@ private:
 	bool					_pwd;
 	std::string				_user;
 	std::string				_nick;
+	Request					*_req;
 	std::vector<Channel*>	_currentsChannels;
 	std::vector<Channel*>	_joinableChannels;
 
@@ -47,6 +50,7 @@ public:
 	void	setAuth(bool auth);
 	void	setPwd(bool pwd);
 
+
 	bool					getAuth();
 	bool					getPwd();
 	int						getFd();
@@ -54,6 +58,7 @@ public:
 	std::string				getNick();
 	std::vector<Channel*>	&getCurrentsChannels();
 	std::vector<Channel*>	&getJoinableChannels();
+	Request					*getRequest();
 };
 
 std::ostream &	operator<<(std::ostream &o, Client &client);

@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 16:04:15 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/17 12:50:03 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/28 17:32:11 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,12 @@
 #include "Server.hpp"
 #include "defines.hpp"
 
-Client::Client(int fd) : _fd(fd), _auth(false),  _pwd(false), _user(""), _nick("") { }
+Client::Client(int fd) : _fd(fd), _auth(false),  _pwd(false), _user(""), _nick(""), _req(new Request()){ }
 
 Client::~Client()
 {
+	delete _req;
+
 	std::vector<Channel*>::iterator	it;
 	for (it = this->_currentsChannels.begin(); it != this->_currentsChannels.end(); it++)
 	{
@@ -150,6 +152,11 @@ std::string	Client::getUser()
 std::vector<Channel*>	&Client::getCurrentsChannels()
 {
 	return (this->_currentsChannels);
+}
+
+Request		*Client::getRequest()
+{
+	return _req;
 }
 
 std::vector<Channel*>	&Client::getJoinableChannels()

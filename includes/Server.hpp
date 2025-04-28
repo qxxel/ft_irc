@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:07 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/28 15:16:18 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/28 17:25:42 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,20 +26,23 @@ class Client;
 class Channel;
 class Client;
 
+class Client;
+class Channel;
+
 class Server
 {
 	private:
 		static bool				_running;
 		int						_port;
-		std::string				_pwd;
+		long					_pwd;
 		std::vector<Client*>	_clients;
 		std::vector<Channel*>	_channels;
-	
+
 	public:
 		~Server();
 		Server(std::string port, std::string password);
-	
-	
+
+
 		int		parsePort(std::string port);
 		void	start(void);
 		void	run(int sock);
@@ -52,21 +55,22 @@ class Server
 		Client	*findClientFd(int fd);
 		Client	*findClientName(std::string name);
 		Channel	*searchChannel(std::string name);
-	
-		static void	exit(void);
-		static void	sendClient(int client, std::string msg);
-		static bool	isValidChar(char c);
+
+		static void			exit(void);
+		static bool			isValidChar(char c);
+		static void			sendClient(int client, std::string msg);
+		static long			simpleHash(std::string const &clear_text);
 
 		void					setRunning(bool running);
-		void					setPwd(std::string pwd);
+		void					setPwd(long pwd);
 		void					setPort(int port);
 		int						getPort(void);
 		bool					getRunning(void);
-		std::string				getPwd(void);
+		long					getPwd(void);
 		std::vector<Client*>	&getClients();
 		std::vector<Channel*>	&getChannels();
-	
-	
+
+
 		class	ChannelAlreadyExists: public std::exception
 		{
 			public:

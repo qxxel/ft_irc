@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/14 17:16:54 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/28 17:30:28 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ Server::Server(std::string port, std::string password)
 {
 	try
 	{
-		_pwd = password;
+		_pwd = simpleHash(password);
 		setPort(parsePort(port));
 		std::cout << *this;
 		start();
@@ -69,6 +69,14 @@ int	Server::parsePort(std::string port)
 	return (atoi(port.c_str()));
 }
 
+long	Server::simpleHash(std::string const &clear_text)
+{
+	long	hash = 0;
+	for (size_t i = 0; i < 	clear_text.length(); i++)
+		hash = 22 * hash + clear_text[i];
+	return (hash);
+}
+
 void	Server::start(void)
 {
 	int	fd_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -78,7 +86,7 @@ void	Server::start(void)
 	int	opt = 1;
 	if (setsockopt(fd_socket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(int)) == -1)
 		throw (std::runtime_error("Error: setsockopt failed: " + std::string(strerror(errno))));
-	
+
 	if (fcntl(fd_socket, F_SETFL, O_NONBLOCK) == -1)
 		throw (std::runtime_error("Error: fcntl failed: " + std::string(strerror(errno))));
 
@@ -123,7 +131,7 @@ void	Server::run(int sock)
 		nfds = epoll_wait(epfd, events, MAX_EVENTS, -1);
 		if (nfds == -1)
 			throw (std::runtime_error("Error: epoll_wait failed: " + std::string(strerror(errno))));
-		
+
 		try
 		{
 			for (int i = 0; i < nfds; i++)
@@ -175,7 +183,7 @@ int	Server::acceptClient(int sock, int epfd)
 	{
 		throw ;
 	}
-	
+
 	return (fd);
 }
 
@@ -190,14 +198,14 @@ void	Server::disconnectClient(int client, int epfd)
 	this->deleteClient(client);
 	delete findClientFd(client);
 
-	std::cout << "Client " << client << " disconnected" << std::endl;	
+	std::cout << "Client " << client << " disconnected" << std::endl;
 }
 
 void	Server::sendClient(int client, std::string msg)
 {
 	if (send(client, msg.c_str(), msg.size(), 0) == -1)
 		throw (std::runtime_error("Error: sending data to clients failed: " + std::string(strerror(errno))));
-}		
+}
 
 bool	Server::isValidChar(char c)
 {
@@ -208,13 +216,13 @@ void	Server::clientRequest(int client, int epfd)
 {
 	char		buffer[MAX_BODY_SIZE + 2];
 	ssize_t		n;
-	
+
 	memset(buffer, 0, MAX_BODY_SIZE + 2);
 	n = recv(client, &buffer, MAX_BODY_SIZE + 1, 0);
 	if (n == -1)
 		return (void)(std::cerr << ("Error: recv failed: " + std::string(strerror(errno))));
-	
-	// std::cout << "\n------------SERVER RECEIVED-------------\n\n" << buffer << std::endl; //debug	
+
+	// std::cout << "\n------------SERVER RECEIVED-------------\n\n" << buffer << std::endl; //debug
 	try
 	{
 		if (n == 0)
@@ -224,19 +232,22 @@ void	Server::clientRequest(int client, int epfd)
 			sendClient(client, "Error: input too big (max_body_size = 5000)\n");
 			return (void)(std::cerr << "Error: client request too big: max " << MAX_BODY_SIZE << " characters" << std::endl);
 		}
-
-		Request	req = Request(buffer);
 		Client	*tp = findClientFd(client);
-		std::vector<Command>::iterator	it;
 
-		for (it = req.getArr().begin(); it != req.getArr().end() ; it++)
-			Command::executeCommand(*this, tp, &(*it));
-	}			
+		tp->getRequest()->append(buffer, n);
+		if (buffer[n - 1] == '\n')
+		{
+			tp->getRequest()->split_Request();
+			for (std::vector<Command>::iterator	 it = tp->getRequest()->getArr().begin(); it != tp->getRequest()->getArr().end() ; it++)
+				Command::executeCommand(*this, tp, &(*it));
+			tp->getRequest()->clear();
+		}
+	}
 	catch(const std::exception& e)
 	{
 		throw ;
 	}
-}	
+}
 
 Client	*Server::findClientFd(int fd)
 {
@@ -333,7 +344,7 @@ Channel	*Server::searchChannel(std::string name)
 
 // ---------------------------------------------SERVER SETTERS AND GETTERS---------------------------------------------
 
-void	Server::setPwd(std::string pwd)
+void	Server::setPwd(long pwd)
 {
 	_pwd = pwd;
 }
@@ -358,7 +369,7 @@ bool	Server::getRunning(void)
 	return (_running);
 }
 
-std::string	Server::getPwd(void)
+long	Server::getPwd(void)
 {
 	return (_pwd);
 }
@@ -371,11 +382,6 @@ std::vector<Client*>	&Server::getClients()
 std::vector<Channel*>	&Server::getChannels()
 {
 	return (this->_channels);
-}
-
-std::vector<Client*>	&Server::getClients()
-{
-	return (_clients);
 }
 
 std::ostream &	operator<<(std::ostream &o, Server &serv)

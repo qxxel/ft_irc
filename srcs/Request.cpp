@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 14:50:48 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/14 17:17:16 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/28 17:29:04 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,20 +18,42 @@ Request::~Request()
 {
 }
 
-Request::Request(char *raw) : _arr()
+Request::Request() : _line(), _arr() {}
+
+Request::Request(char *raw) : _line(raw), _arr()
 {
-	std::string	str_raw(raw);
+	this->split_Request();
+}
+
+void Request::split_Request()
+{
 	std::string	cmd_raw;
 	std::size_t	del;
 
-	while (!str_raw.empty() && (del = str_raw.find('\n')) != std::string::npos)
+	while (!_line.empty() && (del = _line.find('\n')) != std::string::npos)
 	{
-		cmd_raw = str_raw.substr(0, del + 1);
+		cmd_raw = _line.substr(0, del + 1);
 		Command	tp = Command(cmd_raw);
 		std::cout << tp;
 		_arr.push_back(tp);
-		str_raw = str_raw.substr(del + 1, str_raw.size() - del);
+		_line = _line.substr(del + 1, _line.size() - del);
 	}
+}
+
+std::string	&Request::append(const char* s, size_t n)
+{
+	return _line.append(s, n);
+}
+
+void		Request::clear()
+{
+	_line.clear();
+	_arr.clear();
+}
+
+std::string	Request::getLine()
+{
+	return _line;
 }
 
 std::vector<Command>	&Request::getArr()

@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/28 17:23:38 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/28 17:33:29 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,16 @@ Command::~Command()
 {
 }
 
+bool	Command::parse_arg(std::string arg)
+{
+	for (std::string::iterator it = arg.begin(); it != arg.end(); it++)
+	{
+		if (Server::isValidChar(*it))
+			return (true);
+	}
+	return (false);
+}
+
 std::string Command::joinStrings(const std::vector<std::string>& vec)
 {
 	std::string	result;
@@ -37,15 +47,15 @@ std::string Command::joinStrings(const std::vector<std::string>& vec)
 	return (result);
 }
 
-bool	Command::parse_arg(std::string arg)
-{
-	for (std::string::iterator it = arg.begin(); it != arg.end(); it++)
-	{
-		if (Server::isValidChar(*it))
-			return (true);
-	}
-	return (false);
-}
+// bool	Command::parse_arg(std::string arg)
+// {
+// 	for (std::string::iterator it = arg.begin(); it != arg.end(); it++)
+// 	{
+// 		if (Server::isValidChar(*it))
+// 			return (true);
+// 	}
+// 	return (false);
+// }
 
 void	Command::parse()
 {
@@ -59,10 +69,15 @@ void	Command::parse()
 		while (i < _raw.size() && isspace(_raw[i]))
 			i++;
 		if (i == _raw.size())
-			break ;
+			break;
 		j = i;
-		while (i < _raw.size() && isascii(_raw[i]) && !isspace(_raw[i]))
-			i++;
+		if (_raw[i] == ':')
+			i = _raw.size();
+		else
+		{
+			while (i < _raw.size() && isascii(_raw[i]) && !isspace(_raw[i]))
+				i++;
+		}
 		str = _raw.substr(j, i - j);
 		if (_name.empty())
 			_name = str;
@@ -117,6 +132,8 @@ std::ostream &	operator<<(std::ostream &o, Command &cmd)
 			o << "\t";
 		o << i << ": " << vec[i] << std::endl;
 	}
+	if (0 == vec.size())
+		o << std::endl;
 	return (o);
 }
 
@@ -164,7 +181,7 @@ void	Command::handlePass(Server &serv, Client *client, std::vector<std::string> 
 			{
 				return (Server::sendClient(client->getFd(), INV_FORMAT ENTER_PWD));
 			}
-			else if (!(args->at(0).compare(serv.getPwd())))
+			else if (Server::simpleHash(args->at(0)) == serv.getPwd())
 			{
 				client->setPwd(true);
 				Server::sendClient(client->getFd(), PWD_GOOD);
@@ -221,11 +238,11 @@ void	Command::handleNick(Client *client, std::vector<std::string> *args)
 }
 void	Command::handleUser(Server &serv, Client *client, std::vector<std::string> *args)
 {
-	try
+try
 	{
 		if (!client->getPwd())
 			return (Server::sendClient(client->getFd(), ENTER_PWD));
-		else if (args->size() != 3 || args->at(1).compare("0") || args->at(2).compare("*"))
+		else if (args->size() < 3 || args->size() > 4 || args->at(1).compare("0") || args->at(2).compare("*"))
 			return (Server::sendClient(client->getFd(), ENTER_USER));
 		else if (!client->getUser().empty())
 		{
@@ -667,13 +684,13 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 	{
 		std::string	modes = " +";
 		std::string	modesArgs;
-		
+
 		if (channel->getInvOnly())
 			modes += "i";
 		else if (!channel->getTopic().empty())
 		{
 			modes += "t";
-			modesArgs += " " + channel->getTopic(); 
+			modesArgs += " " + channel->getTopic();
 		}
 		else if (!channel->getPwd().empty())
 			modes += "k";
@@ -771,7 +788,7 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 		channel->setModeSetTimestamp(time(NULL));
 		channel->sendClients("", client->getUser() + " MODE " + channel->getName() + " -t\n");
 	}
-	
+
 		// ADD CHECK SIZE ARGS
 	// ADD PASSWORD MODE
 	else if (args->at(1) == "+k")
@@ -837,7 +854,7 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 			std::cout << "handle modify MODE failed => target already op" << std::endl;
 			return ;
 		}
-		
+
 		channel->getOpList().push_back(target);
 		channel->setModeSetTimestamp(time(NULL));
 		channel->sendClients("", client->getUser() + " MODE " + channel->getName() + " +o " + target->getUser() + "\n");
@@ -860,7 +877,7 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 			std::cout << "handle modify MODE failed => target isn't op" << std::endl;
 			return ;
 		}
-		
+
 		channel->delOpName(target->getUser());
 		channel->setModeSetTimestamp(time(NULL));
 		channel->sendClients("", client->getUser() + " MODE " + channel->getName() + " -o " + target->getUser() + "\n");
@@ -876,12 +893,12 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 			return ;
 		}
 
-		if (args->at(2)) 			/*		/!\ CHECK IF ISDIGIT !! /!\		*/
-		{
-			Server::sendClient(client->getFd(), ISNT_NB);
-			std::cout << "handle modify MODE failed => invalid input (nan)" << std::endl;
-			return ;
-		}
+		// if (args->at(2)) 			/*		/!\ CHECK IF ISDIGIT !! /!\		*/
+		// {
+		// 	Server::sendClient(client->getFd(), ISNT_NB);
+		// 	std::cout << "handle modify MODE failed => invalid input (nan)" << std::endl;
+		// 	return ;
+		// }
 
 		channel->setMaxUsers(stringToInt(args->at(2)));
 		channel->setModeSetTimestamp(time(NULL));
