@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:07 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/14 16:24:28 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/28 15:16:18 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,9 @@
 # include "Channel.hpp"
 # include "Client.hpp"
 # include "Request.hpp"
+
+class Channel;
+class Client;
 
 class Channel;
 class Client;
@@ -50,10 +53,9 @@ class Server
 		Client	*findClientName(std::string name);
 		Channel	*searchChannel(std::string name);
 	
-		static void			exit(void);
-		static void			sendClient(int client, std::string msg);
-		static bool			isValidChar(char c);
-
+		static void	exit(void);
+		static void	sendClient(int client, std::string msg);
+		static bool	isValidChar(char c);
 
 		void					setRunning(bool running);
 		void					setPwd(std::string pwd);

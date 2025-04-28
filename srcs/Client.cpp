@@ -11,6 +11,8 @@
 /* ************************************************************************** */
 
 #include "Client.hpp"
+#include "Server.hpp"
+#include "defines.hpp"
 
 Client::Client(int fd) : _fd(fd), _auth(false),  _pwd(false), _user(""), _nick("") { }
 
@@ -100,7 +102,19 @@ void	Client::setUser(std::string user)
 
 void	Client::setAuth(bool auth)
 {
-	_auth = auth;
+	try
+	{
+		if (auth)
+		{
+			Server::sendClient(_fd, AUTHY_GOOD);
+			Server::sendClient(_fd, USR_NAME + _user + "\n" + NICK_NAME + _nick + "\n");
+		}
+		_auth = auth;
+	}
+	catch(const std::exception& e)
+	{
+		throw ;
+	}
 }
 
 void	Client::setPwd(bool pwd)

@@ -35,6 +35,8 @@ public:
 	static std::string joinStrings(const std::vector<std::string>& vec);
 
 	void	parse();
+	bool	parse_arg(std::string arg);
+	bool	is_available(Server &serv, std::string name);
 
 	//Setters and getters
 	std::string					getName();
@@ -45,7 +47,7 @@ public:
 	static void	executeCommand(Server &serv, Client *client, Command *cmd);
 	void	handlePass(Server &serv, Client *client, std::vector<std::string> *args);
 	void	handleNick(Client *client, std::vector<std::string> *args);
-	void	handleUser(Client *client, std::vector<std::string> *args);
+	void	handleUser(Server &serv, Client *client, std::vector<std::string> *args);
 	void	handleJoin(Server &serv, Client *client, std::vector<std::string> *args);
 	void	handlePart(Server &serv, Client *client, std::vector<std::string> *args);
 	void	handleKick(Server &serv, Client *client, std::vector<std::string> *args);
