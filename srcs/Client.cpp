@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 16:04:15 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/15 14:10:42 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/04/28 17:32:11 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,31 +14,47 @@
 #include "Server.hpp"
 #include "defines.hpp"
 
+Client::Client(int fd) : _fd(fd), _auth(false),  _pwd(false), _user(""), _nick(""), _req(new Request()){ }
+
 Client::~Client()
 {
 	delete _req;
-}
 
-Client::Client(int fd) : _fd(fd), _auth(false),  _pwd(false), _user(""), _nick(""), _currentChannel(NULL) , _req(new Request())
-{
-	if (this->_currentChannel)
+	std::vector<Channel*>::iterator	it;
+	for (it = this->_currentsChannels.begin(); it != this->_currentsChannels.end(); it++)
 	{
-		this->_currentChannel->delClientName(this->_user);
-		if (this->_currentChannel->isOpName(this->_user))
-			this->_currentChannel->delOpName(this->_user);
+		(*it)->delClientName(this->_user);
+		if ((*it)->isOpName(this->_user))
+			(*it)->delOpName(this->_user);
 	}
 }
 
-void	Client::setUnjoinableChannel(Channel *channel)
+void	Client::delJoinableChannel(Channel *channel)
 {
 	if (!channel)
 		return ;
 
-	for (std::vector<Channel*>::iterator	it = this->_joinableChannels.begin(); it != this->_joinableChannels.end(); it++)
+	for (std::vector<Channel*>::iterator it = this->_joinableChannels.begin(); it != this->_joinableChannels.end(); it++)
 	{
 		if ((*it) == channel)
 		{
 			this->_joinableChannels.erase(it);
+			return ;
+		}
+	}
+}
+
+void	Client::delCurrentChannel(Channel *channel)
+{
+	if (!channel)
+		return ;
+
+	std::vector<Channel*>::iterator	it;
+	for (it = this->_currentsChannels.begin(); it != this->_currentsChannels.end(); it++)
+	{
+		if ((*it) == channel)
+		{
+			this->_currentsChannels.erase(it);
 			return ;
 		}
 	}
@@ -52,6 +68,17 @@ bool	Client::isJoinableChannel(Channel *channel)
 	for (std::vector<Channel*>::iterator	it = this->_joinableChannels.begin(); it != this->_joinableChannels.end(); it++)
 	{
 		if ((*it) == channel)
+			return (true);
+	}
+	return (false);
+}
+
+bool	Client::isCurrentChannel(std::string name)
+{
+	std::vector<Channel*>::iterator	it;
+	for (it = this->_currentsChannels.begin(); it != this->_currentsChannels.end(); it++)
+	{
+		if ((*it)->getName() == name)
 			return (true);
 	}
 	return (false);
@@ -97,13 +124,6 @@ void	Client::setPwd(bool pwd)
 	_pwd = pwd;
 }
 
-void	Client::setCurrentChannel(Channel *channel)
-{
-	if (!channel)
-		return ;
-	this->_currentChannel = channel;
-}
-
 int		Client::getFd()
 {
 	return (_fd);
@@ -129,9 +149,9 @@ std::string	Client::getUser()
 	return (_user);
 }
 
-Channel		*Client::getCurrentChannel()
+std::vector<Channel*>	&Client::getCurrentsChannels()
 {
-	return (this->_currentChannel);
+	return (this->_currentsChannels);
 }
 
 Request		*Client::getRequest()

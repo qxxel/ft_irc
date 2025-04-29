@@ -3,10 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:07 by ibjean-b          #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2025/04/29 16:19:05 by mreynaud         ###   ########.fr       */
+=======
+/*   Updated: 2025/04/28 17:25:42 by agerbaud         ###   ########.fr       */
+>>>>>>> axel
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +38,7 @@ class Server
 	private:
 		static bool				_running;
 		int						_port;
-		std::string				_pwd;
+		long					_pwd;
 		std::vector<Client*>	_clients;
 		std::vector<Channel*>	_channels;
 
@@ -57,16 +61,17 @@ class Server
 		Channel	*searchChannel(std::string name);
 
 		static void			exit(void);
-		static void			sendClient(int client, std::string msg);
 		static bool			isValidChar(char c);
 		static std::string	str_toupper(std::string str);
+		static void			sendClient(int client, std::string msg);
+		static long			simpleHash(std::string const &clear_text);
 
 		void					setRunning(bool running);
-		void					setPwd(std::string pwd);
+		void					setPwd(long pwd);
 		void					setPort(int port);
 		int						getPort(void);
 		bool					getRunning(void);
-		std::string				getPwd(void);
+		long					getPwd(void);
 		std::vector<Client*>	&getClients();
 		std::vector<Channel*>	&getChannels();
 

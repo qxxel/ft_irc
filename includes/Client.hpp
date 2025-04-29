@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 16:03:22 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/15 14:03:39 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/04/28 17:31:11 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,16 +30,18 @@ private:
 	bool					_pwd;
 	std::string				_user;
 	std::string				_nick;
-	Channel					*_currentChannel;
 	Request					*_req;
+	std::vector<Channel*>	_currentsChannels;
 	std::vector<Channel*>	_joinableChannels;
 
 public:
 	Client(int fd);
 	~Client();
 
-	void	setUnjoinableChannel(Channel *channel);
+	void	delJoinableChannel(Channel *channel);
+	void	delCurrentChannel(Channel *channel);
 	bool	isJoinableChannel(Channel *channel);
+	bool	isCurrentChannel(std::string name);
 
 	//SETTERS AND GETTERS
 	void	setFd(int fd);
@@ -47,7 +49,6 @@ public:
 	void	setNick(std::string nick);
 	void	setAuth(bool auth);
 	void	setPwd(bool pwd);
-	void	setCurrentChannel(Channel *channel);
 
 
 	bool					getAuth();
@@ -55,7 +56,7 @@ public:
 	int						getFd();
 	std::string				getUser();
 	std::string				getNick();
-	Channel					*getCurrentChannel();
+	std::vector<Channel*>	&getCurrentsChannels();
 	std::vector<Channel*>	&getJoinableChannels();
 	Request					*getRequest();
 };

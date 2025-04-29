@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 16:12:51 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/15 14:30:48 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/04/29 16:39:45 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 # define PWD_SET "Password was already given !\n"
 # define PWD_GOOD "Good password !\n"
 # define INV_PWD "Invalid password !\n"
+# define NOT_ALW "You're not allowed to enter this channel\n"
 # define AUTHY_GOOD "Finished authentification !\n\n"
 # define ENTER_NCK_USR "Please enter a username or a nickname: USER <username> <0> <*> or NICK <nickname>\n"
 # define UKWN_CMD "Unknown command: "
@@ -34,8 +35,10 @@
 # define CANT_USER "Can not change username !\n"
 # define HAS_INVALID_CHARS "This field can not contain any of these characters: '\\0', '\\r', '\\a', '\\n', 'space', ',', ';'\n"
 # define IS_TAKEN "This name is unavailable !\n"
+# define NEED_AUTH "You need to finish authentication to execute commands\n"
 
 # define JOIN_USG "Join channels one by one\n"
+# define MSG_RULE "You have to put a ':' in front of your message\n"
 # define ALRDY_IN_CHNL "Already in this channel\n"
 # define NOT_ALW "You're not allowed to enter this channel\n"
 # define INV_CHNL_NAME "The name of the channel is invalid\n"
@@ -48,6 +51,7 @@
 # define TRGT_KICK "Target kicked\n"
 # define NO_CHNL "Channel don't exist\n"
 # define NO_TPC "No topic is set\n"
+# define TRGT_NOT_FOUND "Target not found\n"
 # define NO_CHNL_ASK "You're not on that channel\n"
 # define CHNL_LEFT "Channel left\n"
 # define INVT_SEND "Invitation sent\n"
@@ -57,6 +61,11 @@
 # define ACTL_TPC "This is the current topic\n"
 # define ALRD_OP "Already op in this channel\n"
 # define ISNT_OP "Target isn't op in this channel\n"
+# define ISNT_NB "Argument isn't a number\n"
+# define INV_PASS_FRMT "The password is invalid\n"
+# define LST_MODES "MODE flags are -+iktop one by one\n"
+
+
 
 // # define ERR_USR "Enter a username: USER <username>\n"
 // # define ERR_NCK "Enter a nickname: NICK <nickname>\n"

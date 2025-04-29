@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/29 16:13:10 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/04/29 16:40:47 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ Server::Server(std::string port, std::string password)
 {
 	try
 	{
-		_pwd = password;
+		_pwd = simpleHash(password);
 		setPort(parsePort(port));
 		std::cout << *this;
 		start();
@@ -67,6 +67,14 @@ int	Server::parsePort(std::string port)
 			throw (std::runtime_error("Error: invalid port"));
 	}
 	return (atoi(port.c_str()));
+}
+
+long	Server::simpleHash(std::string const &clear_text)
+{
+	long	hash = 0;
+	for (size_t i = 0; i < 	clear_text.length(); i++)
+		hash = 22 * hash + clear_text[i];
+	return (hash);
 }
 
 void	Server::start(void)
@@ -343,7 +351,7 @@ Channel	*Server::searchChannel(std::string name)
 
 // ---------------------------------------------SERVER SETTERS AND GETTERS---------------------------------------------
 
-void	Server::setPwd(std::string pwd)
+void	Server::setPwd(long pwd)
 {
 	_pwd = pwd;
 }
@@ -368,7 +376,7 @@ bool	Server::getRunning(void)
 	return (_running);
 }
 
-std::string	Server::getPwd(void)
+long	Server::getPwd(void)
 {
 	return (_pwd);
 }

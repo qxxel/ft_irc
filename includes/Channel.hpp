@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:48 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/04/14 16:25:33 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/29 16:14:49 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,12 +60,13 @@ class Channel
 		void	setLockTopic(bool lockTopic);
 
 
-		void	parseName(std::string name) const;
-		Client	*findClientName(std::string name);
-		void	delClientName(std::string name);
-		void	delOpName(std::string name);
-		bool	isOpName(std::string name);
-		void	sendClients(std::string message);
+		void		parseName(std::string name) const;
+		Client		*findClientName(std::string name);
+		void		delClientName(std::string name);
+		void		delOpName(std::string name);
+		bool		isOpName(std::string name);
+		void		sendClients(std::string exceptionName, std::string message);
+		std::string	listClients();
 
 		class	NameIsntValid: public std::exception
 		{

@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:13 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/14 16:22:00 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/28 15:31:56 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ public:
 	void	handlePass(Server &serv, Client *client, std::vector<std::string> *args);
 	void	handleNick(Client *client, std::vector<std::string> *args);
 	void	handleUser(Server &serv, Client *client, std::vector<std::string> *args);
+	void	handlePrivMsg(Server &serv, Client *client, std::vector<std::string> *args);
 	void	handleJoin(Server &serv, Client *client, std::vector<std::string> *args);
 	void	handlePart(Server &serv, Client *client, std::vector<std::string> *args);
 	void	handleKick(Server &serv, Client *client, std::vector<std::string> *args);
