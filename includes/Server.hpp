@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:07 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/15 14:09:13 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/04/29 16:19:05 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ class Server
 		static void			exit(void);
 		static void			sendClient(int client, std::string msg);
 		static bool			isValidChar(char c);
-
+		static std::string	str_toupper(std::string str);
 
 		void					setRunning(bool running);
 		void					setPwd(std::string pwd);

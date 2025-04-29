@@ -6,13 +6,14 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/15 14:14:27 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/04/29 16:17:54 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Command.hpp"
 #include "Server.hpp"
 #include "defines.hpp"
+#include "Bot.hpp"
 
 Command::Command(std::string raw) : _raw(raw), _name("")
 {
@@ -132,7 +133,9 @@ void Command::executeCommand(Server &serv, Client *client, Command *cmd)
 	std::vector<std::string>	args = cmd->getArgs();
 	try
 	{
-		if (!cmd->getName().compare("PASS"))
+		if (!cmd->getName().compare("!GAME"))
+			Bot::handleBot(serv, client, &args);
+		else if (!cmd->getName().compare("PASS"))
 			cmd->handlePass(serv, client, &args);
 		else if (!cmd->getName().compare("NICK"))
 			cmd->handleNick(client, &args);

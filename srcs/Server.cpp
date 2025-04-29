@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/15 14:10:11 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/04/29 16:13:10 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -202,6 +202,13 @@ void	Server::sendClient(int client, std::string msg)
 bool	Server::isValidChar(char c)
 {
 	return (!(c == 0 || c == 7 || c == '\r' || c == '\n' || c == ' ' || c == ',' || c == ':'));
+}
+
+std::string	Server::str_toupper(std::string str)
+{
+	for (std::string::iterator it = str.begin(); it != str.end(); it++)
+		*it = toupper(*it);
+	return str;
 }
 
 void	Server::clientRequest(int client, int epfd)
