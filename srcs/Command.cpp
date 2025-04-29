@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/28 17:33:29 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/29 16:27:19 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,7 +148,14 @@ void Command::executeCommand(Server &serv, Client *client, Command *cmd)
 			cmd->handleNick(client, &args);
 		else if (!cmd->getName().compare("USER"))
 			cmd->handleUser(serv, client, &args);
-		else if (!cmd->getName().compare("PRIVMSG"))
+		
+		if (!client->getAuth())
+		{
+			Server::sendClient(client->getFd(), NEED_AUTH);
+			return ;
+		}
+		
+		if (!cmd->getName().compare("PRIVMSG"))
 			cmd->handlePrivMsg(serv, client, &args);
 		else if (!cmd->getName().compare("JOIN"))
 			cmd->handleJoin(serv, client, &args);
@@ -287,29 +294,26 @@ void	Command::handlePrivMsg(Server &serv, Client *client, std::vector<std::strin
 		return ;
 	}
 
-	// SEARCH FOR ':' IN MESSAGE
+	// SEARCH FOR ':' IN FRONT OF THE MESSAGE
 	if (args->at(1)[0] != ':')
 	{
-		
+		Server::sendClient(client->getFd(), MSG_RULE);
+		std::cout << "handle PRIVMSG failed => no ':' at the start of the message" << std::endl;
+		return ;
 	}
 
-	// TRY TO FIND A CHANNEL
-	Channel	*channel = serv.searchChannel(args->at(0));
-	if (!channel)
+	// CHECK IF THE TARGET IS A CHANNEL
+	if (args->at(0)[0] == '#')
 	{
-		// TRY TO FIND A CLIENT
-		Client	*target = serv.findClientName(args->at(0));
-		if (!target)
+		// TRY TO FIND CHANNEL IN THE SERVER
+		Channel	*channel = serv.searchChannel(args->at(0));
+		if (!channel)
 		{
-			Server::sendClient(client->getFd(), TRGT_NOT_FOUND);
-			std::cout << "handle PRIVMSG failed => wrong target" << std::endl;
+			Server::sendClient(client->getFd(), NO_CHNL);
+			std::cout << "handle PART failed => inexistant channel" << std::endl;
 			return ;
 		}
 
-		Server::sendClient(target->getFd(), client->getUser() + " PRIVMSG " + target->getUser() + " " + args->at(1) + "\n");
-	}
-	else
-	{
 		// CHECK IF CLIENT IS IN THIS CHANNEL
 		if (!client->isCurrentChannel(channel->getName()))
 		{
@@ -318,7 +322,21 @@ void	Command::handlePrivMsg(Server &serv, Client *client, std::vector<std::strin
 			return ;
 		}
 
-		channel->sendClients(client->getUser(), client->getUser() + " PRIVMSG " + channel->getName() + " " + args->at(1) + "\n");
+		channel->sendClients(client->getUser(), ":" + client->getNick() + "!" + client->getUser() + " PRIVMSG " + channel->getName() + " " + args->at(1) + "\n");
+	}
+	// CHECK IF THE TARGET IS A CLIENT
+	else
+	{
+		// TRY TO FIND THE TARGET IN THE SERVER
+		Client	*target = serv.findClientName(args->at(0));
+		if (!target)
+		{
+			Server::sendClient(client->getFd(), TRGT_NOT_FOUND);
+			std::cout << "handle PRIVMSG failed => inexistant target" << std::endl;
+			return ;
+		}
+
+		Server::sendClient(target->getFd(), ":" + client->getNick() + "!" + client->getUser() + " PRIVMSG " + target->getUser() + " " + args->at(1) + "\n");
 	}
 
 	std::cout << "handle PRIVMSG successfuly called" << std::endl;
@@ -350,20 +368,27 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 		// CREATE CHANNEL
 		serv.addChannel(newChannel);
 		client->getCurrentsChannels().push_back(newChannel);
-		Server::sendClient(client->getFd(), client->getUser() + " JOIN " + newChannel->getName() + "\n");
+		Server::sendClient(client->getFd(), ":" + client->getNick() + "!" + client->getUser() + " JOIN :" + newChannel->getName() + "\n");
 		Server::sendClient(client->getFd(), "MODE " + newChannel->getName() + " +l\n");
 	}
+	// IF NAME IS NOT VALID
 	catch (Channel::NameIsntValid &e)
 	{
-		std::cout << "handle JOIN exception: " << e.what() << std::endl;
 		Server::sendClient(client->getFd(), INV_CHNL_NAME);
+		std::cout << "handle JOIN exception: " << e.what() << std::endl;
 		return ;
 	}
+	// IF THE CHANNEL ALREADY EXISTS
 	catch (Server::ChannelAlreadyExists &)
 	{
+		// FIND CHANNEL IN SERVER
 		Channel	*channel = serv.searchChannel(args->at(0));
-		if (!channel) // maybe adapt
+		if (!channel)
+		{
+			Server::sendClient(client->getFd(), NO_CHNL);
+			std::cout << "handle JOIN failed => inexistant channel" << std::endl;
 			return ;
+		}
 
 		// CHECK IF CLIENT CAN ACCESS
 		if (channel && channel->getInvOnly() && !(client->isJoinableChannel(channel) || channel->isOpName(client->getUser())))
@@ -376,13 +401,15 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 		// CHECK PASSWORD
 		if (!channel->getPwd().empty() && !client->isJoinableChannel(channel))
 		{
+			// ADD CHECK SIZE ARGS
 			if (args->size() == 1)
-		// ADD CHECK SIZE ARGS
 			{
 				Server::sendClient(client->getFd(), ND_PASS);
 				std::cout << "handle JOIN failed => need password to join" << std::endl;
 				return ;
 			}
+	
+			// TRY PASSWORD
 			if (channel->getPwd() != args->at(1))
 			{
 				Server::sendClient(client->getFd(), WRNG_PASS);
@@ -399,8 +426,15 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 			return ;
 		}
 
+		// ADD CLIENT IN CHANNEL AND SEND MESSAGES
 		client->getCurrentsChannels().push_back(channel);
-		channel->sendClients("", client->getUser() + " JOIN " + channel->getName() + "\n");
+		channel->sendClients("", ":" + client->getNick() + "!" + client->getUser() + " JOIN :" + channel->getName() + "\n");
+		if (channel->getTopic().empty())
+			Server::sendClient(client->getFd(), client->getNick() + " " + channel->getName() + " :No topic is set\n");
+		else		
+			Server::sendClient(client->getFd(), client->getNick() + " " + channel->getName() + " " + channel->getTopic() + "\n");
+		Server::sendClient(client->getFd(), client->getNick() + " " + channel->getName() + " :" + channel->listClients() + "\n");
+		Server::sendClient(client->getFd(), client->getNick() + " " + channel->getName() + " :End of NAMES list\n");
 	}
 
 	std::cout << "handle JOIN successfully called" << std::endl;
@@ -509,7 +543,8 @@ void	Command::handleKick(Server &serv, Client *client, std::vector<std::string> 
 // INVITE USER IN CURRENT CHANNEL
 void	Command::handleInvite(Server &serv, Client *client, std::vector<std::string> *args)
 {
-	if (!args || args->empty() || args->size() != 1)
+	// USAGE: INVITE <user> <channel>
+	if (!args || args->empty() || args->size() != 2)
 	{
 		Server::sendClient(client->getFd(), INV_FORMAT);
 		std::cout << "handle INVITE failed => wrong input" << std::endl;
@@ -893,12 +928,12 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 			return ;
 		}
 
-		// if (args->at(2)) 			/*		/!\ CHECK IF ISDIGIT !! /!\		*/
-		// {
-		// 	Server::sendClient(client->getFd(), ISNT_NB);
-		// 	std::cout << "handle modify MODE failed => invalid input (nan)" << std::endl;
-		// 	return ;
-		// }
+		if (args->at(2)) 			/*		/!\ CHECK IF ISDIGIT !! /!\		*/
+		{
+			Server::sendClient(client->getFd(), ISNT_NB);
+			std::cout << "handle modify MODE failed => invalid input (nan)" << std::endl;
+			return ;
+		}
 
 		channel->setMaxUsers(stringToInt(args->at(2)));
 		channel->setModeSetTimestamp(time(NULL));

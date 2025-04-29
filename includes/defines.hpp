@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 16:12:51 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/28 17:25:06 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/28 17:50:40 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,10 @@
 # define CANT_USER "Can not change username !\n"
 # define HAS_INVALID_CHARS "This field can not contain any of these characters: '\\0', '\\r', '\\a', '\\n', 'space', ',', ';'\n"
 # define IS_TAKEN "This name is unavailable !\n"
+# define NEED_AUTH "You need to finish authentication to execute commands\n"
 
 # define JOIN_USG "Join channels one by one\n"
+# define MSG_RULE "You have to put a ':' in front of your message\n"
 # define ALRDY_IN_CHNL "Already in this channel\n"
 # define NOT_ALW "You're not allowed to enter this channel\n"
 # define INV_CHNL_NAME "The name of the channel is invalid\n"

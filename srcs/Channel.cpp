@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:05 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/04/28 16:17:15 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/29 16:21:26 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,6 +91,21 @@ void	Channel::sendClients(std::string exceptionName, std::string message)
 	}
 }
 
+std::string	Channel::listClients()
+{
+	std::string	list;
+
+	for (std::vector<Client*>::iterator it = this->_clientsList.begin(); it != this->_clientsList.end(); it++)
+	{
+		if (!list.empty())
+			list += " ";
+		if (this->isOpName((*it)->getUser()))
+			list += "@";
+		list += (*it)->getNick();
+	}
+
+	return (list);
+}
 
 // ---------------------------------------------CHANNEL SETTERS AND GETTERS---------------------------------------------
 
