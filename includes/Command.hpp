@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:13 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/30 12:06:33 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/30 13:47:05 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,6 @@ class Command
 	
 		// STATIC FUNCTIONS
 		static void			executeCommand(Server &serv, Client *client, Command *cmd);
-		static std::string 	joinStrings(const std::vector<std::string>& vec);
 	
 		//SETTERS AND GETTERS
 		std::string					getName();
@@ -42,21 +41,23 @@ class Command
 		void						setArgs(std::vector<std::string> args);
 	
 		// OTHERS MEMBER FUNCTIONS
-		void	parse();
-		bool	parse_arg(std::string arg);
-		bool	is_available(Server &serv, std::string name);
-		int		stringToInt(std::string str);
-		void	deleteChannel(Server &serv, Channel *channel) const;
-		void	handlePass(Server &serv, Client *client, std::vector<std::string> *args);
-		void	handleNick(Client *client, std::vector<std::string> *args);
-		void	handleUser(Server &serv, Client *client, std::vector<std::string> *args);
-		void	handlePrivMsg(Server &serv, Client *client, std::vector<std::string> *args);
-		void	handleJoin(Server &serv, Client *client, std::vector<std::string> *args);
-		void	handlePart(Server &serv, Client *client, std::vector<std::string> *args);
-		void	handleKick(Server &serv, Client *client, std::vector<std::string> *args);
-		void	handleInvite(Server &serv, Client *client, std::vector<std::string> *args);
-		void	handleTopic(Server &serv, Client *client, std::vector<std::string> *args);
-		void	handleMode(Server &serv, Client *client, std::vector<std::string> *args);
+		void		parse();
+		bool		parse_arg(std::string arg);
+		bool		is_available(Server &serv, std::string name);
+		int			stringToInt(std::string str);
+		std::string joinStrings(const std::vector<std::string>& vec);
+		void		deleteChannel(Server &serv, Channel *channel) const;
+		void		handlePass(Server &serv, Client *client, std::vector<std::string> *args);
+		void		handleNick(Client *client, std::vector<std::string> *args);
+		void		handleUser(Server &serv, Client *client, std::vector<std::string> *args);
+		void		handlePrivMsg(Server &serv, Client *client, std::vector<std::string> *args);
+		void		handleJoin(Server &serv, Client *client, std::vector<std::string> *args);
+		void		handlePart(Server &serv, Client *client, std::vector<std::string> *args);
+		void		handleKick(Server &serv, Client *client, std::vector<std::string> *args);
+		void		handleInvite(Server &serv, Client *client, std::vector<std::string> *args);
+		void		handleTopic(Server &serv, Client *client, std::vector<std::string> *args);
+		void		handleMode(Server &serv, Client *client, std::vector<std::string> *args);
+		std::vector<std::string>			splitChannels(std::string str, char del);
 		std::map<std::string, std::string>	splitChannelsPasswords(std::string str1, std::string str2, char del);
 	
 		// EXCEPTIONS

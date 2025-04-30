@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 16:12:51 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/30 12:11:06 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/30 14:15:22 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,9 +38,14 @@
 
 # define JOIN_USG "usage: JOIN <channel>{,<channel>} [<key>{,<key>}]\n"
 # define MODE_USG "usage: MODE <#channel> [<+/-modes>] [arguments]\n"
-# define JOIN_USG "usage: JOIN <channel>{,<channel>} [<key>{,<key>}]\n"
-# define JOIN_USG "usage: JOIN <channel>{,<channel>} [<key>{,<key>}]\n"
+# define TPC_USG "usage: TOPIC #channel [:<new_topic>]\n"
+# define INV_USG "usage: INVITE <user> <channel>\n"
+# define KICK_USG "usage: KICK <channel> <user> [:<comment>]\n"
+# define PART_USG "usage: PART <channel>{,<channel>} [:<message>]\n"
+# define PRIVMSG_USG "usage: PRIVMSG <target> :<message>\n"
 # define MSG_RULE "You have to put a ':' in front of your message\n"
+# define TPC_RULE "You have to put a ':' in front of your topic\n"
+# define KICK_RULE "You have to put a ':' in front of your comment\n"
 # define ALRDY_IN_CHNL "Already in this channel\n"
 # define NOT_ALW "You're not allowed to enter this channel\n"
 # define INV_CHNL_NAME "The name of the channel is invalid\n"
@@ -48,7 +53,6 @@
 # define CHNL_JOIN "Channel joined\n"
 # define NO_CHNL_IN "Not in a channel\n"
 # define NO_PERM "You're not channel operator\n"
-# define KICK_USG "Kick users one by one\n"
 # define BAD_TRGT "No user found channel\n"
 # define TRGT_KICK "Target kicked\n"
 # define NO_CHNL "Channel don't exist\n"

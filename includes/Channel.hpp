@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:48 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/04/30 11:52:45 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/30 14:02:11 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,6 @@ class Channel
 		// GETTERS AND SETTERS
 		std::vector<Client*>	&getClientsList();
 		std::vector<Client*>	&getOpList();
-		Client					*getOldestClient() const;
 		const std::string		&getName() const;
 		const std::string		&getTopic() const;
 		const std::string		&getPwd() const;
@@ -58,11 +57,12 @@ class Channel
 
 
 		void		parseName(std::string name) const;
-		Client		*findClientName(std::string name);
 		void		delClientName(std::string name);
 		void		delOpName(std::string name);
 		bool		isOpName(std::string name);
 		void		sendClients(std::string exceptionName, std::string message);
+		Client		*getOldestClient();
+		Client		*findClientName(std::string name);
 		std::string	listClients();
 
 		class	NameIsntValid: public std::exception
