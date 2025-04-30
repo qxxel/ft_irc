@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 16:12:51 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/30 11:50:51 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/30 12:11:06 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,9 @@
 # define IS_TAKEN "This name is unavailable !\n"
 # define NEED_AUTH "You need to finish authentication to execute commands\n"
 
+# define JOIN_USG "usage: JOIN <channel>{,<channel>} [<key>{,<key>}]\n"
+# define MODE_USG "usage: MODE <#channel> [<+/-modes>] [arguments]\n"
+# define JOIN_USG "usage: JOIN <channel>{,<channel>} [<key>{,<key>}]\n"
 # define JOIN_USG "usage: JOIN <channel>{,<channel>} [<key>{,<key>}]\n"
 # define MSG_RULE "You have to put a ':' in front of your message\n"
 # define ALRDY_IN_CHNL "Already in this channel\n"

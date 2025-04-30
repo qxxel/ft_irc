@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:13 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/30 11:52:04 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/30 12:06:33 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ class Command
 		class notIntNumber: public std::exception
 		{
 			public:
-				const char*	what() const throw() { return ("the input must be a integer"); }
+				const char*	what() const throw() { return ("The input must be a integer"); }
 		};
 };
 
