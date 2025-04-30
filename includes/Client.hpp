@@ -6,18 +6,14 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 16:03:22 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/28 17:31:11 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/30 11:52:31 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CLIENT_HPP
 # define CLIENT_HPP
 
-# include <iostream>
-# include <map>
-# include <vector>
 # include "Channel.hpp"
-#include "Request.hpp"
 
 class Channel;
 class Request;

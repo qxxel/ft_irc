@@ -6,16 +6,13 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:48 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/04/29 16:14:49 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/30 11:52:45 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-# include <exception>
-# include <iostream>
 # include <map>
-# include "Client.hpp"
 # include "Server.hpp"
 
 class Client;

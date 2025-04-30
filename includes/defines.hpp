@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 16:12:51 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/28 17:50:40 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/04/30 11:50:51 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 
 # define MAX_EVENTS	4096
 # define MAX_BODY_SIZE	5000
-
 
 # define SERVER_WELCOME "Welcome to cri_ft !\n"
 # define INV_FORMAT "Invalid format !\n"
@@ -37,7 +36,7 @@
 # define IS_TAKEN "This name is unavailable !\n"
 # define NEED_AUTH "You need to finish authentication to execute commands\n"
 
-# define JOIN_USG "Join channels one by one\n"
+# define JOIN_USG "usage: JOIN <channel>{,<channel>} [<key>{,<key>}]\n"
 # define MSG_RULE "You have to put a ':' in front of your message\n"
 # define ALRDY_IN_CHNL "Already in this channel\n"
 # define NOT_ALW "You're not allowed to enter this channel\n"
