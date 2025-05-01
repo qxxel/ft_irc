@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/29 16:43:28 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/01 16:49:45 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,9 +143,7 @@ void Command::executeCommand(Server &serv, Client *client, Command *cmd)
 	std::vector<std::string>	args = cmd->getArgs();
 	try
 	{
-		if (!cmd->getName().compare("!GAME"))
-			Bot::handleBot(serv, client, &args);
-		else if (!cmd->getName().compare("PASS"))
+		if (!cmd->getName().compare("PASS"))
 			cmd->handlePass(serv, client, &args);
 		else if (!cmd->getName().compare("NICK"))
 			cmd->handleNick(client, &args);
@@ -326,6 +324,8 @@ void	Command::handlePrivMsg(Server &serv, Client *client, std::vector<std::strin
 		}
 
 		channel->sendClients(client->getUser(), ":" + client->getNick() + "!" + client->getUser() + " PRIVMSG " + channel->getName() + " " + args->at(1) + "\n");
+		if (args->at(1).find("!GAME") == 1) // /!\ check if gamebot is in this chanel
+			Bot::handleBot(channel, client, args->at(1));
 	}
 	// CHECK IF THE TARGET IS A CLIENT
 	else
@@ -340,6 +340,8 @@ void	Command::handlePrivMsg(Server &serv, Client *client, std::vector<std::strin
 		}
 
 		Server::sendClient(target->getFd(), ":" + client->getNick() + "!" + client->getUser() + " PRIVMSG " + target->getUser() + " " + args->at(1) + "\n");
+		if (target->getUser() == "GameBot" && args->at(1).find("!GAME") == 1)
+			Bot::handleBot(NULL, client, args->at(1));
 	}
 
 	std::cout << "handle PRIVMSG successfuly called" << std::endl;

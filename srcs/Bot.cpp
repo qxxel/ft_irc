@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 14:55:23 by mreynaud          #+#    #+#             */
-/*   Updated: 2025/04/29 16:35:36 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/01 16:47:25 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,42 +20,82 @@
 #include "Server.hpp"
 #include "Bot.hpp"
 
-Bot::Bot(int fd) : Client(fd)
-{
+Bot::Bot() : Client(-2) {
+	_auth = true;
+	_pwd = true;
+	_user = "GameBot";
+	_nick = "GameBot";
 	srand(time(NULL));
 }
 
 Bot::~Bot() {}
 
-static void explain_rule(Client *client)
+void	Bot::joinChanel(Channel	*channel)
 {
-	Server::sendClient(client->getFd(), "\nGAME RULE:\n");
-	Server::sendClient(client->getFd(), "Rock-Paper-Scissors is a game where two players each choose one of three shapes (Rock, Paper and Scissors):\n\n");
-	Server::sendClient(client->getFd(), "The rules are simple:\n");
-    Server::sendClient(client->getFd(), " - Rock beats scissors\n");
-    Server::sendClient(client->getFd(), " - Scissors beats paper\n");
-    Server::sendClient(client->getFd(), " - Paper beats rock\n");
-	Server::sendClient(client->getFd(), "If both players choose the same shape, it's a tie.\n\n");
-	Server::sendClient(client->getFd(), "To try :\t!GAME [rock|paper|scissors]\n");
+	if (channel->getMaxUsers() != 0 && !(channel->getClientsList().size() < (unsigned long)channel->getMaxUsers()))
+	{
+		// the chanel is full
+		return ;
+	}
+	this->getCurrentsChannels().push_back(channel);
+	channel->getClientsList().push_back(this);
+	channel->getOpList().push_back(this);
+	channel->sendClients("", ":" + this->getNick() + "!" + this->getUser() + " JOIN :" + channel->getName() + "\n");
 }
 
-static void you_lose(std::string my_choice, Client *client)
+void	Bot::kickChanel(Channel	*channel, std::vector<std::string> *args)
 {
-	Server::sendClient(client->getFd(), "I'm choice " + my_choice + "\n");
-	Server::sendClient(client->getFd(), "You lose!\n");
+	channel->delOpName(this->getUser());
+
+	channel->delClientName(this->getUser());
+	this->delCurrentChannel(channel);
+	channel->sendClients("", this->getUser() + " KICK " + Command::joinStrings(*args) + "\n");
+}
+
+static void	send_msg_bot(std::string msg, Client *client, Channel *channel)
+{
+	if (channel)
+		channel->sendClients("", msg);
+	else
+		Server::sendClient(client->getFd(), msg);
+}
+
+static void explain_rule(Client *client, Channel *channel)
+{
+	std::string msg = "\nGAME RULE:\n";
+	msg += "\nGAME RULE:\n";
+	msg += "Rock-Paper-Scissors is a game where two players each choose one of three shapes (Rock, Paper and Scissors):\n\n";
+	msg += "The rules are simple:\n";
+    msg += " - Rock beats scissors\n";
+    msg += " - Scissors beats paper\n";
+    msg += " - Paper beats rock\n";
+	msg += "If both players choose the same shape, it's a tie.\n\n";
+	msg += "To try :\t!GAME [rock|paper|scissors]\n";
+
+	send_msg_bot(msg, client, channel);
+}
+
+
+static void you_lose(std::string my_choice, Client *client, Channel *channel)
+{
+	std::string msg = "I'm choice " + my_choice + "\nYou lose!\n";
+
+	send_msg_bot(msg, client, channel);
 	// and try to kick
 }
 
-static void no_winner(std::string my_choice, Client *client)
+static void no_winner(std::string my_choice, Client *client, Channel *channel)
 {
-	Server::sendClient(client->getFd(), "I'm choice " + my_choice + "\n");
-	Server::sendClient(client->getFd(), "It’s a tie! Go again?\n");
+	std::string msg = "I'm choice " + my_choice + "\nIt's a tie! Go again?\n";
+
+	send_msg_bot(msg, client, channel);
 }
 
-static void you_win(std::string my_choice, Client *client)
+static void you_win(std::string my_choice, Client *client, Channel *channel)
 {
-	Server::sendClient(client->getFd(), "I'm choice " + my_choice + "\n");
-	Server::sendClient(client->getFd(), "You win! 🏆\n");
+	std::string msg = "I'm choice " + my_choice + "\nYou win! 🏆\n";
+
+	send_msg_bot(msg, client, channel);
 	// and try to op
 }
 
@@ -71,50 +111,49 @@ static std::string	rand_rock_paper_scissors()
 		return "SCISSORS";
 }
 
-static void	game_rock_paper_scissors(std::string adverse_choice, Client *client)
+static void	game_rock_paper_scissors(std::string adverse_choice, Client *client, Channel *channel)
 {
+	std::cout << "\"" << adverse_choice << "\"" << std::endl;
 	std::string my_choice = rand_rock_paper_scissors();
 	if (adverse_choice == "ROCK")
 	{
 		if (my_choice == "ROCK")
-			no_winner(my_choice, client);
+			no_winner(my_choice, client, channel);
 		else if (my_choice == "PAPER")
-			you_lose(my_choice, client);
+			you_lose(my_choice, client, channel);
 		else
-			you_win(my_choice, client);
+			you_win(my_choice, client, channel);
 	}
 	else if (adverse_choice == "PAPER")
 	{
 		if (my_choice == "ROCK")
-			you_win(my_choice, client);
+			you_win(my_choice, client, channel);
 		else if (my_choice == "PAPER")
-			no_winner(my_choice, client);
+			no_winner(my_choice, client, channel);
 		else
-			you_lose(my_choice, client);
+			you_lose(my_choice, client, channel);
 	}
 	else if (adverse_choice == "SCISSORS")
 	{
 		if (my_choice == "ROCK")
-			you_lose(my_choice, client);
+			you_lose(my_choice, client, channel);
 		else if (my_choice == "PAPER")
-			you_win(my_choice, client);
+			you_win(my_choice, client, channel);
 		else
-			no_winner(my_choice, client);
+			no_winner(my_choice, client, channel);
 	}
 	else if (adverse_choice == "WELL")
-		you_lose("PAPER", client);
+		you_lose("PAPER", client, channel);
 	else
-		explain_rule(client);
+		explain_rule(client, channel);
 	return ;
 }
 
-void Bot::handleBot(Server &serv, Client *client, std::vector<std::string> *args)
+void Bot::handleBot(Channel *channel, Client *client, std::string &arg)
 {
-	if (args->size() != 1)
-		explain_rule(client);
-	else
-		game_rock_paper_scissors(Server::str_toupper(args->at(0)), client);
+	if (arg.size() <= 7)
+		explain_rule(client, channel);
+	std::string str = arg.substr(7, arg.size() - 8);
 
-	(void)serv;
-	// (void)client;
+	game_rock_paper_scissors(Server::str_toupper(str), client, channel);
 }

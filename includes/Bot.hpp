@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/16 17:48:51 by mreynaud          #+#    #+#             */
-/*   Updated: 2025/04/29 16:30:43 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/04/30 18:17:27 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,11 +16,15 @@
 class Bot : public Client
 {
 	private:
-		bool rand;
 
 	public:
-		Bot(int fd);
+		Bot();
 		~Bot();
 
-	static void handleBot(Server &serv, Client *client, std::vector<std::string> *args);
+	static void handleBot(Channel *channel, Client *client, std::string &arg);
+
+
+	void	joinChanel(Channel	*channel);
+	void	kickChanel(Channel	*channel, std::vector<std::string> *args);
+
 };

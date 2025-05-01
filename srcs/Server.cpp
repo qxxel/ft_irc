@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/29 16:43:31 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/04/30 18:48:54 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 #include <cerrno>
 #include <unistd.h>
 #include "Request.hpp"
+#include "Bot.hpp"
 
 // ---------------------------------------------SERVER SETUP---------------------------------------------
 
@@ -125,6 +126,9 @@ void	Server::run(int sock)
 	if (epoll_ctl(epfd, EPOLL_CTL_ADD, sock, &ev) == -1)
 		throw (std::runtime_error("Error: epoll_ctl failed: " + std::string(strerror(errno))));
 
+	Bot	*tp = new Bot();
+	_clients.push_back(tp);
+
 	int nfds;
 	while (_running)
 	{
@@ -203,6 +207,8 @@ void	Server::disconnectClient(int client, int epfd)
 
 void	Server::sendClient(int client, std::string msg)
 {
+	if (client == -2)
+		return ;
 	if (send(client, msg.c_str(), msg.size(), 0) == -1)
 		throw (std::runtime_error("Error: sending data to clients failed: " + std::string(strerror(errno))));
 }
