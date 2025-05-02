@@ -6,12 +6,12 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 16:12:51 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/02 14:26:51 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/02 17:44:00 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef DEFINES_HPP
-#define DEFINES_HPP
+# define DEFINES_HPP
 
 # define MAX_EVENTS	4096
 # define MAX_BODY_SIZE	5000

@@ -6,12 +6,12 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:13 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/02 16:04:07 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/02 17:43:46 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef	COMMAND_HPP
-# define	COMMAND_HPP
+#ifndef COMMAND_HPP
+# define COMMAND_HPP
 
 # include "Server.hpp"
 

@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:07 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/02 15:58:22 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/02 17:44:06 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,13 @@
 # include <exception>
 # include <iostream>
 # include <limits.h>
+# include <map>
 # include <sstream>
 # include <vector>
 # include "Channel.hpp"
 # include "Client.hpp"
+# include "Command.hpp"
+# include "defines.hpp"
 # include "Request.hpp"
 
 class Channel;

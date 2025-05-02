@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/02 15:58:19 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/02 17:46:03 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,6 +182,7 @@ int	Server::acceptClient(int sock, int epfd)
 		_clients.push_back(tp);
 		sendClient(tp->getFd(), SERVER_WELCOME);
 		sendClient(tp->getFd(), ENTER_PWD);
+		sendClient(tp->getFd(), "* > ");
 		std::cout << "\nNew client connected !\n";
 	}
 	catch(const std::exception& e)
@@ -306,13 +307,37 @@ void	Server::deleteClient(int client)
 	if (!client)
 		return ;
 
-	// CHECK ALL CLIENTS TO ERASE
+	// DELETE CLIENT IN THE SERVER
 	for (std::vector<Client*>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
 	{
 		if ((*it)->getFd() == client)
 		{
 			this->_clients.erase(it);
-			return ;
+			break ;
+		}
+	}
+
+	// DELETE CLIENT IN THE CHANNEL
+	for (std::vector<Channel*>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
+	{
+		// DELETE THE CLIENT IN THE CLIENT LIST
+		for (std::vector<Client*>::iterator it_clients = (*it)->getClientsList().begin(); it_clients != (*it)->getClientsList().end(); it++)
+		{
+			if ((*it_clients)->getFd() == client)
+			{
+				(*it)->getClientsList().erase(it_clients);
+				(*it)->sendClients("", (*it_clients)->getNick() + ":" + (*it_clients)->getUser() + " PART " + (*it)->getName() + "\n");
+				break ;
+			}
+		}
+		// DELETE THE CLIENT IN THE OP LIST
+		for (std::vector<Client*>::iterator it_ops = (*it)->getOpList().begin(); it_ops != (*it)->getOpList().end(); it++)
+		{
+			if ((*it_ops)->getFd() == client)
+			{
+				(*it)->getOpList().erase(it_ops);
+				break ;
+			}
 		}
 	}
 }
