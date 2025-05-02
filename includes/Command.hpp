@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:13 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/30 13:47:05 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/02 16:04:07 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,23 +30,27 @@ class Command
 		// CONSTRUCTOR AND DESTRUCTOR
 		Command(std::string raw);
 		~Command();
-	
+
 		// STATIC FUNCTIONS
 		static void			executeCommand(Server &serv, Client *client, Command *cmd);
-	
+
 		//SETTERS AND GETTERS
 		std::string					getName();
 		std::vector<std::string>	getArgs();
 		void						setName(std::string name);
 		void						setArgs(std::vector<std::string> args);
-	
+
+		// STATIC MEMBER FUNCTIONS
+		static std::string	joinStrings(const std::vector<std::string>& vec);
+
 		// OTHERS MEMBER FUNCTIONS
 		void		parse();
 		bool		parse_arg(std::string arg);
 		bool		is_available(Server &serv, std::string name);
 		int			stringToInt(std::string str);
-		std::string joinStrings(const std::vector<std::string>& vec);
 		void		deleteChannel(Server &serv, Channel *channel) const;
+		std::string	intToString(int value);
+		std::string	timeToString(time_t value);
 		void		handlePass(Server &serv, Client *client, std::vector<std::string> *args);
 		void		handleNick(Client *client, std::vector<std::string> *args);
 		void		handleUser(Server &serv, Client *client, std::vector<std::string> *args);
@@ -59,7 +63,7 @@ class Command
 		void		handleMode(Server &serv, Client *client, std::vector<std::string> *args);
 		std::vector<std::string>			splitChannels(std::string str, char del);
 		std::map<std::string, std::string>	splitChannelsPasswords(std::string str1, std::string str2, char del);
-	
+
 		// EXCEPTIONS
 		class splitFailed: public std::exception
 		{

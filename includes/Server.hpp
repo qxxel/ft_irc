@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:07 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/02 14:27:06 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/02 15:58:22 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@
 class Channel;
 class Client;
 class Request;
+class Bot;
 
 class Server
 {
@@ -34,6 +35,7 @@ class Server
 		long					_pwd;
 		std::vector<Client*>	_clients;
 		std::vector<Channel*>	_channels;
+		Bot						*_bot;
 
 	public:
 		~Server();
@@ -67,6 +69,7 @@ class Server
 		long					getPwd(void);
 		std::vector<Client*>	&getClients();
 		std::vector<Channel*>	&getChannels();
+		Bot						*getBot();
 
 
 		class	ChannelAlreadyExists: public std::exception

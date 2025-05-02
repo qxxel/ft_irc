@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/30 18:48:54 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/02 15:58:19 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,9 @@ bool	Server::_running = true;
 
 Server::~Server()
 {
+	// DELETE BOT
+	delete _bot;
+
 	// DELETE CLIENTS
 	std::vector<Client*>::iterator	it1;
 	for (it1 = _clients.begin(); it1 != _clients.end(); it1++)
@@ -51,6 +54,7 @@ Server::Server(std::string port, std::string password)
 	{
 		_pwd = simpleHash(password);
 		setPort(parsePort(port));
+		_bot = new Bot();
 		std::cout << *this;
 		start();
 	}
@@ -125,9 +129,6 @@ void	Server::run(int sock)
 	ev.events = EPOLLIN | EPOLLRDHUP | EPOLLOUT;
 	if (epoll_ctl(epfd, EPOLL_CTL_ADD, sock, &ev) == -1)
 		throw (std::runtime_error("Error: epoll_ctl failed: " + std::string(strerror(errno))));
-
-	Bot	*tp = new Bot();
-	_clients.push_back(tp);
 
 	int nfds;
 	while (_running)
@@ -395,6 +396,11 @@ std::vector<Client*>	&Server::getClients()
 std::vector<Channel*>	&Server::getChannels()
 {
 	return (this->_channels);
+}
+
+Bot	*Server::getBot()
+{
+	return (this->_bot);
 }
 
 std::ostream &	operator<<(std::ostream &o, Server &serv)

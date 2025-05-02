@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/02 14:30:23 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/02 16:04:27 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -370,7 +370,7 @@ void	Command::handlePrivMsg(Server &serv, Client *client, std::vector<std::strin
 		}
 
 		channel->sendClients(client->getUser(), ":" + client->getNick() + "!" + client->getUser() + " PRIVMSG " + channel->getName() + " " + args->at(1) + "\n");
-		if (args->at(1).find("!GAME") == 1) // /!\ check if gamebot is in this chanel
+		if (args->at(1).find("!GAME") == 1) // || this->isCurrentChannel(channel->getName())) // /!\ check if gamebot is in this chanel
 			Bot::handleBot(channel, client, args->at(1));
 	}
 	// CHECK IF THE TARGET IS A CLIENT
@@ -629,7 +629,6 @@ void	Command::handleKick(Server &serv, Client *client, std::vector<std::string> 
 		return ;
 	}
 
-
 	// HANDLE FOR INVITATION ONLY
 	if (channel->getInvOnly())
 		target->delJoinableChannel(channel);
@@ -702,9 +701,14 @@ void	Command::handleInvite(Server &serv, Client *client, std::vector<std::string
 		target->getJoinableChannels().push_back(channel);
 	}
 
-	Server::sendClient(target->getFd(), client->getNick() + ":" + client->getUser() + " INVITE " + target->getNick() + " " + channel->getName() + "\n");
-	Server::sendClient(client->getFd(), "INVITE " + client->getNick() + " " + target->getUser() + " " + channel->getName() + "\n");
-	std::cout << "handle INVITE successfuly called" << std::endl;
+	if (target->getUser() == "GameBot")
+		serv.getBot()->joinChannel(channel);
+	else
+	{
+		Server::sendClient(target->getFd(), client->getNick() + ":" + client->getUser() + " INVITE " + target->getNick() + " " + channel->getName() + "\n");
+		Server::sendClient(client->getFd(), "INVITE " + client->getNick() + " " + target->getUser() + " " + channel->getName() + "\n");
+		std::cout << "handle INVITE successfuly called" << std::endl;
+	}
 }
 
 // VIEW OR SET TOPIC OF THE CURRENT CHANNEL
@@ -823,13 +827,13 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 		else if (channel->getMaxUsers())
 		{
 			modes += "l";
-			modesArgs += " " + toString(channel->getMaxUsers());
+			modesArgs += " " + intToString(channel->getMaxUsers());
 		}
 		else
 			modes = "";
 
 		Server::sendClient(client->getFd(), client->getNick() + " " + channel->getName() + modes + modesArgs + "\n");
-		Server::sendClient(client->getFd(), client->getNick() + " " + channel->getName() + " " + toString(channel->getModeSetTimestamp()) + "\n");
+		Server::sendClient(client->getFd(), client->getNick() + " " + channel->getName() + " " + timeToString(channel->getModeSetTimestamp()) + "\n");
 		std::cout << "handle ask MODE successfuly called\n";
 		return ;
 	}
@@ -1089,8 +1093,15 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 	std::cout << "handle modify MODE " << args->at(1) << " successfuly called\n";
 }
 
-template <typename T>
-std::string	toString(T value)
+std::string	Command::intToString(int value)
+{
+	std::stringstream	ss;
+
+	ss << value;
+	return ss.str();
+}
+
+std::string	Command::timeToString(time_t value)
 {
 	std::stringstream	ss;
 

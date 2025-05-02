@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 14:55:23 by mreynaud          #+#    #+#             */
-/*   Updated: 2025/05/01 16:47:25 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/02 15:50:18 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ Bot::Bot() : Client(-2) {
 
 Bot::~Bot() {}
 
-void	Bot::joinChanel(Channel	*channel)
+void	Bot::joinChannel(Channel	*channel)
 {
 	if (channel->getMaxUsers() != 0 && !(channel->getClientsList().size() < (unsigned long)channel->getMaxUsers()))
 	{
@@ -43,14 +43,14 @@ void	Bot::joinChanel(Channel	*channel)
 	channel->sendClients("", ":" + this->getNick() + "!" + this->getUser() + " JOIN :" + channel->getName() + "\n");
 }
 
-void	Bot::kickChanel(Channel	*channel, std::vector<std::string> *args)
-{
-	channel->delOpName(this->getUser());
+// void	Bot::kickChanel(Channel	*channel, Client *client, std::vector<std::string> *args)
+// {
+// 	channel->delOpName(this->getUser());
 
-	channel->delClientName(this->getUser());
-	this->delCurrentChannel(channel);
-	channel->sendClients("", this->getUser() + " KICK " + Command::joinStrings(*args) + "\n");
-}
+// 	this->delCurrentChannel(channel);
+// 	channel->delClientName(this->getUser());
+// 	channel->sendClients("", client->getNick() + ":" + client->getUser() + " KICK " + Command::joinStrings(*args) + "\n");
+// }
 
 static void	send_msg_bot(std::string msg, Client *client, Channel *channel)
 {
