@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:05 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/04/30 18:52:38 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/02 14:30:24 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,9 +120,17 @@ std::vector<Client*>	&Channel::getOpList()
 }
 
 
-Client	*Channel::getOldestClient() const
+Client	*Channel::getOldestClient()
 {
-	return (this->_oldestClient);
+	std::vector<Client*>::iterator	it;
+
+	for (it = this->_clientsList.begin(); it != this->_clientsList.end(); it++)
+	{
+		if (!this->isOpName((*it)->getUser()))
+			return (*it);
+	}
+
+	return (NULL);
 }
 
 const std::string	&Channel::getName() const

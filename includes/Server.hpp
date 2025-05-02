@@ -6,14 +6,16 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:07 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/29 19:14:31 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/02 14:27:06 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
+# include <exception>
 # include <iostream>
+# include <limits.h>
 # include <sstream>
 # include <vector>
 # include "Channel.hpp"
@@ -22,6 +24,7 @@
 
 class Channel;
 class Client;
+class Request;
 
 class Server
 {

@@ -6,18 +6,14 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 16:03:22 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/01 16:46:57 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/02 14:26:43 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CLIENT_HPP
 # define CLIENT_HPP
 
-# include <iostream>
-# include <map>
-# include <vector>
 # include "Channel.hpp"
-#include "Request.hpp"
 
 class Channel;
 class Request;
