@@ -6,13 +6,11 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/30 14:15:36 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/02 15:14:25 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Command.hpp"
-#include "Server.hpp"
-#include "defines.hpp"
 
 Command::Command(std::string raw) : _raw(raw), _name("")
 {
@@ -73,16 +71,15 @@ std::map<std::string, std::string>	Command::splitChannelsPasswords(std::string s
 	std::stringstream	ss2(str2);
 	std::string			tmp2;
 
-	while (getline(ss1, tmp1, del) && getline(ss2, tmp2, del))
+	while (getline(ss2, tmp2, del) && getline(ss1, tmp1, del))
 	{
-		if (!tmp1.empty())
+		if (tmp1.empty())
 			throw splitFailed();
 		map.insert(std::pair<std::string, std::string>(tmp1, tmp2));
 	}
-
 	while (getline(ss1, tmp1, del))
 	{
-		if (!tmp1.empty())
+		if (tmp1.empty())
 			throw splitFailed();
 		map.insert(std::pair<std::string, std::string>(tmp1, ""));
 	}
@@ -193,14 +190,7 @@ void Command::executeCommand(Server &serv, Client *client, Command *cmd)
 			cmd->handleNick(client, &args);
 		else if (!cmd->getName().compare("USER"))
 			cmd->handleUser(serv, client, &args);
-		
-		if (!client->getAuth())
-		{
-			Server::sendClient(client->getFd(), NEED_AUTH);
-			return ;
-		}
-		
-		if (!cmd->getName().compare("PRIVMSG"))
+		else if (!cmd->getName().compare("PRIVMSG"))
 			cmd->handlePrivMsg(serv, client, &args);
 		else if (!cmd->getName().compare("JOIN"))
 			cmd->handleJoin(serv, client, &args);
@@ -216,6 +206,12 @@ void Command::executeCommand(Server &serv, Client *client, Command *cmd)
 			cmd->handleMode(serv, client, &args);
 		else
 			Server::sendClient(client->getFd(), UKWN_CMD + cmd->getName() + "\n");
+
+		Server::sendClient(client->getFd(), "------------------------------------------\n");
+		if (!client->getAuth())
+			Server::sendClient(client->getFd(), "* > ");
+		else
+			Server::sendClient(client->getFd(), client->getNick() + ":" + client->getUser() + " > ");
 	}
 	catch(const std::exception& e)
 	{
@@ -332,6 +328,14 @@ try
 // SEND MESSAGE
 void	Command::handlePrivMsg(Server &serv, Client *client, std::vector<std::string> *args)
 {
+	// CHECK IF CLIENT IS AUTH
+	if (!client->getAuth())
+	{
+		Server::sendClient(client->getFd(), NEED_AUTH);
+		std::cout << "handle PRIVMSG failed => client isn't auth" << std::endl;
+		return ;
+	}
+
 	// USAGE: PRIVMSG <target> :<message>
 	if (!args || args->size() != 2)
 	{
@@ -390,10 +394,18 @@ void	Command::handlePrivMsg(Server &serv, Client *client, std::vector<std::strin
 }
 
 // JOIN CHANNEL
-void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> *args) // have to handle on invonly and pwd modes
+void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> *args)
 {
+	// CHECK IF CLIENT IS AUTH
+	if (!client->getAuth())
+	{
+		Server::sendClient(client->getFd(), NEED_AUTH);
+		std::cout << "handle JOIN failed => client isn't auth" << std::endl;
+		return ;
+	}
+
 	// USAGE: JOIN <channel>{,<channel>} [<key>{,<key>}]
-	if (!args || args->empty() || args->size() < 1 || 2 < args->size())
+	if (!args || args->size() < 1 || 2 < args->size())
 	{
 		Server::sendClient(client->getFd(), JOIN_USG);
 		std::cout << "handle JOIN failed => invalid format" << std::endl;
@@ -403,7 +415,10 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 	// TRY TO MAKE PAIR WITH EACH CHANNELS AND PASSWORDS
 	try
 	{
-		std::map<std::string, std::string> 				channelsAsk = splitChannelsPasswords(args->at(0), args->at(1), ',');
+		std::string	passwords;
+		if (args->size() == 2)
+			passwords = args->at(1);
+		std::map<std::string, std::string> 				channelsAsk = splitChannelsPasswords(args->at(0), passwords, ',');
 		std::map<std::string, std::string>::iterator	it;
 		for (it = channelsAsk.begin(); it != channelsAsk.end(); it++)
 		{
@@ -480,7 +495,7 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 				}
 	
 				// CHECK IF CHANNEL IS FULL
-				if (channel->getMaxUsers() != 0 && !(channel->getClientsList().size() < channel->getMaxUsers()))
+				if (channel->getMaxUsers() != 0 && !(channel->getClientsList().size() < (size_t)channel->getMaxUsers()))
 				{
 					Server::sendClient(client->getFd(), CHNL_FULL);
 					std::cout << "handle JOIN failed => channel full" << std::endl;
@@ -514,6 +529,14 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 // LEAVE CHANNEL
 void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> *args)
 {
+	// CHECK IF CLIENT IS AUTH
+	if (!client->getAuth())
+	{
+		Server::sendClient(client->getFd(), NEED_AUTH);
+		std::cout << "handle PART failed => client isn't auth" << std::endl;
+		return ;
+	}
+
 	// USAGE: PART <channel>{,<channel>} [:<message>]
 	if (!args || args->size() < 1)
 	{
@@ -574,6 +597,14 @@ void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> 
 // KICK USER ON THE CURRENT CHANNEL
 void	Command::handleKick(Server &serv, Client *client, std::vector<std::string> *args)
 {
+	// CHECK IF CLIENT IS AUTH
+	if (!client->getAuth())
+	{
+		Server::sendClient(client->getFd(), NEED_AUTH);
+		std::cout << "handle KICK failed => client isn't auth" << std::endl;
+		return ;
+	}
+
 	// USAGE: KICK <channel> <user> [:<comment>]
 	if (!args || args->size() < 2 || 3 < args->size())
 	{
@@ -640,6 +671,14 @@ void	Command::handleKick(Server &serv, Client *client, std::vector<std::string> 
 // INVITE USER IN CURRENT CHANNEL
 void	Command::handleInvite(Server &serv, Client *client, std::vector<std::string> *args)
 {
+	// CHECK IF CLIENT IS AUTH
+	if (!client->getAuth())
+	{
+		Server::sendClient(client->getFd(), NEED_AUTH);
+		std::cout << "handle INVITE failed => client isn't auth" << std::endl;
+		return ;
+	}
+
 	// USAGE: INVITE <user> <channel>
 	if (!args || args->empty() || args->size() != 2)
 	{
@@ -705,6 +744,14 @@ void	Command::handleInvite(Server &serv, Client *client, std::vector<std::string
 // VIEW OR SET TOPIC OF THE CURRENT CHANNEL
 void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string> *args)
 {
+	// CHECK IF CLIENT IS AUTH
+	if (!client->getAuth())
+	{
+		Server::sendClient(client->getFd(), NEED_AUTH);
+		std::cout << "handle TOPIC failed => client isn't auth" << std::endl;
+		return ;
+	}
+
 	// USAGE: TOPIC #channel [:<new_topic>]
 	if (!args || args->empty())
 	{
@@ -772,9 +819,18 @@ void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string>
 	std::cout << "handle TOPIC successfully called\n";
 }
 
+// VIEW OR SET A MODE IN A CHANNEL
 void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> *args)
 // SET OR UNSET MODES ON CURRENT CHANNEL
 {
+	// CHECK IF CLIENT IS AUTH
+	if (!client->getAuth())
+	{
+		Server::sendClient(client->getFd(), NEED_AUTH);
+		std::cout << "handle MODE failed => client isn't auth" << std::endl;
+		return ;
+	}
+
 	// USAGE: MODE <#channel> [<+/-modes>] [arguments]
 	if (!args || args->size() < 1)
 	{
@@ -818,13 +874,13 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 		else if (channel->getMaxUsers())
 		{
 			modes += "l";
-			modesArgs += " " + toString(channel->getMaxUsers());
+			modesArgs += " " + intToString(channel->getMaxUsers());
 		}
 		else
 			modes = "";
 
 		Server::sendClient(client->getFd(), client->getNick() + " " + channel->getName() + modes + modesArgs + "\n");
-		Server::sendClient(client->getFd(), client->getNick() + " " + channel->getName() + " " + toString(channel->getModeSetTimestamp()) + "\n");
+		Server::sendClient(client->getFd(), client->getNick() + " " + channel->getName() + " " + timeToString(channel->getModeSetTimestamp()) + "\n");
 		std::cout << "handle ask MODE successfuly called\n";
 		return ;
 	}
@@ -1084,8 +1140,15 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 	std::cout << "handle modify MODE " << args->at(1) << " successfuly called\n";
 }
 
-template <typename T>
-std::string	toString(T value)
+std::string	Command::intToString(int value)
+{
+	std::stringstream	ss;
+
+	ss << value;
+	return ss.str();
+}
+
+std::string	Command::timeToString(time_t value)
 {
 	std::stringstream	ss;
 

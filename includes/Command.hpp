@@ -6,12 +6,12 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:13 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/30 13:47:05 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/02 13:46:09 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef	COMMAND_HPP
-# define	COMMAND_HPP
+#ifndef COMMAND_HPP
+# define COMMAND_HPP
 
 # include "Server.hpp"
 
@@ -45,6 +45,8 @@ class Command
 		bool		parse_arg(std::string arg);
 		bool		is_available(Server &serv, std::string name);
 		int			stringToInt(std::string str);
+		std::string	intToString(int value);
+		std::string	timeToString(time_t value);
 		std::string joinStrings(const std::vector<std::string>& vec);
 		void		deleteChannel(Server &serv, Channel *channel) const;
 		void		handlePass(Server &serv, Client *client, std::vector<std::string> *args);

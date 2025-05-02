@@ -6,12 +6,12 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 16:12:51 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/30 14:15:22 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/02 13:15:40 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef DEFINES_HPP
-#define DEFINES_HPP
+# define DEFINES_HPP
 
 # define MAX_EVENTS	4096
 # define MAX_BODY_SIZE	5000
