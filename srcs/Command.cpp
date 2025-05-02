@@ -6,11 +6,12 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/02 17:45:19 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/02 18:02:02 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Command.hpp"
+#include "Bot.hpp"
 
 Command::Command(std::string raw) : _raw(raw), _name("")
 {
@@ -745,8 +746,8 @@ void	Command::handleInvite(Server &serv, Client *client, std::vector<std::string
 	{
 		Server::sendClient(target->getFd(), client->getNick() + ":" + client->getUser() + " INVITE " + target->getNick() + " " + channel->getName() + "\n");
 		Server::sendClient(client->getFd(), "INVITE " + client->getNick() + " " + target->getUser() + " " + channel->getName() + "\n");
-		std::cout << "handle INVITE successfuly called" << std::endl;
 	}
+	std::cout << "handle INVITE successfuly called" << std::endl;
 }
 
 // VIEW OR SET TOPIC OF THE CURRENT CHANNEL

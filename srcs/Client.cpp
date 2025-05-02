@@ -3,15 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 16:04:15 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/02 13:14:12 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/02 17:51:27 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
-#include "Server.hpp"
 
 Client::Client(int fd) : _fd(fd), _auth(false),  _pwd(false), _user(""), _nick(""), _req(new Request()){ }
 

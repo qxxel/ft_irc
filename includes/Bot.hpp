@@ -6,13 +6,18 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/16 17:48:51 by mreynaud          #+#    #+#             */
-/*   Updated: 2025/05/02 15:53:44 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/02 17:50:53 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include "Client.hpp"
+#include <cstring>
+#include <cerrno>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <time.h>
+# include "Server.hpp"
 
 class Client;
 

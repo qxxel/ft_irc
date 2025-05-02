@@ -6,18 +6,11 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 14:55:23 by mreynaud          #+#    #+#             */
-/*   Updated: 2025/05/02 15:50:18 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/02 18:17:58 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <iostream>
-
-#include <cstring>
-#include <cerrno>
-#include <fcntl.h>
-#include <stdlib.h>
-#include <time.h>
-#include "Server.hpp"
+// #include <iostream>
 #include "Bot.hpp"
 
 Bot::Bot() : Client(-2) {
@@ -63,7 +56,6 @@ static void	send_msg_bot(std::string msg, Client *client, Channel *channel)
 static void explain_rule(Client *client, Channel *channel)
 {
 	std::string msg = "\nGAME RULE:\n";
-	msg += "\nGAME RULE:\n";
 	msg += "Rock-Paper-Scissors is a game where two players each choose one of three shapes (Rock, Paper and Scissors):\n\n";
 	msg += "The rules are simple:\n";
     msg += " - Rock beats scissors\n";

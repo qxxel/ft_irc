@@ -6,12 +6,11 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/02 17:46:03 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/02 18:20:07 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
-#include "defines.hpp"
 #include <cstdlib>
 #include <csignal>
 #include <cstring>
@@ -21,7 +20,6 @@
 #include <sys/epoll.h>
 #include <cerrno>
 #include <unistd.h>
-#include "Request.hpp"
 #include "Bot.hpp"
 
 // ---------------------------------------------SERVER SETUP---------------------------------------------
@@ -285,6 +283,8 @@ Client	*Server::findClientName(std::string name)
 		if ((*it)->getUser() == name)
 			return ((*it));
 	}
+	if (name == _bot->getUser())
+		return (_bot);
 	return (NULL);
 }
 
