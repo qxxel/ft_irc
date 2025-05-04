@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/04 14:39:14 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/04 15:06:28 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ std::vector<std::string>	Command::splitChannels(std::string str, char del)
 
 	while (getline(ss, tmp, del))
 	{
-		if (!tmp.empty())
+		if (tmp.empty())
 			throw splitFailed();
 		vec.push_back(tmp);
 	}
@@ -572,10 +572,6 @@ void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> 
 			return ;
 		}
 
-		// DELETE OLD CHANNEL IF EMPTY
-		if (channel->getClientsList().size() == 1)
-			this->deleteChannel(serv, channel);
-
 		// CHECK IF THERE IS NO OP AFTER CLIENT QUIT
 		if (channel->getOpList().size() == 1 && channel->isOpName(client->getUser()))
 		{
@@ -585,9 +581,20 @@ void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> 
 				channel->getOpList().push_back(oldestClient);
 		}
 
-		channel->sendClients("", client->getNick() + ":" + client->getUser() + " PART " + Command::joinStrings(*args) + "\n");
-		channel->delClientName(client->getUser());
-		client->delCurrentChannel(channel);
+		// IF CHANNEL IS EMPTY
+		if (channel->getClientsList().size() == 1)
+		{
+			this->deleteChannel(serv, channel); // maybe leaks
+			Server::sendClient(client->getFd(), client->getNick() + ":" + client->getUser() + " PART " + Command::joinStrings(*args) + "\n");
+			return ;
+		}
+
+		else
+		{
+			channel->delClientName(client->getUser());
+			client->delCurrentChannel(channel);
+			channel->sendClients("", client->getNick() + ":" + client->getUser() + " PART " + Command::joinStrings(*args) + "\n");
+		}
 	}
 	// CATCH IF WRONG INPUT IN CHANNELS
 	catch (splitFailed &)
