@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:13 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/02 17:43:46 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/04 17:09:50 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,8 @@ class Command
 		void		handlePrivMsg(Server &serv, Client *client, std::vector<std::string> *args);
 		void		handleJoin(Server &serv, Client *client, std::vector<std::string> *args);
 		void		handlePart(Server &serv, Client *client, std::vector<std::string> *args);
+		void		handleQuit(Server &serv, Client *client, std::vector<std::string> *args);
+		void		handleHelp(Client *client, std::vector<std::string> *args);
 		void		handleKick(Server &serv, Client *client, std::vector<std::string> *args);
 		void		handleInvite(Server &serv, Client *client, std::vector<std::string> *args);
 		void		handleTopic(Server &serv, Client *client, std::vector<std::string> *args);

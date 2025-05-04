@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   defines.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 16:12:51 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/02 17:44:00 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/04 19:16:07 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,13 +36,24 @@
 # define IS_TAKEN "This name is unavailable !\n"
 # define NEED_AUTH "You need to finish authentication to execute commands\n"
 
-# define JOIN_USG "usage: JOIN <channel>{,<channel>} [<key>{,<key>}]\n"
-# define MODE_USG "usage: MODE <#channel> [<+/-modes>] [arguments]\n"
-# define TPC_USG "usage: TOPIC #channel [:<new_topic>]\n"
-# define INV_USG "usage: INVITE <user> <channel>\n"
-# define KICK_USG "usage: KICK <channel> <user> [:<comment>]\n"
-# define PART_USG "usage: PART <channel>{,<channel>} [:<message>]\n"
 # define PRIVMSG_USG "usage: PRIVMSG <target> :<message>\n"
+# define PRIVMSG_DESC "description: Send messages to users or channels\n"
+# define JOIN_USG "usage: JOIN <channel>{,<channel>} [<key>{,<key>}]\n"
+# define JOIN_DESC "description: Join one or more channels, optionally with a key\n"
+# define PART_USG "usage: PART <channel>{,<channel>} [:<message>]\n"
+# define PART_DESC "description: Quit one or more channels, optionally with a message\n"
+# define QUIT_USG "usage: QUIT\n"
+# define QUIT_DESC "description: Quit the server\n"
+# define KICK_USG "usage: KICK <channel> <user> [:<comment>]\n"
+# define KICK_DESC "description: Kick a user of a channel\n"
+# define INV_USG "usage: INVITE <user> <channel>\n"
+# define INV_DESC "description: Invite a user to a channel\n"
+# define TPC_USG "usage: TOPIC #channel [:<new_topic>]\n"
+# define TPC_DESC "description: Change or view the topic of a channel\n"
+# define MODE_USG "usage: MODE <#channel> [<+/-modes>] [<arguments>]\n"
+# define MODE_DESC "description: Change or view the modes of a channel\n"
+# define HELP_USG "usage: HELP [<command>]\n"
+
 # define MSG_RULE "You have to put a ':' in front of your message\n"
 # define TPC_RULE "You have to put a ':' in front of your topic\n"
 # define KICK_RULE "You have to put a ':' in front of your comment\n"
@@ -70,6 +81,7 @@
 # define ISNT_NB "Argument isn't a number\n"
 # define INV_PASS_FRMT "The password is invalid\n"
 # define LST_MODES "MODE flags are -+iktop one by one\n"
+# define NO_CMD "Command not found\n"
 
 
 
