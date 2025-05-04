@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/02 18:02:02 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/04 14:39:14 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -361,7 +361,7 @@ void	Command::handlePrivMsg(Server &serv, Client *client, std::vector<std::strin
 		if (!channel)
 		{
 			Server::sendClient(client->getFd(), NO_CHNL);
-			std::cout << "handle PART failed => inexistant channel" << std::endl;
+			std::cout << "handle PRIVMSG failed => inexistant channel" << std::endl;
 			return ;
 		}
 
@@ -374,7 +374,7 @@ void	Command::handlePrivMsg(Server &serv, Client *client, std::vector<std::strin
 		}
 
 		channel->sendClients(client->getUser(), ":" + client->getNick() + "!" + client->getUser() + " PRIVMSG " + channel->getName() + " " + args->at(1) + "\n");
-		if (args->at(1).find("!GAME") == 1) // || this->isCurrentChannel(channel->getName())) // /!\ check if gamebot is in this chanel
+		if (args->at(1).find("!GAME") == 1 && serv.getBot()->isCurrentChannel(channel->getName()))
 			Bot::handleBot(channel, client, args->at(1));
 	}
 	// CHECK IF THE TARGET IS A CLIENT
