@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:05 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/02 14:30:24 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/04 19:34:03 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,9 @@ void	Channel::parseName(std::string name) const
 
 	for (std::string::iterator it = name.begin(); it < name.end(); it++)
 	{
+		if (it == name.begin())
+			continue ;
+
 		if (!Server::isValidChar(*it))
 			throw NameIsntValid();
 	}

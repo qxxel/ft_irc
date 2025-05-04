@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/04 19:21:42 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/04 19:30:44 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -1022,6 +1022,9 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 		// CHECK IF ALL CHARACTERS ARE VALID
 		for (std::string::iterator it = args->at(2).begin(); it != args->at(2).end(); it++)
 		{
+			if (it == args->at(2).begin())
+				continue ;
+
 			if (!Server::isValidChar(*it))
 			{
 				Server::sendClient(client->getFd(), INV_PASS_FRMT);
