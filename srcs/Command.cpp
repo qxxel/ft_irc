@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/04 15:06:28 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/04 19:21:42 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -197,6 +197,8 @@ void Command::executeCommand(Server &serv, Client *client, Command *cmd)
 			cmd->handleJoin(serv, client, &args);
 		else if (!cmd->getName().compare("PART"))
 			cmd->handlePart(serv, client, &args);
+		else if (!cmd->getName().compare("QUIT"))
+			cmd->handleQuit(serv, client, &args);
 		else if (!cmd->getName().compare("KICK"))
 			cmd->handleKick(serv, client, &args);
 		else if (!cmd->getName().compare("INVITE"))
@@ -205,6 +207,8 @@ void Command::executeCommand(Server &serv, Client *client, Command *cmd)
 			cmd->handleTopic(serv, client, &args);
 		else if (!cmd->getName().compare("MODE"))
 			cmd->handleMode(serv, client, &args);
+		else if (!cmd->getName().compare("HELP"))
+			cmd->handleHelp(client, &args);
 		else
 			Server::sendClient(client->getFd(), UKWN_CMD + cmd->getName() + "\n");
 
@@ -606,6 +610,22 @@ void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> 
 	std::cout << "handle PART successfuly called" << std::endl;
 }
 
+// LEAVE SERVER
+void	Command::handleQuit(Server &serv, Client *client, std::vector<std::string> *args)
+{
+	// USAGE: QUIT
+	if (!args || args->size() != 0)
+	{
+		Server::sendClient(client->getFd(), QUIT_USG);
+		std::cout << "handle PART failed => wrong format" << std::endl;
+		return ;
+	}
+
+	serv.deleteClient(client->getFd());
+
+	std::cout << "handle QUIT successfuly called" << std::endl;
+}
+
 // KICK USER ON THE CURRENT CHANNEL
 void	Command::handleKick(Server &serv, Client *client, std::vector<std::string> *args)
 {
@@ -847,7 +867,7 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 		return ;
 	}
 
-	// USAGE: MODE <#channel> [<+/-modes>] [arguments]
+	// USAGE: MODE <#channel> [<+/-modes>] [<arguments>]
 	if (!args || args->size() < 1)
 	{
 		Server::sendClient(client->getFd(), MODE_USG);
@@ -1154,6 +1174,117 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 	}
 
 	std::cout << "handle modify MODE " << args->at(1) << " successfuly called\n";
+}
+
+// DISPLAY ALL COMMANDS USAGES
+void	Command::handleHelp(Client *client, std::vector<std::string> *args)
+{
+	// CHECK IF CLIENT IS AUTH
+	if (!client->getAuth())
+	{
+		Server::sendClient(client->getFd(), NEED_AUTH);
+		std::cout << "handle HELP failed => client isn't auth" << std::endl;
+		return ;
+	}
+
+	// USAGE: HELP
+	if (!args || args->size() >= 2)
+	{
+		Server::sendClient(client->getFd(), HELP_USG);
+		std::cout << "handle HELP failed => wrong format" << std::endl;
+		return ;
+	}
+
+	// SHOW ALL COMMANDS AND DESCRIPTIONS
+	if (args->size() == 0)
+	{
+		Server::sendClient(client->getFd(), "Commands list:\n");
+		Server::sendClient(client->getFd(), "PRIVMSG\t\t" PRIVMSG_DESC);
+		Server::sendClient(client->getFd(), "JOIN\t\t" JOIN_DESC);
+		Server::sendClient(client->getFd(), "PART\t\t" PART_DESC);
+		Server::sendClient(client->getFd(), "QUIT\t\t" QUIT_DESC);
+		Server::sendClient(client->getFd(), "KICK\t\t" KICK_DESC);
+		Server::sendClient(client->getFd(), "INVITE\t\t" INV_DESC);
+		Server::sendClient(client->getFd(), "TOPIC\t\t" TPC_DESC);
+		Server::sendClient(client->getFd(), "MODE\t\t" MODE_DESC);
+	}
+	// SHOW USAGE OF THE ASKED COMMAND
+	else
+	{
+		// IF THE CLIENT WANT HELP WITH PRIVMSG
+		if (args->at(0) == "PRIVMSG")
+		{
+			Server::sendClient(client->getFd(), "PRIVMSG:\n");
+			Server::sendClient(client->getFd(), PRIVMSG_USG);
+			Server::sendClient(client->getFd(), PRIVMSG_DESC);
+		}
+
+		// IF THE CLIENT WANT HELP WITH JOIN
+		else if (args->at(0) == "JOIN")
+		{
+			Server::sendClient(client->getFd(), "JOIN:\n");
+			Server::sendClient(client->getFd(), JOIN_USG);
+			Server::sendClient(client->getFd(), JOIN_DESC);
+		}
+
+		// IF THE CLIENT WANT HELP WITH PART
+		else if (args->at(0) == "PART")
+		{
+			Server::sendClient(client->getFd(), "PART:\n");
+			Server::sendClient(client->getFd(), PART_USG);
+			Server::sendClient(client->getFd(), PART_DESC);
+		}
+
+		// IF THE CLIENT WANT HELP WITH QUIT
+		else if (args->at(0) == "QUIT")
+		{
+			Server::sendClient(client->getFd(), "QUIT:\n");
+			Server::sendClient(client->getFd(), QUIT_USG);
+			Server::sendClient(client->getFd(), QUIT_DESC);
+		}
+
+		// IF THE CLIENT WANT HELP WITH KICK
+		else if (args->at(0) == "KICK")
+		{
+			Server::sendClient(client->getFd(), "KICK:\n");
+			Server::sendClient(client->getFd(), KICK_USG);
+			Server::sendClient(client->getFd(), KICK_DESC);
+		}
+
+		// IF THE CLIENT WANT HELP WITH INVITE
+		else if (args->at(0) == "INVITE")
+		{
+			Server::sendClient(client->getFd(), "INVITE:\n");
+			Server::sendClient(client->getFd(), INV_USG);
+			Server::sendClient(client->getFd(), INV_DESC);
+		}
+
+		// IF THE CLIENT WANT HELP WITH TOPIC
+		else if (args->at(0) == "TOPIC")
+		{
+			Server::sendClient(client->getFd(), "TOPIC:\n");
+			Server::sendClient(client->getFd(), TPC_USG);
+			Server::sendClient(client->getFd(), TPC_DESC);
+		}
+
+		// IF THE CLIENT WANT HELP WITH MODE
+		else if (args->at(0) == "MODE")
+		{
+			Server::sendClient(client->getFd(), "MODE:\n");
+			Server::sendClient(client->getFd(), MODE_USG);
+			Server::sendClient(client->getFd(), MODE_DESC);
+		}
+
+		// OTHERS INPUT
+		else
+		{
+			Server::sendClient(client->getFd(), NO_CMD);
+			std::cout << "handle HELP failed => command not found" << std::endl;
+			return ;
+		}
+	}
+
+	std::cout << "handle HELP successfuly called" << std::endl;
 }
 
 std::string	Command::intToString(int value)

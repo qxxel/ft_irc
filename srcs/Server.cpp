@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/02 18:20:07 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/04 19:17:29 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -215,7 +215,7 @@ void	Server::sendClient(int client, std::string msg)
 
 bool	Server::isValidChar(char c)
 {
-	return (!(c == 0 || c == 7 || c == '\r' || c == '\n' || c == ' ' || c == ',' || c == ':'));
+	return (!(!isprint(c) || c == ' ' || c == ',' || c == ':' || c == '#'));
 }
 
 std::string	Server::str_toupper(std::string str)
@@ -304,7 +304,7 @@ void	Server::addChannel(Channel *channel)
 
 void	Server::deleteClient(int client)
 {
-	if (!client)
+	if (client < 3)
 		return ;
 
 	// DELETE CLIENT IN THE SERVER
