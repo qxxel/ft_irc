@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 16:12:51 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/04 19:16:07 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/05 16:50:29 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,9 +48,11 @@
 # define KICK_DESC "description: Kick a user of a channel\n"
 # define INV_USG "usage: INVITE <user> <channel>\n"
 # define INV_DESC "description: Invite a user to a channel\n"
-# define TPC_USG "usage: TOPIC #channel [:<new_topic>]\n"
+# define TPC_USG "usage: TOPIC <channel> [:<new_topic>]\n"
 # define TPC_DESC "description: Change or view the topic of a channel\n"
-# define MODE_USG "usage: MODE <#channel> [<+/-modes>] [<arguments>]\n"
+# define NAMES_USG "usage: NAMES <channel>{,<channel>}\n"
+# define NAMES_DESC "description: View clients in a channel\n"
+# define MODE_USG "usage: MODE <channel> [<+/-modes>] [<arguments>]\n"
 # define MODE_DESC "description: Change or view the modes of a channel\n"
 # define HELP_USG "usage: HELP [<command>]\n"
 
@@ -65,6 +67,7 @@
 # define NO_CHNL_IN "Not in a channel\n"
 # define NO_PERM "You're not channel operator\n"
 # define BAD_TRGT "No user found channel\n"
+# define SLF_KICK "You cannot kick yourself\n"
 # define TRGT_KICK "Target kicked\n"
 # define NO_CHNL "Channel don't exist\n"
 # define NO_TPC "No topic is set\n"

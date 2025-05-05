@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/05 16:33:21 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/05 17:17:13 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,6 @@ Server::Server(std::string port, std::string password)
 		setPort(parsePort(port));
 		this->_bot = new Bot();
 		std::cout << *this;
-		// start();
 	}
 	catch(const std::exception& e)
 	{
