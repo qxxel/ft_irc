@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/05 16:26:49 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/05 16:33:21 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,10 +85,16 @@ void	Server::start(void)
 
 	int	opt = 1;
 	if (setsockopt(fd_socket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(int)) == -1)
+	{
+		close(fd_socket);
 		throw (std::runtime_error("Error: setsockopt failed: " + std::string(strerror(errno))));
+	}
 
 	if (fcntl(fd_socket, F_SETFL, O_NONBLOCK) == -1)
+	{
+		close(fd_socket);
 		throw (std::runtime_error("Error: fcntl failed: " + std::string(strerror(errno))));
+	}
 
 	sockaddr_in	network;
 	network.sin_family = AF_INET;
@@ -96,10 +102,16 @@ void	Server::start(void)
 	network.sin_addr.s_addr = INADDR_ANY;
 
 	if (bind(fd_socket, (struct sockaddr*)&network, sizeof(network)) == -1)
+	{
+		close(fd_socket);
 		throw (std::runtime_error("Error: bind failed: " + std::string(strerror(errno))));
+	}
 
 	if (listen(fd_socket, SOMAXCONN) == -1)
+	{
+		close(fd_socket);
 		throw (std::runtime_error("Error: listen failed: " + std::string(strerror(errno))));
+	}
 
 	try
 	{
