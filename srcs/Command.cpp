@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/04 19:30:44 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/05 14:48:23 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,7 +180,7 @@ std::ostream &	operator<<(std::ostream &o, Command &cmd)
 	return (o);
 }
 
-void Command::executeCommand(Server &serv, Client *client, Command *cmd)
+void Command::executeCommand(Server &serv, Client *client, Command *cmd, int epfd)
 {
 	std::vector<std::string>	args = cmd->getArgs();
 	try
@@ -198,7 +198,10 @@ void Command::executeCommand(Server &serv, Client *client, Command *cmd)
 		else if (!cmd->getName().compare("PART"))
 			cmd->handlePart(serv, client, &args);
 		else if (!cmd->getName().compare("QUIT"))
-			cmd->handleQuit(serv, client, &args);
+		{
+			cmd->handleQuit(serv, client, &args, epfd);
+			return ;
+		}
 		else if (!cmd->getName().compare("KICK"))
 			cmd->handleKick(serv, client, &args);
 		else if (!cmd->getName().compare("INVITE"))
@@ -427,6 +430,7 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 		std::string	passwords;
 		if (args->size() == 2)
 			passwords = args->at(1);
+
 		std::map<std::string, std::string> 				channelsAsk = splitChannelsPasswords(args->at(0), passwords, ',');
 		std::map<std::string, std::string>::iterator	it;
 		for (it = channelsAsk.begin(); it != channelsAsk.end(); it++)
@@ -611,7 +615,7 @@ void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> 
 }
 
 // LEAVE SERVER
-void	Command::handleQuit(Server &serv, Client *client, std::vector<std::string> *args)
+void	Command::handleQuit(Server &serv, Client *client, std::vector<std::string> *args, int epfd)
 {
 	// USAGE: QUIT
 	if (!args || args->size() != 0)
@@ -621,7 +625,7 @@ void	Command::handleQuit(Server &serv, Client *client, std::vector<std::string> 
 		return ;
 	}
 
-	serv.deleteClient(client->getFd());
+	serv.disconnectClient(client->getFd(), epfd);
 
 	std::cout << "handle QUIT successfuly called" << std::endl;
 }

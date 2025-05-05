@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:13 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/04 17:09:50 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/04 19:45:48 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ class Command
 		~Command();
 
 		// STATIC FUNCTIONS
-		static void			executeCommand(Server &serv, Client *client, Command *cmd);
+		static void			executeCommand(Server &serv, Client *client, Command *cmd, int epfd);
 
 		//SETTERS AND GETTERS
 		std::string					getName();
@@ -57,7 +57,7 @@ class Command
 		void		handlePrivMsg(Server &serv, Client *client, std::vector<std::string> *args);
 		void		handleJoin(Server &serv, Client *client, std::vector<std::string> *args);
 		void		handlePart(Server &serv, Client *client, std::vector<std::string> *args);
-		void		handleQuit(Server &serv, Client *client, std::vector<std::string> *args);
+		void		handleQuit(Server &serv, Client *client, std::vector<std::string> *args, int epfd);
 		void		handleHelp(Client *client, std::vector<std::string> *args);
 		void		handleKick(Server &serv, Client *client, std::vector<std::string> *args);
 		void		handleInvite(Server &serv, Client *client, std::vector<std::string> *args);

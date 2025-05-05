@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/04 19:17:29 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/05 14:38:35 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -252,7 +252,7 @@ void	Server::clientRequest(int client, int epfd)
 		{
 			tp->getRequest()->split_Request();
 			for (std::vector<Command>::iterator	 it = tp->getRequest()->getArr().begin(); it != tp->getRequest()->getArr().end() ; it++)
-				Command::executeCommand(*this, tp, &(*it));
+				Command::executeCommand(*this, tp, &(*it), epfd);
 			tp->getRequest()->clear();
 		}
 	}
@@ -321,7 +321,7 @@ void	Server::deleteClient(int client)
 	for (std::vector<Channel*>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
 	{
 		// DELETE THE CLIENT IN THE CLIENT LIST
-		for (std::vector<Client*>::iterator it_clients = (*it)->getClientsList().begin(); it_clients != (*it)->getClientsList().end(); it++)
+		for (std::vector<Client*>::iterator it_clients = (*it)->getClientsList().begin(); it_clients != (*it)->getClientsList().end(); it_clients++)
 		{
 			if ((*it_clients)->getFd() == client)
 			{
@@ -331,14 +331,28 @@ void	Server::deleteClient(int client)
 			}
 		}
 		// DELETE THE CLIENT IN THE OP LIST
-		for (std::vector<Client*>::iterator it_ops = (*it)->getOpList().begin(); it_ops != (*it)->getOpList().end(); it++)
+		for (std::vector<Client*>::iterator it_ops = (*it)->getOpList().begin(); it_ops != (*it)->getOpList().end(); it_ops++) // PROBLEM
 		{
 			if ((*it_ops)->getFd() == client)
 			{
 				(*it)->getOpList().erase(it_ops);
+
+				if ((*it)->getOpList().empty() && !(*it)->getClientsList().empty())
+				{
+
+					Client	*oldestClient = (*it)->getOldestClient();
+																			std::cerr << "old: " << oldestClient << " | " << oldestClient->getUser() << std::endl;
+					if (oldestClient)
+						(*it)->getOpList().push_back(oldestClient);
+																			std::cerr << "opVec: " << oldestClient << " | " << (*it)->getOpList().at(0)->getUser() << std::endl;
+					}
+
 				break ;
 			}
 		}
+		// DELETE CHANNEL IF EMPTY
+		if ((*it)->getClientsList().empty())
+			this->deleteChannel((*it));
 	}
 }
 
