@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:16:26 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/05 15:42:34 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/05 16:23:44 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ int main(int argc, char const *argv[])
 	{
 		setupSignals();
 		Server	ircserv = Server(argv[1], argv[2]);
+		ircserv.start();
 	}
 	catch (const std::exception& e)
 	{
