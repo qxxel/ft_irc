@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   Bot.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 14:55:23 by mreynaud          #+#    #+#             */
-/*   Updated: 2025/05/02 18:17:58 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/05 16:00:55 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 // #include <iostream>
 #include "Bot.hpp"
 
-Bot::Bot() : Client(-2) {
+Bot::Bot(): Client(-2) {
 	_auth = true;
 	_pwd = true;
 	_user = "GameBot";
@@ -21,7 +21,7 @@ Bot::Bot() : Client(-2) {
 	srand(time(NULL));
 }
 
-Bot::~Bot() {}
+Bot::~Bot() { }
 
 void	Bot::joinChannel(Channel	*channel)
 {

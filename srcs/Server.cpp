@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/05 14:38:35 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/05 16:09:57 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,30 +29,26 @@ bool	Server::_running = true;
 Server::~Server()
 {
 	// DELETE BOT
-	delete _bot;
+	delete this->_bot;
 
 	// DELETE CLIENTS
 	std::vector<Client*>::iterator	it1;
-	for (it1 = _clients.begin(); it1 != _clients.end(); it1++)
+	for (it1 = this->_clients.begin(); it1 != this->_clients.end(); it1++)
 		delete *it1;
 
 	// DELETE CHANNELS
 	std::vector<Channel*>::iterator	it2;
-	for (it2 = _channels.begin(); it2 != _channels.end(); it2++)
+	for (it2 = this->_channels.begin(); it2 != this->_channels.end(); it2++)
 		delete *it2;
-
-	// CLOSE PORT
-	if (close(_port) == -1)
-		throw (std::runtime_error("Error: close failed: " + std::string(strerror(errno))));
 }
 
 Server::Server(std::string port, std::string password)
 {
 	try
 	{
-		_pwd = simpleHash(password);
+		this->_pwd = simpleHash(password);
 		setPort(parsePort(port));
-		_bot = new Bot();
+		this->_bot = new Bot();
 		std::cout << *this;
 		start();
 	}
@@ -133,7 +129,10 @@ void	Server::run(int sock)
 	{
 		nfds = epoll_wait(epfd, events, MAX_EVENTS, -1);
 		if (nfds == -1)
+		{
+			deleteServer(sock, epfd);
 			throw (std::runtime_error("Error: epoll_wait failed: " + std::string(strerror(errno))));
+		}
 
 		try
 		{
@@ -147,11 +146,13 @@ void	Server::run(int sock)
 					disconnectClient(events[i].data.fd, epfd);
 			}
 		}
-		catch(const std::exception& e)
+		catch(const std::exception&)
 		{
+			deleteServer(sock, epfd);
 			throw ;
 		}
 	}
+	deleteServer(sock, epfd);
 }
 
 // ---------------------------------------------SERVER ACTIONS---------------------------------------------
@@ -341,10 +342,8 @@ void	Server::deleteClient(int client)
 				{
 
 					Client	*oldestClient = (*it)->getOldestClient();
-																			std::cerr << "old: " << oldestClient << " | " << oldestClient->getUser() << std::endl;
 					if (oldestClient)
 						(*it)->getOpList().push_back(oldestClient);
-																			std::cerr << "opVec: " << oldestClient << " | " << (*it)->getOpList().at(0)->getUser() << std::endl;
 					}
 
 				break ;
@@ -383,6 +382,25 @@ void	Server::deleteChannel(Channel *channel)
 			return ;
 		}
 	}
+}
+
+void	Server::deleteServer(int sock, int epfd)
+{
+	// DELETE ALL CLIENTS IN EPOLL AND CLOSE THEM
+	std::vector<Client*>::iterator	it_clnt;
+	for (it_clnt = this->_clients.begin(); it_clnt != this->_clients.end(); it_clnt++)
+	{
+		epoll_ctl(epfd, EPOLL_CTL_DEL, (*it_clnt)->getFd(), NULL);
+		close((*it_clnt)->getFd());
+	}
+
+	// CLOSE SOCKET
+	epoll_ctl(epfd, EPOLL_CTL_DEL, sock, NULL);
+	close(sock);
+	// (void)sock;
+
+	// CLOSE EPOLL
+	close(epfd);
 }
 
 Channel	*Server::searchChannel(std::string name)

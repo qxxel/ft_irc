@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:07 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/02 17:59:32 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/05 15:49:09 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,8 @@ class Server
 		Bot						*_bot;
 
 	public:
-		~Server();
 		Server(std::string port, std::string password);
+		~Server();
 
 
 		int		parsePort(std::string port);
@@ -54,6 +54,7 @@ class Server
 		void	addChannel(Channel *channel);
 		void	deleteClient(int client);
 		void	deleteChannel(Channel *channel);
+		void	deleteServer(int sock, int epfd);
 		Client	*findClientFd(int fd);
 		Client	*findClientName(std::string name);
 		Channel	*searchChannel(std::string name);

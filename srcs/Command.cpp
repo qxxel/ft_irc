@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/05 14:48:23 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/05 15:52:00 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,6 +133,10 @@ void	Command::parse()
 
 bool	Command::is_available(Server &serv, std::string name)
 {
+	// DO NOT HAVE THE SAME USER THAN THE BOT
+	if (name == "GameBot")
+		return (false);
+
 	std::vector<Client*>::const_iterator	it;
 	for (it = serv.getClients().begin(); it != serv.getClients().end(); it++)
 	{
