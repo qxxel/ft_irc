@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:13 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/04 19:45:48 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/05 16:17:15 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,7 @@ class Command
 		void		handleKick(Server &serv, Client *client, std::vector<std::string> *args);
 		void		handleInvite(Server &serv, Client *client, std::vector<std::string> *args);
 		void		handleTopic(Server &serv, Client *client, std::vector<std::string> *args);
+		void		handleNames(Server &serv, Client *client, std::vector<std::string> *args);
 		void		handleMode(Server &serv, Client *client, std::vector<std::string> *args);
 		std::vector<std::string>			splitChannels(std::string str, char del);
 		std::map<std::string, std::string>	splitChannelsPasswords(std::string str1, std::string str2, char del);

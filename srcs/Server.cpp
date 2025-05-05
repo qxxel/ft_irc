@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/05 16:26:49 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/05 17:01:21 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,6 @@ Server::Server(std::string port, std::string password)
 		setPort(parsePort(port));
 		this->_bot = new Bot();
 		std::cout << *this;
-		// start();
 	}
 	catch(const std::exception& e)
 	{
