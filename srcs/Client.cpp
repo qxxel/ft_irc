@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 16:04:15 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/05 16:01:18 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/05 17:22:01 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ bool	Client::isCurrentChannel(std::string name)
 	std::vector<Channel*>::iterator	it;
 	for (it = this->_currentsChannels.begin(); it != this->_currentsChannels.end(); it++)
 	{
-		if ((*it)->getName() == name)
+		if (!(*it)->getName().compare(name))
 			return (true);
 	}
 	return (false);
