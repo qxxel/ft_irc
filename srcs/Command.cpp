@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/05 17:09:56 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/05 20:31:20 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,7 @@ void	Command::parse()
 		}
 		str = _raw.substr(j, i - j);
 		if (_name.empty())
-			_name = str;
+			_name = Server::str_toupper(str);
 		else
 			args.push_back(str);
 		i++;
@@ -387,7 +387,7 @@ void	Command::handlePrivMsg(Server &serv, Client *client, std::vector<std::strin
 		}
 
 		channel->sendClients(client->getUser(), ":" + client->getNick() + "!" + client->getUser() + " PRIVMSG " + channel->getName() + " " + args->at(1) + "\n");
-		if (args->at(1).find("!GAME") == 1 && serv.getBot()->isCurrentChannel(channel->getName()))
+		if (serv.getBot()->isCurrentChannel(channel->getName()))
 			Bot::handleBot(channel, client, args->at(1));
 	}
 	// CHECK IF THE TARGET IS A CLIENT
@@ -403,7 +403,7 @@ void	Command::handlePrivMsg(Server &serv, Client *client, std::vector<std::strin
 		}
 
 		Server::sendClient(target->getFd(), ":" + client->getNick() + "!" + client->getUser() + " PRIVMSG " + target->getUser() + " " + args->at(1) + "\n");
-		if (target->getUser() == "GameBot" && args->at(1).find("!GAME") == 1)
+		if (target->getUser() == "GameBot")
 			Bot::handleBot(NULL, client, args->at(1));
 	}
 
@@ -713,7 +713,7 @@ void	Command::handleKick(Server &serv, Client *client, std::vector<std::string> 
 	// HANDLE FOR INVITATION ONLY
 	if (channel->getInvOnly())
 		target->delJoinableChannel(channel);
-	
+
 	// HANDLE IF TARGET IS OP
 	if (channel->isOpName(target->getUser()))
 		channel->delOpName(target->getUser());

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Bot.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 14:55:23 by mreynaud          #+#    #+#             */
-/*   Updated: 2025/05/05 16:00:55 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/05 20:33:32 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,8 @@ void	Bot::joinChannel(Channel	*channel)
 {
 	if (channel->getMaxUsers() != 0 && !(channel->getClientsList().size() < (unsigned long)channel->getMaxUsers()))
 	{
-		// the chanel is full
+		channel->sendClients("", "the bot (GameBot) cannot rejoin, because the channel is full\n");
+		std::cout << "GameBot JOIN failed => channel full" << std::endl;
 		return ;
 	}
 	this->getCurrentsChannels().push_back(channel);
@@ -35,15 +36,6 @@ void	Bot::joinChannel(Channel	*channel)
 	channel->getOpList().push_back(this);
 	channel->sendClients("", ":" + this->getNick() + "!" + this->getUser() + " JOIN :" + channel->getName() + "\n");
 }
-
-// void	Bot::kickChanel(Channel	*channel, Client *client, std::vector<std::string> *args)
-// {
-// 	channel->delOpName(this->getUser());
-
-// 	this->delCurrentChannel(channel);
-// 	channel->delClientName(this->getUser());
-// 	channel->sendClients("", client->getNick() + ":" + client->getUser() + " KICK " + Command::joinStrings(*args) + "\n");
-// }
 
 static void	send_msg_bot(std::string msg, Client *client, Channel *channel)
 {
@@ -143,8 +135,11 @@ static void	game_rock_paper_scissors(std::string adverse_choice, Client *client,
 
 void Bot::handleBot(Channel *channel, Client *client, std::string &arg)
 {
-	if (arg.size() <= 7)
+	if (arg.find("!GAME") != 1 || arg.size() <= 7)
+	{
 		explain_rule(client, channel);
+		return ;
+	}
 	std::string str = arg.substr(7, arg.size() - 8);
 
 	game_rock_paper_scissors(Server::str_toupper(str), client, channel);
