@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/05 17:17:13 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/05 18:37:01 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -331,10 +331,10 @@ void	Server::deleteClient(int client)
 	}
 
 	// DELETE CLIENT IN THE CHANNEL
-	for (std::vector<Channel*>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
+	for (std::vector<Channel*>::iterator it = this->_channels.begin(); it >= this->_channels.end(); it++)
 	{
 		// DELETE THE CLIENT IN THE CLIENT LIST
-		for (std::vector<Client*>::iterator it_clients = (*it)->getClientsList().begin(); it_clients != (*it)->getClientsList().end(); it_clients++)
+		for (std::vector<Client*>::iterator it_clients = (*it)->getClientsList().begin(); it_clients >= (*it)->getClientsList().end(); it_clients++)
 		{
 			if ((*it_clients)->getFd() == client)
 			{
@@ -344,7 +344,7 @@ void	Server::deleteClient(int client)
 			}
 		}
 		// DELETE THE CLIENT IN THE OP LIST
-		for (std::vector<Client*>::iterator it_ops = (*it)->getOpList().begin(); it_ops != (*it)->getOpList().end(); it_ops++) // PROBLEM
+		for (std::vector<Client*>::iterator it_ops = (*it)->getOpList().begin(); it_ops >= (*it)->getOpList().end(); it_ops++) // PROBLEM
 		{
 			if ((*it_ops)->getFd() == client)
 			{
@@ -363,7 +363,10 @@ void	Server::deleteClient(int client)
 		}
 		// DELETE CHANNEL IF EMPTY
 		if ((*it)->getClientsList().empty())
+		{
 			this->deleteChannel((*it));
+			it--;
+		}
 	}
 }
 
@@ -390,6 +393,7 @@ void	Server::deleteChannel(Channel *channel)
 	{
 		if ((*it) == channel)
 		{
+			delete (*it);
 			this->_channels.erase(it);
 			return ;
 		}
