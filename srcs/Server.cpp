@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/05 16:09:57 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/05 16:21:37 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,8 @@ bool	Server::_running = true;
 Server::~Server()
 {
 	// DELETE BOT
-	delete this->_bot;
+	if (this->_bot)
+		delete this->_bot;
 
 	// DELETE CLIENTS
 	std::vector<Client*>::iterator	it1;
@@ -131,6 +132,7 @@ void	Server::run(int sock)
 		if (nfds == -1)
 		{
 			deleteServer(sock, epfd);
+			delete this->_bot;
 			throw (std::runtime_error("Error: epoll_wait failed: " + std::string(strerror(errno))));
 		}
 
