@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:05 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/05 17:27:55 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/06 20:05:01 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,6 +152,16 @@ const std::string	&Channel::getPwd() const
 	return (this->_pwd);
 }
 
+const std::string	&Channel::getTopicSetter() const
+{
+	return (this->_topicSetter);
+}
+
+time_t	Channel::getTopicSetTimestamp() const
+{
+	return (this->_topicSetTimestamp);
+}
+
 time_t	Channel::getModeSetTimestamp() const
 {
 	return (this->_modeSetTimestamp);
@@ -190,6 +200,16 @@ void	Channel::setTopic(const std::string &topic)
 void	Channel::setPwd(const std::string &pwd)
 {
 	this->_pwd = pwd;
+}
+
+void	Channel::setTopicSetter(const std::string &topicSetter)
+{
+	this->_topicSetter = topicSetter;
+}
+
+void	Channel::setTopicSetTimestamp(time_t topicSetTimestamp)
+{
+	this->_topicSetTimestamp = topicSetTimestamp;
 }
 
 void	Channel::setModeSetTimestamp(time_t modeSetTimestamp)
