@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/06 16:51:57 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/06 17:00:27 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -204,18 +204,20 @@ int	Server::acceptClient(int sock, int epfd)
 	return (fd);
 }
 
-void	Server::disconnectClient(int client, int epfd)
+void	Server::disconnectClient(int fd, int epfd)
 {
-	if (epoll_ctl(epfd, EPOLL_CTL_DEL, client, NULL) == -1)
+	Client	*client = findClientFd(fd);
+
+	if (epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL) == -1)
 		throw (std::runtime_error("Error: deleting client from epoll failed: " + std::string(strerror(errno))));
 
-	if (close(client) == -1)
+	if (close(fd) == -1)
 		throw (std::runtime_error("Error: closing client socket failed: " + std::string(strerror(errno))));
 
-	this->deleteClient(client);
-	delete findClientFd(client);
+	this->deleteClient(fd);
+	delete client;
 
-	std::cout << "Client " << client << " disconnected" << std::endl;
+	std::cout << "Client " << fd << " disconnected" << std::endl;
 }
 
 void	Server::sendClient(Client *client, std::string msg)
@@ -342,6 +344,7 @@ void	Server::deleteClient(int client)
 		if ((*it)->getFd() == client)
 		{
 			this->_clients.erase(it);
+										std::cerr << "cc" << std::endl;
 			break ;
 		}
 	}
