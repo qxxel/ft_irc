@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:48 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/02 13:15:58 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/06 20:04:53 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,10 @@ class Channel
 		std::vector<Client*>	_opList;
 		Client					*_oldestClient;
 		std::string				_name;
-		std::string				_topic;
 		std::string				_pwd;
+		std::string				_topic;
+		std::string				_topicSetter;
+		time_t					_topicSetTimestamp;
 		time_t					_modeSetTimestamp;
 		int						_maxUsers;
 		bool					_invOnly;
@@ -41,6 +43,8 @@ class Channel
 		const std::string		&getName() const;
 		const std::string		&getTopic() const;
 		const std::string		&getPwd() const;
+		const std::string		&getTopicSetter() const;
+		time_t					getTopicSetTimestamp() const;
 		time_t					getModeSetTimestamp() const;
 		int						getMaxUsers() const;
 		bool					getInvOnly() const;
@@ -49,6 +53,8 @@ class Channel
 		void	setName(const std::string &name);
 		void	setTopic(const std::string &topic);
 		void	setPwd(const std::string &pwd);
+		void	setTopicSetter(const std::string &topicSetter);
+		void	setTopicSetTimestamp(time_t topicSetTimestamp);
 		void	setModeSetTimestamp(time_t modeSetTimestamp);
 		void	setMaxUsers(int maxUsers);
 		void	setInvOnly(bool invOnly);

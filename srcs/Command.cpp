@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/06 16:10:22 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/06 20:49:54 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -222,10 +222,6 @@ void Command::executeCommand(Server &serv, Client *client, Command *cmd, int epf
 			Server::sendClient(client, UKWN_CMD + cmd->getName() + "\n");
 
 		Server::sendClient(client->getFd(), "------------------------------------------\n");
-		if (!client->getAuth())
-			Server::sendClient(client->getFd(), "* > ");
-		else
-			Server::sendClient(client->getFd(), client->getNick() + ":" + client->getUser() + " > ");
 	}
 	catch(const std::exception& e)
 	{
@@ -810,7 +806,7 @@ void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string>
 	// CHECK IF CLIENT IS AUTH
 	if (!client->getAuth())
 	{
-		Server::sendClient(client, NEED_AUTH);
+		Server::sendClient(client->getFd(), ":localhost 451 " + client->getUser() + " :You have not registered\n");
 		std::cout << "handle TOPIC failed => client isn't auth" << std::endl;
 		return ;
 	}
@@ -818,7 +814,8 @@ void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string>
 	// USAGE: TOPIC <channel> [:<new_topic>]
 	if (!args || args->empty() || args->size() > 2)
 	{
-		Server::sendClient(client, TPC_USG);
+		// 461 <nick> TOPIC :Not enough parameters
+		Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " TOPIC :Not enough parameters");
 		std::cout << "handle TOPIC failed => no args" << std::endl;
 		return ;
 	}
@@ -827,7 +824,7 @@ void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string>
 	Channel	*channel = serv.searchChannel(args->at(0));
 	if (!channel)
 	{
-		Server::sendClient(client, NO_CHNL);
+		Server::sendClient(client->getFd(), ":localhost 403 " + client->getUser() + " " + channel->getName() + " :No such channel\n");
 		std::cout << "handle TOPIC failed => channel don't exist" << std::endl;
 		return ;
 	}
@@ -836,9 +833,12 @@ void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string>
 	if (args->size() == 1)
 	{
 		if (channel->getTopic().empty())
-			Server::sendClient(client, client->getNick() + " " + channel->getName() + " :" + NO_TPC + "\n");
+			Server::sendClient(client->getFd(), ":localhost 331 " + client->getUser() + " " + channel->getName() + " :" + NO_TPC + "\n");
 		else
-			Server::sendClient(client, client->getNick() + " " + channel->getName() + " " + channel->getTopic() + "\n");
+		{
+			Server::sendClient(client->getFd(), ":localhost 332 " + client->getUser() + " " + channel->getName() + " " + channel->getTopic() + "\n");
+			Server::sendClient(client->getFd(), ":localhost 333 " + client->getUser() + " " + channel->getName() + " " + channel->getTopicSetter() + timeToString(channel->getTopicSetTimestamp()) + "\n");
+		}
 	}
 	// SET TOPIC
 	else
@@ -846,7 +846,7 @@ void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string>
 		// FIND CLIENT IN THE CHANNEL
 		if (!client->isCurrentChannel(channel->getName()))
 		{
-			Server::sendClient(client, NO_CHNL_ASK);
+			Server::sendClient(client->getFd(), ":localhost 442 " + client->getUser() + " " + channel->getName() + " :You're not on that channel\n");
 			std::cout << "handle set TOPIC failed => client isn't in the channel asked" << std::endl;
 			return ;
 		}
@@ -854,28 +854,49 @@ void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string>
 		// CHECK IF CLIENT IS OP
 		if (channel->getLockTopic() && !channel->isOpName(client->getUser()))
 		{
-			Server::sendClient(client, NO_PERM);
+			Server::sendClient(client->getFd(), ":localhost 482 " + client->getUser() + " " + channel->getName() + " :You're not channel operator\n");
 			std::cout << "handle set TOPIC failed => client isn't moderator" << std::endl;
 			return ;
 		}
 
-		// CHECK IF THERE IS A ':' IN FRONT OF THE NEW TOPIC
+		// CHECK IF THERE IS A ':' IN FRONT OF THE NEW TOPIC // ONLY FOR NC
 		if (args->at(1)[0] != ':')
 		{
-			Server::sendClient(client, TPC_RULE);
+			Server::sendClient(client->getFd(), ":localhost 902 " + client->getUser() + " " + channel->getName() + " :Need a ':' in front of the topic\n");
 			std::cout << "handle set TOPIC failed => there is no ':' in front of the topic" << std::endl;
 			return ;
+		}
+
+		// CHECK IF ALL CHARACTERS ARE VALID
+		std::string::iterator it;
+		for (it = args->at(1).begin(); it != args->at(1).end(); ++it)
+		{
+			if (it == args->at(1).begin())
+				it++;
+
+			if (it == args->at(1).end())
+				break ;
+
+			if (!Server::isValidChar(*it))
+			{
+				std::cerr << args->at(1) << std::endl;
+				Server::sendClient(client->getFd(), ":localhost 900 " + client->getUser() + " " + channel->getName() + " :Invalid characters in topic\n");
+				std::cout << "handle set TOPIC failed => there is invalid character" << std::endl;
+				return ;
+			}
 		}
 
 		// CHECK IF THE TOPIC IS ALREADY SET
 		if (channel->getTopic() == args->at(1))
 		{
-			Server::sendClient(client, ACTL_TPC);
-			std::cout << "handle set TOPIC failed => client isn't moderator" << std::endl;
+			Server::sendClient(client->getFd(), ":localhost 901 " + client->getUser() + " " + channel->getName() + " :Topic already set\n");
+			std::cout << "handle set TOPIC failed => topic already set" << std::endl;
 			return ;
 		}
 
 		channel->setTopic(args->at(1));
+		channel->setTopicSetter(client->getUser());
+		channel->setTopicSetTimestamp(time(NULL));
 		channel->sendClients("", client->getNick() + ":" + client->getUser() + " TOPIC " + channel->getName() + " " + channel->getTopic() + "\n");
 	}
 
