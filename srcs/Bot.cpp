@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 14:55:23 by mreynaud          #+#    #+#             */
-/*   Updated: 2025/05/06 21:03:31 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/06 21:24:16 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,7 @@ static std::string	rand_rock_paper_scissors()
 
 static void	game_rock_paper_scissors(std::string adverse_choice, Client *client, Channel *channel)
 {
-	std::cout << "\"" << adverse_choice << "\"" << std::endl;
+	std::cout << "\"" << adverse_choice << "\"" << std::endl; // /!\ //
 	std::string my_choice = rand_rock_paper_scissors();
 	if (adverse_choice == "ROCK")
 	{
@@ -135,6 +135,8 @@ static void	game_rock_paper_scissors(std::string adverse_choice, Client *client,
 
 void Bot::handleBot(Channel *channel, Client *client, std::string &arg)
 {
+	std::cout << "\"" << arg << "\"" << std::endl;
+
 	if (arg.find("!GAME") != 1 || arg.size() <= 7)
 	{
 		explain_rule(client, channel);

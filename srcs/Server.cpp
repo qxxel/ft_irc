@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/06 21:00:33 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/06 21:17:29 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -269,7 +269,6 @@ void	Server::clientRequest(int client, int epfd)
 		tp->getRequest()->append(buffer, n);
 		if (buffer[n - 1] == '\n')
 		{
-			buffer[n - 1] = '\0';
 			tp->getRequest()->split_Request();
 			for (std::vector<Command>::iterator	 it = tp->getRequest()->getArr().begin(); it != tp->getRequest()->getArr().end() ; it++)
 				Command::executeCommand(*this, tp, &(*it), epfd);
