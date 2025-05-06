@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/05 18:37:01 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/06 16:25:44 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -204,18 +204,20 @@ int	Server::acceptClient(int sock, int epfd)
 	return (fd);
 }
 
-void	Server::disconnectClient(int client, int epfd)
+void	Server::disconnectClient(int fd, int epfd)
 {
-	if (epoll_ctl(epfd, EPOLL_CTL_DEL, client, NULL) == -1)
+	Client	*client = findClientFd(fd);
+
+	if (epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL) == -1)
 		throw (std::runtime_error("Error: deleting client from epoll failed: " + std::string(strerror(errno))));
 
-	if (close(client) == -1)
+	if (close(fd) == -1)
 		throw (std::runtime_error("Error: closing client socket failed: " + std::string(strerror(errno))));
 
-	this->deleteClient(client);
-	delete findClientFd(client);
+	this->deleteClient(fd);
+	delete client;
 
-	std::cout << "Client " << client << " disconnected" << std::endl;
+	std::cout << "Client " << fd << " disconnected" << std::endl;
 }
 
 void	Server::sendClient(int client, std::string msg)
@@ -326,15 +328,16 @@ void	Server::deleteClient(int client)
 		if ((*it)->getFd() == client)
 		{
 			this->_clients.erase(it);
+										std::cerr << "cc" << std::endl;
 			break ;
 		}
 	}
 
 	// DELETE CLIENT IN THE CHANNEL
-	for (std::vector<Channel*>::iterator it = this->_channels.begin(); it >= this->_channels.end(); it++)
+	for (std::vector<Channel*>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
 	{
 		// DELETE THE CLIENT IN THE CLIENT LIST
-		for (std::vector<Client*>::iterator it_clients = (*it)->getClientsList().begin(); it_clients >= (*it)->getClientsList().end(); it_clients++)
+		for (std::vector<Client*>::iterator it_clients = (*it)->getClientsList().begin(); it_clients != (*it)->getClientsList().end(); it_clients++)
 		{
 			if ((*it_clients)->getFd() == client)
 			{
@@ -344,7 +347,7 @@ void	Server::deleteClient(int client)
 			}
 		}
 		// DELETE THE CLIENT IN THE OP LIST
-		for (std::vector<Client*>::iterator it_ops = (*it)->getOpList().begin(); it_ops >= (*it)->getOpList().end(); it_ops++) // PROBLEM
+		for (std::vector<Client*>::iterator it_ops = (*it)->getOpList().begin(); it_ops != (*it)->getOpList().end(); it_ops++) // PROBLEM
 		{
 			if ((*it_ops)->getFd() == client)
 			{
