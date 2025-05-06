@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:05 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/06 20:50:01 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/06 21:03:16 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,7 @@ void	Channel::sendClients(std::string exceptionName, std::string message)
 	for (std::vector<Client*>::iterator it = this->_clientsList.begin(); it != this->_clientsList.end(); it++)
 	{
 		if (exceptionName.compare((*it)->getUser()))
-			Server::sendClient((*it), message);
+			Server::sendClient((*it)->getFd(), message);
 	}
 }
 

@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/06 17:00:27 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/06 21:00:33 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -191,9 +191,9 @@ int	Server::acceptClient(int sock, int epfd)
 	{
 		Client	*tp = new Client(fd);
 		_clients.push_back(tp);
-		sendClient(tp, SERVER_WELCOME);
-		sendClient(tp, ENTER_PWD);
-		sendClient(tp, "* > ");
+		sendClient(tp->getFd(), SERVER_WELCOME);
+		sendClient(tp->getFd(), ENTER_PWD);
+		sendClient(tp->getFd(), "* > ");
 		std::cout << "\nNew client connected !\n";
 	}
 	catch(const std::exception& e)
@@ -220,19 +220,11 @@ void	Server::disconnectClient(int fd, int epfd)
 	std::cout << "Client " << fd << " disconnected" << std::endl;
 }
 
-void	Server::sendClient(Client *client, std::string msg)
-{
-	if (!client || client->getFd() == -2)
-		return ;
-
-	msg = "\r\033[K" + msg;
-
-	if (send(client->getFd(), msg.c_str(), msg.size(), 0) == -1)
-		throw (std::runtime_error("Error: sending data to clients failed: " + std::string(strerror(errno))));
-}
-
 void	Server::sendClient(int client, std::string msg)
 {
+	if (client == -2)
+		return ;
+
 	if (send(client, msg.c_str(), msg.size(), 0) == -1)
 		throw (std::runtime_error("Error: sending data to clients failed: " + std::string(strerror(errno))));
 }
@@ -270,10 +262,6 @@ void	Server::clientRequest(int client, int epfd)
 				n = recv(client, &buffer, MAX_BODY_SIZE + 1, 0);
 			sendClient(client, "Error: input too big (max_body_size = 5000)\n");
 			Server::sendClient(client, "------------------------------------------\n");
-			if (!this->findClientFd(client)->getAuth())
-				Server::sendClient(client, "* > ");
-			else
-				Server::sendClient(client, this->findClientFd(client)->getNick() + ":" + this->findClientFd(client)->getUser() + " > ");
 			return (void)(std::cerr << "Error: client request too big: max " << MAX_BODY_SIZE << " characters" << std::endl);
 		}
 		Client	*tp = findClientFd(client);
@@ -281,6 +269,7 @@ void	Server::clientRequest(int client, int epfd)
 		tp->getRequest()->append(buffer, n);
 		if (buffer[n - 1] == '\n')
 		{
+			buffer[n - 1] = '\0';
 			tp->getRequest()->split_Request();
 			for (std::vector<Command>::iterator	 it = tp->getRequest()->getArr().begin(); it != tp->getRequest()->getArr().end() ; it++)
 				Command::executeCommand(*this, tp, &(*it), epfd);

@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:07 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/06 16:08:32 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/06 20:59:54 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,6 @@ class Server
 		static void			exit(void);
 		static bool			isValidChar(char c);
 		static std::string	str_toupper(std::string str);
-		static void			sendClient(Client *client, std::string msg);
 		static void			sendClient(int client, std::string msg);
 		static long			simpleHash(std::string const &clear_text);
 
