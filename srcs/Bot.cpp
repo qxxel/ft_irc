@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 14:55:23 by mreynaud          #+#    #+#             */
-/*   Updated: 2025/05/05 20:33:32 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/06 15:44:25 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ static void	send_msg_bot(std::string msg, Client *client, Channel *channel)
 	if (channel)
 		channel->sendClients("", msg);
 	else
-		Server::sendClient(client->getFd(), msg);
+		Server::sendClient(client, msg);
 }
 
 static void explain_rule(Client *client, Channel *channel)

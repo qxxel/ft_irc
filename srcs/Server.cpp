@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/05 18:37:01 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/06 16:51:57 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -191,9 +191,9 @@ int	Server::acceptClient(int sock, int epfd)
 	{
 		Client	*tp = new Client(fd);
 		_clients.push_back(tp);
-		sendClient(tp->getFd(), SERVER_WELCOME);
-		sendClient(tp->getFd(), ENTER_PWD);
-		sendClient(tp->getFd(), "* > ");
+		sendClient(tp, SERVER_WELCOME);
+		sendClient(tp, ENTER_PWD);
+		sendClient(tp, "* > ");
 		std::cout << "\nNew client connected !\n";
 	}
 	catch(const std::exception& e)
@@ -218,10 +218,19 @@ void	Server::disconnectClient(int client, int epfd)
 	std::cout << "Client " << client << " disconnected" << std::endl;
 }
 
+void	Server::sendClient(Client *client, std::string msg)
+{
+	if (!client || client->getFd() == -2)
+		return ;
+
+	msg = "\r\033[K" + msg;
+
+	if (send(client->getFd(), msg.c_str(), msg.size(), 0) == -1)
+		throw (std::runtime_error("Error: sending data to clients failed: " + std::string(strerror(errno))));
+}
+
 void	Server::sendClient(int client, std::string msg)
 {
-	if (client == -2)
-		return ;
 	if (send(client, msg.c_str(), msg.size(), 0) == -1)
 		throw (std::runtime_error("Error: sending data to clients failed: " + std::string(strerror(errno))));
 }
@@ -255,7 +264,14 @@ void	Server::clientRequest(int client, int epfd)
 			return (disconnectClient(client, epfd));
 		if (strlen(buffer) > MAX_BODY_SIZE)
 		{
+			while (n > MAX_BODY_SIZE)
+				n = recv(client, &buffer, MAX_BODY_SIZE + 1, 0);
 			sendClient(client, "Error: input too big (max_body_size = 5000)\n");
+			Server::sendClient(client, "------------------------------------------\n");
+			if (!this->findClientFd(client)->getAuth())
+				Server::sendClient(client, "* > ");
+			else
+				Server::sendClient(client, this->findClientFd(client)->getNick() + ":" + this->findClientFd(client)->getUser() + " > ");
 			return (void)(std::cerr << "Error: client request too big: max " << MAX_BODY_SIZE << " characters" << std::endl);
 		}
 		Client	*tp = findClientFd(client);
@@ -331,10 +347,10 @@ void	Server::deleteClient(int client)
 	}
 
 	// DELETE CLIENT IN THE CHANNEL
-	for (std::vector<Channel*>::iterator it = this->_channels.begin(); it >= this->_channels.end(); it++)
+	for (std::vector<Channel*>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
 	{
 		// DELETE THE CLIENT IN THE CLIENT LIST
-		for (std::vector<Client*>::iterator it_clients = (*it)->getClientsList().begin(); it_clients >= (*it)->getClientsList().end(); it_clients++)
+		for (std::vector<Client*>::iterator it_clients = (*it)->getClientsList().begin(); it_clients != (*it)->getClientsList().end(); it_clients++)
 		{
 			if ((*it_clients)->getFd() == client)
 			{
@@ -344,7 +360,7 @@ void	Server::deleteClient(int client)
 			}
 		}
 		// DELETE THE CLIENT IN THE OP LIST
-		for (std::vector<Client*>::iterator it_ops = (*it)->getOpList().begin(); it_ops >= (*it)->getOpList().end(); it_ops++) // PROBLEM
+		for (std::vector<Client*>::iterator it_ops = (*it)->getOpList().begin(); it_ops != (*it)->getOpList().end(); it_ops++) // PROBLEM
 		{
 			if ((*it_ops)->getFd() == client)
 			{
@@ -356,7 +372,7 @@ void	Server::deleteClient(int client)
 					Client	*oldestClient = (*it)->getOldestClient();
 					if (oldestClient)
 						(*it)->getOpList().push_back(oldestClient);
-					}
+				}
 
 				break ;
 			}

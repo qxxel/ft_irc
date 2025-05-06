@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 16:04:15 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/05 17:22:01 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/06 15:47:17 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,8 +106,8 @@ void	Client::setAuth(bool auth)
 	{
 		if (auth)
 		{
-			Server::sendClient(_fd, AUTHY_GOOD);
-			Server::sendClient(_fd, USR_NAME + _user + "\n" + NICK_NAME + _nick + "\n");
+			Server::sendClient(this, AUTHY_GOOD);
+			Server::sendClient(this, USR_NAME + _user + "\n" + NICK_NAME + _nick + "\n");
 		}
 		_auth = auth;
 	}
