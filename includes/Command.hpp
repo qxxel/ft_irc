@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:13 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/05 16:17:15 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/07 10:08:07 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,4 +81,5 @@ class Command
 };
 
 std::ostream &	operator<<(std::ostream &o, Command &cmd);
+
 #endif
