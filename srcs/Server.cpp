@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/07 16:35:45 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/07 16:57:49 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -270,47 +270,33 @@ void	Server::clientRequest(int client, int epfd)
 {
 	ssize_t		n;
 	ssize_t		total_read = 0;
-	char		buffer[MAX_BODY_SIZE];
+	char		buffer[MAX_BODY_SIZE + 2];
 
 	memset(buffer, 0, sizeof(buffer));
 	while (true)
 	{
-		n = recv(client, buffer + total_read, MAX_BODY_SIZE - total_read, 0);
+		n = recv(client, buffer + total_read, MAX_BODY_SIZE + 1, 0);
+		std::cerr << n << std::endl;
+		std::cerr << total_read << std::endl;
 		if (n == 0)
 			return (disconnectClient(client, epfd));
 		else if (n == -1)
 		{
-<<<<<<< HEAD
-			while (n > MAX_BODY_SIZE)
-				n = recv(client, &buffer, MAX_BODY_SIZE + 1, 0);
-			sendClient(client, "Error: input too big (max_body_size = 5000)\n");
-			Server::sendClient(client, "------------------------------------------\n");
-			return (void)(std::cerr << "Error: client request too big: max " << MAX_BODY_SIZE << " characters" << std::endl);
-=======
 			if (errno == EAGAIN || errno == EWOULDBLOCK)
 				break ;
 			else
 				return (void)(std::cerr << ("Error: recv failed: " + std::string(strerror(errno))));
->>>>>>> iban
 		}
 		else
 		{
-<<<<<<< HEAD
-			tp->getRequest()->split_Request();
-			for (std::vector<Command>::iterator	 it = tp->getRequest()->getArr().begin(); it != tp->getRequest()->getArr().end() ; it++)
-			{
-				Command::executeCommand(*this, tp, &(*it), epfd);
-				if (!this->findClientFd(client))
-					break ;
-			}
-			if (this->findClientFd(client))
-				tp->getRequest()->clear();
-=======
 			if (total_read + n > MAX_BODY_SIZE)
+			{
+				while (n > 0)
+					n = recv(client, buffer + total_read, MAX_BODY_SIZE, 0);
 				return (void)sendClient(client, std::string("Error: message size too big: max 5000 characters\n"));
+			}
 			else
 				total_read += n;
->>>>>>> iban
 		}
 	}
 	// std::cout << "\n------------SERVER RECEIVED-------------\n\n" << buffer << std::endl; //debug
