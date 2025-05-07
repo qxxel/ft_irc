@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   privmsg.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:39:20 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/07 20:36:30 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/07 22:53:18 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,9 +77,10 @@ void	Command::handlePrivMsg(Server &serv, Client *client, std::vector<std::strin
 			return ;
 		}
 
-		Server::sendClient(target->getFd(), ":" + client->getNick() + "!" + client->getUser() + " PRIVMSG " + target->getNick() + " " + args->at(1) + "\n");
 		if (target->getNick() == "GameBot")
 			Bot::handleBot(NULL, client, args->at(1));
+		else
+			Server::sendClient(target->getFd(), ":" + client->getNick() + "!" + client->getUser() + " PRIVMSG " + target->getNick() + " " + args->at(1) + "\n");
 	}
 
 	std::cout << "handle PRIVMSG successfuly called" << std::endl;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/07 20:24:40 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/07 23:43:51 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -1410,5 +1410,5 @@ void	Command::deleteChannel(Server &serv, Channel *channel) const
 	if (!channel)
 		return ;
 	serv.deleteChannel(channel);
-	delete channel;
+	// /!\ delete channel;
 }

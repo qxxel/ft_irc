@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   part.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:39:47 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/07 20:36:08 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/07 22:18:56 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> 
 			// IF CHANNEL IS EMPTY
 			if (channel->getClientsList().size() == 1)
 			{
+				client->delCurrentChannel(channel);
 				Server::sendClient(client->getFd(), ":" + client->getNick() + "!" + client->getUser() + "@localhost PART " + Command::joinStrings(*args) + "\n");
 				this->deleteChannel(serv, channel);
 				continue ;

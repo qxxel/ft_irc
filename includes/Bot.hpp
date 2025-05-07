@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Bot.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/16 17:48:51 by mreynaud          #+#    #+#             */
-/*   Updated: 2025/05/07 20:27:32 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/07 23:41:49 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,5 +34,4 @@ class Bot: public Client
 		static void handleBot(Channel *channel, Client *client, std::string &arg);
 
 		void	joinChannel(Channel	*channel);
-		// void	kickChanel(Channel	*channel, Client *client, std::vector<std::string> *args);
 };
