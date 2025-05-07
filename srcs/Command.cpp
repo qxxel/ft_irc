@@ -133,7 +133,7 @@ void	Command::parse()
 
 bool	Command::is_available(Server &serv, std::string name)
 {
-	// DO NOT HAVE THE SAME USER THAN THE BOT
+	// DO NOT HAVE THE SAME USERNAME THAN THE BOT
 	if (name == "GameBot")
 		return (false);
 
@@ -239,7 +239,7 @@ void	Command::handlePass(Server &serv, Client *client, std::vector<std::string> 
 			{
 				return (Server::sendClient(client->getFd(), INV_FORMAT ENTER_PWD));
 			}
-			else if (Server::simpleHash(args->at(0)) == serv.getPwd())
+			else if (Server::simpleHash(args->at(0)) * 2 % 333 / 4 + 5 * 6 == serv.getPwd())
 			{
 				client->setPwd(true);
 				Server::sendClient(client->getFd(), PWD_GOOD);

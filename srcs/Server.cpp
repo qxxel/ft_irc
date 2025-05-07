@@ -43,11 +43,12 @@ Server::~Server()
 		delete *it2;
 }
 
+//Simple creation of a server object.
 Server::Server(std::string port, std::string password)
 {
 	try
 	{
-		this->_pwd = simpleHash(password);
+		this->_pwd = simpleHash(password) * 2 % 333 / 4 + 5 * 6;
 		setPort(parsePort(port));
 		this->_bot = new Bot();
 		std::cout << *this;
@@ -58,6 +59,7 @@ Server::Server(std::string port, std::string password)
 	}
 }
 
+//Makes sure the server's port is valid
 int	Server::parsePort(std::string port)
 {
 	for (size_t i = 0; i < port.size(); i++)
@@ -68,14 +70,16 @@ int	Server::parsePort(std::string port)
 	return (atoi(port.c_str()));
 }
 
+//Hashes the password so it's only used once as the raw format (for security reasons)
 long	Server::simpleHash(std::string const &clear_text)
 {
 	long	hash = 0;
 	for (size_t i = 0; i < 	clear_text.length(); i++)
-		hash = 22 * hash + clear_text[i];
+		hash = 818 * hash + clear_text[i];
 	return (hash);
 }
 
+// Creates a socket, setup the server communications, binds and listens on the socket on non-blockable mode
 void	Server::start(void)
 {
 	int	fd_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -123,6 +127,8 @@ void	Server::start(void)
 }
 
 // ---------------------------------------------SERVER RUNNING---------------------------------------------
+
+//Runs the server until it dies (_running should never be false) and checks for events triggered by the clients when connecting/ disconnecting/ requesting
 void	Server::run(int sock)
 {
 	int				epfd = epoll_create1(0);
@@ -169,6 +175,7 @@ void	Server::run(int sock)
 
 // ---------------------------------------------SERVER ACTIONS---------------------------------------------
 
+//Adds a client to the server and defines the events that will be monitored by the server
 int	Server::acceptClient(int sock, int epfd)
 {
 	epoll_event	ev;
@@ -204,6 +211,7 @@ int	Server::acceptClient(int sock, int epfd)
 	return (fd);
 }
 
+//Disconnects a client from the server and removes it's data
 void	Server::disconnectClient(int fd, int epfd)
 {
 	Client	*client = findClientFd(fd);
@@ -220,6 +228,7 @@ void	Server::disconnectClient(int fd, int epfd)
 	std::cout << "Client " << fd << " disconnected" << std::endl;
 }
 
+//Answers the client request by sending it a message proprely.
 void	Server::sendClient(int client, std::string msg)
 {
 	ssize_t		n;
@@ -243,11 +252,13 @@ void	Server::sendClient(int client, std::string msg)
 	}
 }
 
+//Valid characters in all the <names> used (channels or user/nick names).
 bool	Server::isValidChar(char c)
 {
 	return (!(!isprint(c) || c == ' ' || c == ',' || c == ':' || c == '#'));
 }
 
+//Speaks for itself
 std::string	Server::str_toupper(std::string str)
 {
 	for (std::string::iterator it = str.begin(); it != str.end(); it++)
@@ -255,6 +266,7 @@ std::string	Server::str_toupper(std::string str)
 	return str;
 }
 
+//Reads data from a triggered file descriptor of a client that has been triggered by a EPOLLIN event and creates a request that is usable by the server
 void	Server::clientRequest(int client, int epfd)
 {
 	ssize_t		n;
@@ -294,7 +306,7 @@ void	Server::clientRequest(int client, int epfd)
 	}
 }
 
-
+//Finds a client form its file descriptor in the server's vector of clients and returns it, returns NULL otherwise
 Client	*Server::findClientFd(int fd)
 {
 	std::vector<Client*>::iterator	it;
@@ -307,6 +319,7 @@ Client	*Server::findClientFd(int fd)
 	return (NULL);
 }
 
+//Finds a client form its name in the server's vector of clients and returns it, returns NULL otherwise
 Client	*Server::findClientName(std::string name)
 {
 	std::vector<Client*>::iterator	it;
