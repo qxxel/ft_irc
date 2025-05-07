@@ -42,6 +42,7 @@ class Command
 
 		// STATIC MEMBER FUNCTIONS
 		static std::string	joinStrings(const std::vector<std::string>& vec);
+		static	void		handleHelp(Client *client, std::vector<std::string> *args);
 
 		// OTHERS MEMBER FUNCTIONS
 		void		parse();
@@ -52,13 +53,12 @@ class Command
 		std::string	intToString(int value);
 		std::string	timeToString(time_t value);
 		void		handlePass(Server &serv, Client *client, std::vector<std::string> *args);
-		void		handleNick(Client *client, std::vector<std::string> *args);
-		void		handleUser(Server &serv, Client *client, std::vector<std::string> *args);
+		void		handleNick(Server &serv, Client *client, std::vector<std::string> *args);
+		void		handleUser(Client *client, std::vector<std::string> *args);
 		void		handlePrivMsg(Server &serv, Client *client, std::vector<std::string> *args);
 		void		handleJoin(Server &serv, Client *client, std::vector<std::string> *args);
 		void		handlePart(Server &serv, Client *client, std::vector<std::string> *args);
 		void		handleQuit(Server &serv, Client *client, std::vector<std::string> *args, int epfd);
-		void		handleHelp(Client *client, std::vector<std::string> *args);
 		void		handleKick(Server &serv, Client *client, std::vector<std::string> *args);
 		void		handleInvite(Server &serv, Client *client, std::vector<std::string> *args);
 		void		handleTopic(Server &serv, Client *client, std::vector<std::string> *args);
