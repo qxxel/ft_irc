@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:05 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/07 11:58:02 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/07 19:32:00 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ Client	*Channel::findClientName(std::string name)
 
 void	Channel::delClientName(std::string name)
 {
-	for (std::vector<Client*>::iterator it = this->_clientsList.begin(); it < this->_clientsList.end(); it++)
+	for (std::vector<Client*>::iterator it = this->_clientsList.begin(); it != this->_clientsList.end(); it++)
 	{
 		if ((*it)->getUser() == name)
 		{
@@ -49,7 +49,7 @@ void	Channel::delClientName(std::string name)
 
 void	Channel::delOpName(std::string name)
 {
-	for (std::vector<Client*>::iterator it = this->_opList.begin(); it < this->_opList.end(); it++)
+	for (std::vector<Client*>::iterator it = this->_opList.begin(); it != this->_opList.end(); it++)
 	{
 		if ((*it)->getUser() == name)
 		{

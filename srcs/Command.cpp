@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/07 18:45:57 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/07 19:32:06 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,7 +125,7 @@ bool	Command::is_available(Server &serv, std::string name)
 
 bool	Command::isValidString(std::string str, bool skip)
 {
-	for (std::string::iterator it = str.begin(); it < str.end(); it++)
+	for (std::string::iterator it = str.begin(); it != str.end(); it++)
 	{
 		if (skip && it == str.begin())
 			continue ;
@@ -208,7 +208,13 @@ void Command::executeCommand(Server &serv, Client *client, Command *cmd, int epf
 	else if (!cmd->getName().compare("HELP"))
 		cmd->handleHelp(client, &args);
 	else
-		Server::sendClient(client->getFd(), ":localhost 906 " + client->getUser() + " :" UKWN_CMD + cmd->getName() + "\n");
+	{
+		if (client->getNick().empty())
+			Server::sendClient(client->getFd(), ":localhost 906 * :" UKWN_CMD + cmd->getName() + "\n");
+		else
+			Server::sendClient(client->getFd(), ":localhost 906 " + client->getNick() + " :" UKWN_CMD + cmd->getName() + "\n");
+		std::cout << "Unknown command" << std::endl;
+	}
 	Server::sendClient(client->getFd(), "------------------------------------------\n");
 }
 
@@ -220,7 +226,7 @@ void	Command::handlePass(Server &serv, Client *client, std::vector<std::string> 
 	{
 		// IF TOO MANY ARGS OR NOT ENOUGH
 		if (args->size() != 1)
-			return (void)Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " :" INV_FORMAT ENTER_PWD);
+			return (void)Server::sendClient(client->getFd(), ":localhost 461 * :" INV_FORMAT ENTER_PWD);
 		// IF PWD IS GOOD
 		else if (Server::simpleHash(args->at(0)) * 2 % 333 / 4 + 5 * 6 == serv.getPwd())
 		{
@@ -236,7 +242,7 @@ void	Command::handlePass(Server &serv, Client *client, std::vector<std::string> 
 			return (Server::sendClient(client->getFd(), INV_PWD));
 	}
 	else
-		return (void)Server::sendClient(client->getFd(), ":localhost 462 " + client->getUser() + " :" PWD_SET);
+		Server::sendClient(client->getFd(), ":localhost 462 * :" PWD_SET);
 }
 
 //Checks for the 2nd connection step, setting up a Nickname
@@ -244,17 +250,22 @@ void	Command::handleNick(Server &serv, Client *client, std::vector<std::string> 
 {
 	// IF CLIENT HAS NOT GIVEN THE PASSWORD
 	if (!client->getPwd())
-		return (void)Server::sendClient(client->getFd(), ":localhost 904 " + client->getUser() + " :" ENTER_PWD);
+		return (void)Server::sendClient(client->getFd(), ":localhost 904 * :" ENTER_PWD);
+
 	// IF CLIENT HAS ALREADY SET A NICKNAME
 	else if (client->getNick().compare(""))
 	{
 		if (client->getUser().empty())
-		Server::sendClient(client->getFd(), ":localhost 905 * :" CANT_NICK);
+			Server::sendClient(client->getFd(), ":localhost 905 * :" CANT_NICK);
+		else
+			Server::sendClient(client->getFd(), ":localhost 905 * :" CANT_NICK);
 		return ;
 	}
+
 	// IF BAD ARGUMENTS NUMBER
 	else if (args->size() != 1)
-		return (void)Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " :" ENTER_NICK);
+		return (void)Server::sendClient(client->getFd(), ":localhost 461 * :" ENTER_NICK);
+
 	else
 	{
 		// IF GOOD NICKNAME
@@ -264,22 +275,25 @@ void	Command::handleNick(Server &serv, Client *client, std::vector<std::string> 
 			if (is_available(serv, args->at(0)))
 			{
 				client->setNick(args->at(0));
-				Server::sendClient(client->getFd(), client->getUser() + " :" NICK_NAME + client->getNick() + "\n");
+				Server::sendClient(client->getFd(), "* :" NICK_NAME + client->getNick() + "\n");
 			}
+
 			// IF NICKNAME IS TAKEN
 			else
-				return (Server::sendClient(client->getFd(), ":localhost 908 " + client->getUser() + " :" IS_TAKEN ENTER_NICK));
+				return (Server::sendClient(client->getFd(), ":localhost 908 * :" IS_TAKEN ENTER_NICK));
 		}
 		// IF BAD NICKNAME
 		else
-			Server::sendClient(client->getFd(), ":localhost 900 " + client->getUser() + " :" HAS_INVALID_CHARS);
+			Server::sendClient(client->getFd(), ":localhost 900 * :" HAS_INVALID_CHARS);
 	}
+
 	// SETS AUTH TO TRUE IF AUTH FINISHED
 	if (!client->getNick().empty() && !client->getUser().empty() && client->getPwd())
 		client->setAuth(true);
+
 	// TELLS THE CLIENTS TO SET A USERNAME
 	else if (!client->getUser().compare(""))
-		return (Server::sendClient(client->getFd(), client->getUser() + " :" ENTER_USER));
+		return (Server::sendClient(client->getFd(), "* :" ENTER_USER));
 }
 
 //Checks for the 3rd connection step, setting up a username
@@ -287,31 +301,36 @@ void	Command::handleUser(Client *client, std::vector<std::string> *args)
 {
 	// IF CLIENT HAS NOT GIVEN THE PASSWORD
 	if (!client->getPwd())
-		return (Server::sendClient(client->getFd(), ":localhost 904 " + client->getUser() + " :" ENTER_PWD));
+		return (Server::sendClient(client->getFd(), ":localhost 904 * :" ENTER_PWD));
+
 	// IF BAD ARGUMENTS
 	else if (args->size() < 3 || args->size() > 4 || args->at(1).compare("0") || args->at(2).compare("*"))
-		return (Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " :" ENTER_USER));
+		return (Server::sendClient(client->getFd(), ":localhost 461 * :" ENTER_USER));
+
 	// IF CLIENT HAS ALREADY SET A USERNAME
 	else if (!client->getUser().empty())
-		return (Server::sendClient(client->getFd(), ":localhost 905 " + client->getUser() + " :" CANT_USER USR_NAME + client->getUser() + "\n"));
+		return (Server::sendClient(client->getFd(), ":localhost 905 * :" CANT_USER USR_NAME + client->getUser() + "\n"));
+
 	else
 	{
 		// IF GOOD USERNAME
 		if (isValidString(args->at(0), false))
 		{
 			client->setUser(args->at(0));
-			Server::sendClient(client->getFd(), client->getUser() + " :" USR_NAME + client->getUser() + "\n");
+			Server::sendClient(client->getFd(), "* :" USR_NAME + client->getUser() + "\n");
 		}
 		// IF BAD USERNAME
 		else
-			return (Server::sendClient(client->getFd(), ":localhost 900 " + client->getUser() + " :" HAS_INVALID_CHARS));
+			return (Server::sendClient(client->getFd(), ":localhost 900 * :" HAS_INVALID_CHARS));
 	}
+
 	// IF DONE AUTHENTIFIED
 	if (!client->getNick().empty() && !client->getUser().empty() && client->getPwd())
 		client->setAuth(true);
+
 	// IF NOT DONE AUTHENTIFIED
 	else if (!client->getNick().compare(""))
-		return (Server::sendClient(client->getFd(), client->getUser() + " :" ENTER_NICK));
+		return (Server::sendClient(client->getFd(), "* :" ENTER_NICK));
 }
 
 // SEND MESSAGE
@@ -442,8 +461,8 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 				client->getCurrentsChannels().push_back(newChannel);
 				Server::sendClient(client->getFd(), ":" + client->getNick() + "!" + client->getUser() + "@localhost JOIN :" + newChannel->getName() + "\n");
 				Server::sendClient(client->getFd(), ":localhost 331 " + client->getNick() + " " + newChannel->getName() + " :No topic is set\n");
-				// Server::sendClient(client->getFd(), ":localhost 353 " + client->getNick() + " " + newChannel->getName() + " :" + newChannel->listClients() + "\n");
-				// Server::sendClient(client->getFd(), ":localhost 366 " + client->getNick() + " " + newChannel->getName() + " :End of NAMES list\n");
+				Server::sendClient(client->getFd(), ":localhost 353 " + client->getNick() + " " + newChannel->getName() + " :" + newChannel->listClients() + "\n");
+				Server::sendClient(client->getFd(), ":localhost 366 " + client->getNick() + " " + newChannel->getName() + " :End of NAMES list\n");
 				continue ;
 			}
 
@@ -584,16 +603,27 @@ void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> 
 // LEAVE SERVER
 void	Command::handleQuit(Server &serv, Client *client, std::vector<std::string> *args, int epfd)
 {
-	// USAGE: QUIT
-	if (!args || args->size() != 0)
+	// USAGE: QUIT [:<message>]
+	if (!args || args->size() > 1)
 	{
 		Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " QUIT :Not enough parameters");
-		std::cout << "handle PART failed => wrong format" << std::endl;
+		std::cout << "handle QUIT failed => wrong format" << std::endl;
 		return ;
 	}
 
-	serv.disconnectClient(client->getFd(), epfd);
+	// SET MESSAGE TO SEND
+	std::string	message = ":Client quit";
+	if (args->size() == 1 && args->at(0).size() > 1)
+	{
+		if (isValidString(args->at(0), true))
+			message = args->at(0);
+	}
 
+	// SEND MESSAGE TO EVERY CURRENT CHANNEL
+	for (std::vector<Channel*>::iterator it = client->getCurrentsChannels().begin(); it != client->getCurrentsChannels().end(); ++it)
+			(*it)->sendClients(client->getNick(), ":" + client->getNick() + "!" + client->getUser() + "@localhost QUIT " + message + "\n");
+
+	serv.disconnectClient(client->getFd(), epfd);
 	std::cout << "handle QUIT successfuly called" << std::endl;
 }
 
@@ -827,7 +857,7 @@ void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string>
 		}
 
 		// CHECK IF ALL CHARACTERS ARE VALID
-		if (isValidString(args->at(1), true))
+		if (!isValidString(args->at(1), true))
 		{
 			Server::sendClient(client->getFd(), ":localhost 900 " + client->getNick() + " " + channel->getName() + " :invalid characters in topic\n");
 			std::cout << "handle set TOPIC failed => there is invalid character" << std::endl;
@@ -876,7 +906,7 @@ void	Command::handleNames(Server &serv, Client *client, std::vector<std::string>
 		std::vector<Channel*>::iterator	it_chnl;
 		for (it_chnl = serv.getChannels().begin(); it_chnl != serv.getChannels().end(); it_chnl++)
 		{
-			Server::sendClient(client->getFd(), ":localhost 353 " + client->getNick() + " " + (*it_chnl)->getName() + " :" + (*it_chnl)->listClients() + "\n");
+			Server::sendClient(client->getFd(), ":localhost 353 " + client->getNick() + " = " + (*it_chnl)->getName() + " :" + (*it_chnl)->listClients() + "\n");
 			Server::sendClient(client->getFd(), ":localhost 366 " + client->getNick() + " " + (*it_chnl)->getName() + " :End of NAMES list\n");
 		}
 
@@ -892,9 +922,9 @@ void	Command::handleNames(Server &serv, Client *client, std::vector<std::string>
 		for (it = channels.begin(); it != channels.end(); it++)
 		{
 			// FIND CHANNEL IN SERVER
-			Channel	*channel = serv.searchChannel(args->at(0));
+			Channel	*channel = serv.searchChannel(*it);
 			if (channel)
-				Server::sendClient(client->getFd(), ":localhost 353 " + client->getNick() + " " + channel->getName() + " :" + channel->listClients() + "\n");
+				Server::sendClient(client->getFd(), ":localhost 353 " + client->getNick() + " = " + channel->getName() + " :" + channel->listClients() + "\n");
 			Server::sendClient(client->getFd(), ":localhost 366 " + client->getNick() + " " + args->at(0) + " :End of NAMES list\n");
 		}
 	}

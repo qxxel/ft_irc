@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/07 17:04:53 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/07 19:34:47 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -303,8 +303,12 @@ void	Server::clientRequest(int client, int epfd)
 	if (total_read > 0 && buffer[total_read - 1] == '\n')
 	{
 		tp->getRequest()->split_Request();
-		for (std::vector<Command>::iterator	 it = tp->getRequest()->getArr().begin(); it != tp->getRequest()->getArr().end() ; it++)
+		for (std::vector<Command>::iterator	it = tp->getRequest()->getArr().begin(); it != tp->getRequest()->getArr().end() ; it++)
+		{
 			Command::executeCommand(*this, tp, &(*it), epfd);
+			if (!this->findClientFd(client))
+				return ;
+		}
 		tp->getRequest()->clear();
 	}
 }
@@ -457,7 +461,7 @@ void	Server::deleteServer(int sock, int epfd)
 
 Channel	*Server::searchChannel(std::string name)
 {
-	for (std::vector<Channel*>::iterator it = this->_channels.begin(); it < this->_channels.end(); it++)
+	for (std::vector<Channel*>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
 	{
 		if ((*it)->getName() == name)
 			return (*it);

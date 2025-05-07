@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 16:12:51 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/07 16:58:47 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/07 19:16:11 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@
 # define JOIN_DESC "description: Join one or more channels, optionally with a key\n"
 # define PART_USG "usage: PART <channel>{,<channel>} [:<message>]\n"
 # define PART_DESC "description: Quit one or more channels, optionally with a message\n"
-# define QUIT_USG "usage: QUIT\n"
+# define QUIT_USG "usage: QUIT [:<message>]\n"
 # define QUIT_DESC "description: Quit the server\n"
 # define KICK_USG "usage: KICK <channel> <user> [:<comment>]\n"
 # define KICK_DESC "description: Kick a user of a channel\n"
