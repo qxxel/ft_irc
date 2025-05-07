@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/06 21:28:38 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/07 15:09:48 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -310,11 +310,7 @@ void	Command::handleUser(Server &serv, Client *client, std::vector<std::string> 
 			}
 			// IF USERNAME IS TAKEN
 			else
-<<<<<<< HEAD
-				return Server::sendClient(client->getFd(), HAS_INVALID_CHARS);
-=======
 				return (Server::sendClient(client->getFd(), ":localhost 811 " + client->getUser() + " :" IS_TAKEN ENTER_USER));
->>>>>>> iban
 		}
 		// IF BAD USERNAME
 		else
