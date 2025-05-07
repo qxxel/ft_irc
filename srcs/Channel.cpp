@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:05 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/06 21:03:16 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/07 11:58:02 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 Channel::Channel(std::string name, Client *creator): _oldestClient(NULL), _modeSetTimestamp(time(NULL)), _maxUsers(100), _invOnly(false), _lockTopic(false)
 {
-	this->parseName(name);
 	this->_name = name;
 	this->_clientsList.push_back(creator);
 	this->_opList.push_back(creator);
@@ -22,20 +21,6 @@ Channel::Channel(std::string name, Client *creator): _oldestClient(NULL), _modeS
 
 Channel::~Channel() { }
 
-void	Channel::parseName(std::string name) const
-{
-	if (name.size() < 2 || 50 < name.size() || name[0] != '#')
-		throw NameIsntValid();
-
-	for (std::string::iterator it = name.begin(); it < name.end(); it++)
-	{
-		if (it == name.begin())
-			continue ;
-
-		if (!Server::isValidChar(*it))
-			throw NameIsntValid();
-	}
-}
 
 Client	*Channel::findClientName(std::string name)
 {

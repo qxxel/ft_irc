@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/06 21:28:38 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/07 15:11:16 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,19 +18,8 @@ Command::Command(std::string raw) : _raw(raw), _name("")
 	parse();
 }
 
-Command::~Command()
-{
-}
+Command::~Command() { }
 
-bool	Command::parse_arg(std::string arg)
-{
-	for (std::string::iterator it = arg.begin(); it != arg.end(); it++)
-	{
-		if (Server::isValidChar(*it))
-			return (true);
-	}
-	return (false);
-}
 
 std::string Command::joinStrings(const std::vector<std::string>& vec)
 {
@@ -88,18 +77,6 @@ std::map<std::string, std::string>	Command::splitChannelsPasswords(std::string s
 	return (map);
 }
 
-
-// bool	Command::parse_arg(std::string arg)
-// {
-// 	for (std::string::iterator it = arg.begin(); it != arg.end(); it++)
-// 	{
-// 		if (Server::isValidChar(*it))
-// 			return (true);
-// 	}
-// 	return (false);
-// }
-
-
 void	Command::parse()
 {
 	std::size_t	i = 0;
@@ -145,6 +122,19 @@ bool	Command::is_available(Server &serv, std::string name)
 	}
 	return (true);
 }
+
+bool	Command::isValidString(std::string str, bool skip)
+{
+	for (std::string::iterator it = str.begin(); it < str.end(); it++)
+	{
+		if (skip && it == str.begin())
+			continue ;
+		if (!Server::isValidChar(*it))
+			return (false);
+	}
+	return (true);
+}
+
 
 std::vector<std::string>	Command::getArgs()
 {
@@ -212,7 +202,7 @@ void Command::executeCommand(Server &serv, Client *client, Command *cmd, int epf
 			cmd->handleInvite(serv, client, &args);
 		else if (!cmd->getName().compare("TOPIC"))
 			cmd->handleTopic(serv, client, &args);
-		else if (!cmd->getName().compare("NAMES"))
+		else if (!cmd->getName().compare("NAMES") || !cmd->getName().compare("WHO"))
 			cmd->handleNames(serv, client, &args);
 		else if (!cmd->getName().compare("MODE"))
 			cmd->handleMode(serv, client, &args);
@@ -276,7 +266,7 @@ void	Command::handleNick(Client *client, std::vector<std::string> *args)
 			return (Server::sendClient(client->getFd(), ENTER_NICK));
 		else
 		{
-			if (parse_arg(args->at(0)))
+			if (isValidString(args->at(0), false))
 			{
 				client->setNick(args->at(0));
 				Server::sendClient(client->getFd(), NICK_NAME + client->getNick() + "\n");
@@ -311,7 +301,7 @@ try
 		}
 		else
 		{
-			if (parse_arg(args->at(0)))
+			if (isValidString(args->at(0), false))
 			{
 				if (is_available(serv, args->at(0)))
 				{
@@ -341,7 +331,7 @@ void	Command::handlePrivMsg(Server &serv, Client *client, std::vector<std::strin
 	// CHECK IF CLIENT IS AUTH
 	if (!client->getAuth())
 	{
-		Server::sendClient(client->getFd(), NEED_AUTH);
+		Server::sendClient(client->getFd(), ":localhost 451 * :You have not registered\n");
 		std::cout << "handle PRIVMSG failed => client isn't auth" << std::endl;
 		return ;
 	}
@@ -349,15 +339,15 @@ void	Command::handlePrivMsg(Server &serv, Client *client, std::vector<std::strin
 	// USAGE: PRIVMSG <target> :<message>
 	if (!args || args->size() != 2)
 	{
-		Server::sendClient(client->getFd(), PRIVMSG_USG);
+		Server::sendClient(client->getFd(), ":localhost 461 " + client->getNick() + " PRIVMSG :Not enough parameters");
 		std::cout << "handle PRIVMSG failed => invalid format" << std::endl;
 		return ;
 	}
 
-	// SEARCH FOR ':' IN FRONT OF THE MESSAGE
+	// SEARCH FOR ':' IN FRONT OF THE MESSAGE // ONLY FOR NC
 	if (args->at(1)[0] != ':')
 	{
-		Server::sendClient(client->getFd(), MSG_RULE);
+		Server::sendClient(client->getFd(), ":localhost 902 " + client->getNick() + " :Need a ':' in front of the message\n");
 		std::cout << "handle PRIVMSG failed => no ':' at the start of the message" << std::endl;
 		return ;
 	}
@@ -369,7 +359,7 @@ void	Command::handlePrivMsg(Server &serv, Client *client, std::vector<std::strin
 		Channel	*channel = serv.searchChannel(args->at(0));
 		if (!channel)
 		{
-			Server::sendClient(client->getFd(), NO_CHNL);
+			Server::sendClient(client->getFd(), ":localhost 401 " + client->getNick() + " :No such nick/channel");
 			std::cout << "handle PRIVMSG failed => inexistant channel" << std::endl;
 			return ;
 		}
@@ -393,18 +383,17 @@ void	Command::handlePrivMsg(Server &serv, Client *client, std::vector<std::strin
 		Client	*target = serv.findClientName(args->at(0));
 		if (!target)
 		{
-			Server::sendClient(client->getFd(), TRGT_NOT_FOUND);
+			Server::sendClient(client->getFd(), ":localhost 401 " + client->getNick() + " :No such nick/channel");
 			std::cout << "handle PRIVMSG failed => inexistant target" << std::endl;
 			return ;
 		}
 
-		Server::sendClient(target->getFd(), ":" + client->getNick() + "!" + client->getUser() + " PRIVMSG " + target->getUser() + " " + args->at(1) + "\n");
-		if (target->getUser() == "GameBot")
+		Server::sendClient(target->getFd(), ":" + client->getNick() + "!" + client->getUser() + " PRIVMSG " + target->getNick() + " " + args->at(1) + "\n");
+		if (target->getNick() == "GameBot")
 			Bot::handleBot(NULL, client, args->at(1));
 	}
 
 	std::cout << "handle PRIVMSG successfuly called" << std::endl;
-
 }
 
 // JOIN CHANNEL
@@ -413,7 +402,7 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 	// CHECK IF CLIENT IS AUTH
 	if (!client->getAuth())
 	{
-		Server::sendClient(client->getFd(), NEED_AUTH);
+		Server::sendClient(client->getFd(), ":localhost 451 * :You have not registered\n");
 		std::cout << "handle JOIN failed => client isn't auth" << std::endl;
 		return ;
 	}
@@ -421,7 +410,7 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 	// USAGE: JOIN <channel>{,<channel>} [<key>{,<key>}]
 	if (!args || args->size() < 1 || 2 < args->size())
 	{
-		Server::sendClient(client->getFd(), JOIN_USG);
+		Server::sendClient(client->getFd(), ":localhost 461 " + client->getNick() + " JOIN :Not enough parameters");
 		std::cout << "handle JOIN failed => invalid format" << std::endl;
 		return ;
 	}
@@ -440,98 +429,81 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 			// CHECK IF CLIENT ALREADY IN THE CHANNEL
 			if (client->isCurrentChannel(it->first))
 			{
-				Server::sendClient(client->getFd(), ALRDY_IN_CHNL);
+				Server::sendClient(client->getFd(), ":localhost 443 " + client->getNick() + " " + it->first + " :is already on channel\n");
 				std::cout << "handle JOIN failed => client already in this channel" << std::endl;
 				continue ;
 			}
 
-			// TRY TO CREATE NEW CHANNEL
-			try
+			// CHECK IF THE NAME IS VALID
+			if (it->first.size() < 2 || 50 < it->first.size() || it->first[0] != '#' || !isValidString(it->first, true))
 			{
-				Channel *newChannel = new Channel(it->first, client); // CHECK IF EXCEPTION DELETE
-
-				// CREATE CHANNEL
-				serv.addChannel(newChannel);
-				client->getCurrentsChannels().push_back(newChannel);
-				Server::sendClient(client->getFd(), ":" + client->getNick() + "!" + client->getUser() + " JOIN :" + newChannel->getName() + "\n");
-				Server::sendClient(client->getFd(), client->getNick() + " " + newChannel->getName() + " :No topic is set\n");
-				Server::sendClient(client->getFd(), client->getNick() + " " + newChannel->getName() + " :" + newChannel->listClients() + "\n");
-				Server::sendClient(client->getFd(), client->getNick() + " " + newChannel->getName() + " :End of NAMES list\n");
-				Server::sendClient(client->getFd(), "MODE " + newChannel->getName() + " +l\n");
-			}
-			// IF NAME IS NOT VALID
-			catch (Channel::NameIsntValid &e)
-			{
-				Server::sendClient(client->getFd(), INV_CHNL_NAME);
-				std::cout << "handle JOIN exception: " << e.what() << std::endl;
+				Server::sendClient(client->getFd(), ":localhost 476 " + client->getNick() + " " + it->first + " :Bad Channel Mask\n");
+				std::cout << "handle JOIN failed => invalid name" << std::endl;
 				continue ;
 			}
-			// IF THE CHANNEL ALREADY EXISTS
-			catch (Server::ChannelAlreadyExists &)
+
+			// FIND THE CHANNEL IN THE SERVER
+			Channel	*channel = serv.searchChannel(it->first);
+			if (!channel)
 			{
-				// FIND CHANNEL IN SERVER
-				Channel	*channel = serv.searchChannel(it->first);
-				if (!channel)
-				{
-					Server::sendClient(client->getFd(), NO_CHNL);
-					std::cout << "handle JOIN failed => inexistant channel" << std::endl;
-					continue ;
-				}
+				// CREATE CHANNEL
+				Channel *newChannel = new Channel(it->first, client);
 
-				// CHECK IF CLIENT CAN ACCESS
-				if (channel && channel->getInvOnly() && !(client->isJoinableChannel(channel) || channel->isOpName(client->getUser())))
-				{
-					Server::sendClient(client->getFd(), NOT_ALW);
-					std::cout << "handle JOIN failed => client not allowed in this channel" << std::endl;
-					continue ;
-				}
-
-				// CHECK PASSWORD
-				if (!channel->getPwd().empty() && !client->isJoinableChannel(channel))
-				{
-					// CHECK IF PASSWORD IS SENDED
-					if (it->second.empty())
-					{
-						Server::sendClient(client->getFd(), ND_PASS);
-						std::cout << "handle JOIN failed => need password to join" << std::endl;
-						continue ;
-					}
-
-					// TRY PASSWORD
-					if (channel->getPwd() != it->second)
-					{
-						Server::sendClient(client->getFd(), WRNG_PASS);
-						std::cout << "handle JOIN failed => wrong password" << std::endl;
-						continue ;
-					}
-				}
-
-				// CHECK IF CHANNEL IS FULL
-				if (channel->getMaxUsers() != 0 && !(channel->getClientsList().size() < (size_t)channel->getMaxUsers()))
-				{
-					Server::sendClient(client->getFd(), CHNL_FULL);
-					std::cout << "handle JOIN failed => channel full" << std::endl;
-					continue ;
-				}
-
-				// ADD CLIENT IN CHANNEL AND SEND MESSAGES
-				client->getCurrentsChannels().push_back(channel);
-				channel->getClientsList().push_back(client);
-				channel->sendClients("", ":" + client->getNick() + "!" + client->getUser() + " JOIN :" + channel->getName() + "\n");
-				if (channel->getTopic().empty())
-					Server::sendClient(client->getFd(), client->getNick() + " " + channel->getName() + " :No topic is set\n");
-				else
-					Server::sendClient(client->getFd(), client->getNick() + " " + channel->getName() + " " + channel->getTopic() + "\n");
-				Server::sendClient(client->getFd(), client->getNick() + " " + channel->getName() + " :" + channel->listClients() + "\n");
-				Server::sendClient(client->getFd(), client->getNick() + " " + channel->getName() + " :End of NAMES list\n");
+				serv.addChannel(newChannel);
+				client->getCurrentsChannels().push_back(newChannel);
+				Server::sendClient(client->getFd(), ":" + client->getNick() + "!" + client->getUser() + "@localhost JOIN :" + newChannel->getName() + "\n");
+				Server::sendClient(client->getFd(), ":localhost 331 " + client->getNick() + " " + newChannel->getName() + " :No topic is set\n");
+				Server::sendClient(client->getFd(), ":localhost 353 " + client->getNick() + " " + newChannel->getName() + " :" + newChannel->listClients() + "\n");
+				Server::sendClient(client->getFd(), ":localhost 366 " + client->getNick() + " " + newChannel->getName() + " :End of NAMES list\n");
+				Server::sendClient(client->getFd(), "MODE " + newChannel->getName() + " +l\n"); // a mettre en forme
+				continue ;
 			}
+
+			// CHECK IF CLIENT CAN ACCESS
+			if (channel->getInvOnly() && !(client->isJoinableChannel(channel) || channel->isOpName(client->getUser())))
+			{
+				Server::sendClient(client->getFd(), ":localhost 473 " + client->getNick() + " " + channel->getName() + " :Cannot join channel (+i)");
+				std::cout << "handle JOIN failed => client not allowed in this channel" << std::endl;
+				continue ;
+			}
+
+			// CHECK PASSWORD
+			if (!channel->getPwd().empty() && !client->isJoinableChannel(channel))
+			{
+				// CHECK IF PASSWORD IS SENDED AND TRY IT
+				if (it->second.empty() || channel->getPwd() != it->second)
+				{
+					Server::sendClient(client->getFd(), ":localhost 475 " + client->getNick() + " " + channel->getName() + " :Cannot join channel (+k)");
+					std::cout << "handle JOIN failed => wrong password" << std::endl;
+					continue ;
+				}
+			}
+
+			// CHECK IF CHANNEL IS FULL
+			if (channel->getMaxUsers() != 0 && !(channel->getClientsList().size() < (size_t)channel->getMaxUsers()))
+			{
+				Server::sendClient(client->getFd(), ":localhost 471 " + client->getNick() + " " + channel->getName() + " :Cannot join channel (+l)");
+				std::cout << "handle JOIN failed => channel full" << std::endl;
+				continue ;
+			}
+
+			// ADD CLIENT IN CHANNEL AND SEND MESSAGES
+			client->getCurrentsChannels().push_back(channel);
+			channel->getClientsList().push_back(client);
+			channel->sendClients("", ":" + client->getNick() + "!" + client->getUser() + "@localhost JOIN :" + channel->getName() + "\n");
+			if (channel->getTopic().empty())
+				Server::sendClient(client->getFd(), ":localhost 331 " + client->getNick() + " " + channel->getName() + " :No topic is set\n");
+			else
+				Server::sendClient(client->getFd(), ":localhost 332 " + client->getNick() + " " + channel->getName() + " " + channel->getTopic() + "\n");
+			Server::sendClient(client->getFd(), ":localhost 353 " + client->getNick() + " " + channel->getName() + " :" + channel->listClients() + "\n");
+			Server::sendClient(client->getFd(), ":localhost 366 " + client->getNick() + " " + channel->getName() + " :End of NAMES list\n");
 		}
 	}
 	// CATCH IF WRONG INPUT IN CHANNELS
 	catch (splitFailed &)
 	{
-		Server::sendClient(client->getFd(), JOIN_USG);
-		std::cout << "handle JOIN failed => wrong input" << std::endl;
+		Server::sendClient(client->getFd(), ":localhost 461 " + client->getNick() + " JOIN :Not enough parameters");
+		std::cout << "handle JOIN failed => invalid format" << std::endl;
 	}
 
 	std::cout << "handle JOIN successfully called" << std::endl;
@@ -543,7 +515,7 @@ void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> 
 	// CHECK IF CLIENT IS AUTH
 	if (!client->getAuth())
 	{
-		Server::sendClient(client->getFd(), NEED_AUTH);
+		Server::sendClient(client->getFd(), ":localhost 451 * :You have not registered\n");
 		std::cout << "handle PART failed => client isn't auth" << std::endl;
 		return ;
 	}
@@ -551,7 +523,7 @@ void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> 
 	// USAGE: PART <channel>{,<channel>} [:<message>]
 	if (!args || args->size() < 1)
 	{
-		Server::sendClient(client->getFd(), PART_USG);
+		Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " PART :Not enough parameters");
 		std::cout << "handle PART failed => wrong format" << std::endl;
 		return ;
 	}
@@ -567,7 +539,7 @@ void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> 
 			Channel	*channel = serv.searchChannel((*it));
 			if (!channel)
 			{
-				Server::sendClient(client->getFd(), NO_CHNL);
+				Server::sendClient(client->getFd(), ":localhost 403 " + client->getNick() + " " + *it + " :No such channel\n");
 				std::cout << "handle PART failed => inexistant channel" << std::endl;
 				continue ;
 			}
@@ -575,7 +547,7 @@ void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> 
 			// CHECK IF CLIENT IS IN THIS CHANNEL
 			if (!client->isCurrentChannel(channel->getName()))
 			{
-				Server::sendClient(client->getFd(), NO_CHNL_ASK);
+				Server::sendClient(client->getFd(), "localhost 442 " + client->getNick() + " " + channel->getName() + " :You're not on that channel\n");
 				std::cout << "handle PART failed => client isn't in the channel asked" << std::endl;
 				continue ;
 			}
@@ -592,8 +564,8 @@ void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> 
 			// IF CHANNEL IS EMPTY
 			if (channel->getClientsList().size() == 1)
 			{
+				Server::sendClient(client->getFd(), ":" + client->getNick() + "!" + client->getUser() + "@localhost PART " + Command::joinStrings(*args) + "\n");
 				this->deleteChannel(serv, channel);
-				Server::sendClient(client->getFd(), client->getNick() + ":" + client->getUser() + " PART " + Command::joinStrings(*args) + "\n");
 				continue ;
 			}
 
@@ -607,14 +579,14 @@ void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> 
 
 			channel->delClientName(client->getUser());
 			client->delCurrentChannel(channel);
-			channel->sendClients("", client->getNick() + ":" + client->getUser() + " PART " + Command::joinStrings(*args) + "\n");
+			channel->sendClients("", ":" + client->getNick() + "!" + client->getUser() + "@localhost PART " + Command::joinStrings(*args) + "\n");
 		}
 	}
 	// CATCH IF WRONG INPUT IN CHANNELS
 	catch (splitFailed &)
 	{
-		Server::sendClient(client->getFd(), PART_USG);
-		std::cout << "handle PART failed => wrong input" << std::endl;
+		Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " PART :Not enough parameters");
+		std::cout << "handle PART failed => wrong format" << std::endl;
 		return ;
 	}
 
@@ -627,7 +599,7 @@ void	Command::handleQuit(Server &serv, Client *client, std::vector<std::string> 
 	// USAGE: QUIT
 	if (!args || args->size() != 0)
 	{
-		Server::sendClient(client->getFd(), QUIT_USG);
+		Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " QUIT :Not enough parameters");
 		std::cout << "handle PART failed => wrong format" << std::endl;
 		return ;
 	}
@@ -643,7 +615,7 @@ void	Command::handleKick(Server &serv, Client *client, std::vector<std::string> 
 	// CHECK IF CLIENT IS AUTH
 	if (!client->getAuth())
 	{
-		Server::sendClient(client->getFd(), NEED_AUTH);
+		Server::sendClient(client->getFd(), ":localhost 451 * :You have not registered\n");
 		std::cout << "handle KICK failed => client isn't auth" << std::endl;
 		return ;
 	}
@@ -651,7 +623,7 @@ void	Command::handleKick(Server &serv, Client *client, std::vector<std::string> 
 	// USAGE: KICK <channel> <user> [:<comment>]
 	if (!args || args->size() < 2 || 3 < args->size())
 	{
-		Server::sendClient(client->getFd(), KICK_USG);
+		Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " KICK :Not enough parameters");
 		std::cout << "handle KICK failed => invalid format" << std::endl;
 		return ;
 	}
@@ -660,7 +632,7 @@ void	Command::handleKick(Server &serv, Client *client, std::vector<std::string> 
 	Channel	*channel = serv.searchChannel(args->at(0));
 	if (!channel)
 	{
-		Server::sendClient(client->getFd(), INV_CHNL_NAME);
+		Server::sendClient(client->getFd(), ":localhost 403 " + client->getNick() + " " + args->at(0) + " :No such channel\n");
 		std::cout << "handle KICK failed => channel don't exist" << std::endl;
 		return ;
 	}
@@ -668,16 +640,8 @@ void	Command::handleKick(Server &serv, Client *client, std::vector<std::string> 
 	// FIND CLIENT IN THE CHANNEL
 	if (!client->isCurrentChannel(channel->getName()))
 	{
-		Server::sendClient(client->getFd(), NO_CHNL_ASK);
+		Server::sendClient(client->getFd(), ":localhost 442 " + client->getNick() + " " + channel->getName() + " :You're not on that channel\n");
 		std::cout << "handle KICK failed => client not in the channel asked" << std::endl;
-		return ;
-	}
-
-	// CHECK IF CLIENT IS OP
-	if (!channel->isOpName(client->getUser()))
-	{
-		Server::sendClient(client->getFd(), NO_PERM);
-		std::cout << "handle KICK failed => client isn't moderator" << std::endl;
 		return ;
 	}
 
@@ -685,23 +649,31 @@ void	Command::handleKick(Server &serv, Client *client, std::vector<std::string> 
 	Client	*target = channel->findClientName(args->at(1));
 	if (!target)
 	{
-		Server::sendClient(client->getFd(), BAD_TRGT);
+		Server::sendClient(client->getFd(), ":localhost 441 " + client->getNick() + " " + args->at(1) + " " + channel->getName() + " :They aren't on that channel\n");
 		std::cout << "handle KICK failed => target isn't in the channel" << std::endl;
+		return ;
+	}
+
+	// CHECK IF CLIENT IS OP
+	if (!channel->isOpName(client->getUser()))
+	{
+		Server::sendClient(client->getFd(), ":localhost 482 " + client->getNick() + " " + channel->getName() + " :You're not channel operator\n");
+		std::cout << "handle KICK failed => client isn't moderator" << std::endl;
 		return ;
 	}
 
 	// CHECK IF CLIENT IS TRING TO KICK HIMSELF
 	if (client == target)
 	{
-		Server::sendClient(client->getFd(), SLF_KICK);
+		Server::sendClient(client->getFd(), ":localhost 903 " + client->getUser() + " " + channel->getName() + " :You cannot kick yourself\n");
 		std::cout << "handle KICK failed => the client cannot kick himself" << std::endl;
 		return ;
 	}
 
-	// CHECK IF THERE IS A ':' IN FRONT OF THE COMMENT
+	// CHECK IF THERE IS A ':' IN FRONT OF THE COMMENT // ONLY FOR NC
 	if (args->size() == 3 && args->at(2)[0] != ':')
 	{
-		Server::sendClient(client->getFd(), KICK_RULE);
+		Server::sendClient(client->getFd(), ":localhost 902 " + client->getUser() + " " + channel->getName() + " :Need a ':' in front of the comment\n");
 		std::cout << "handle KICK failed => there is no ':' in front of the comment" << std::endl;
 		return ;
 	}
@@ -714,10 +686,9 @@ void	Command::handleKick(Server &serv, Client *client, std::vector<std::string> 
 	if (channel->isOpName(target->getUser()))
 		channel->delOpName(target->getUser());
 
+	channel->sendClients("", ":" + client->getNick() + "!" + client->getUser() + "@localhost KICK " + Command::joinStrings(*args) + "\n");
 	target->delCurrentChannel(channel);
 	channel->delClientName(target->getUser());
-	channel->sendClients("", client->getNick() + ":" + client->getUser() + " KICK " + Command::joinStrings(*args) + "\n");
-	Server::sendClient(target->getFd(), client->getNick() + ":" + client->getUser() + " KICK " + Command::joinStrings(*args) + "\n");
 
 	std::cout << "handle KICK successfully called" << std::endl;
 }
@@ -728,7 +699,7 @@ void	Command::handleInvite(Server &serv, Client *client, std::vector<std::string
 	// CHECK IF CLIENT IS AUTH
 	if (!client->getAuth())
 	{
-		Server::sendClient(client->getFd(), NEED_AUTH);
+		Server::sendClient(client->getFd(), ":localhost 451 * :You have not registered\n");
 		std::cout << "handle INVITE failed => client isn't auth" << std::endl;
 		return ;
 	}
@@ -736,7 +707,7 @@ void	Command::handleInvite(Server &serv, Client *client, std::vector<std::string
 	// USAGE: INVITE <user> <channel>
 	if (!args || args->empty() || args->size() != 2)
 	{
-		Server::sendClient(client->getFd(), INV_USG);
+		Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " INVITE :Not enough parameters");
 		std::cout << "handle INVITE failed => invalid format" << std::endl;
 		return ;
 	}
@@ -745,7 +716,7 @@ void	Command::handleInvite(Server &serv, Client *client, std::vector<std::string
 	Client	*target = serv.findClientName(args->at(0));
 	if (!target)
 	{
-		Server::sendClient(client->getFd(), BAD_TRGT);
+		Server::sendClient(client->getFd(), ":localhost 401 " + client->getNick() + " " + target->getNick() + " :No such nick/channel\n");
 		std::cout << "handle INVITE failed => target don't exist" << std::endl;
 		return ;
 	}
@@ -754,7 +725,7 @@ void	Command::handleInvite(Server &serv, Client *client, std::vector<std::string
 	Channel	*channel = serv.searchChannel(args->at(1));
 	if (!channel)
 	{
-		Server::sendClient(client->getFd(), NO_CHNL);
+		Server::sendClient(client->getFd(), ":localhost 403 " + client->getNick() + " " + args->at(1) + " :No such channel\n");
 		std::cout << "handle INVITE failed => inexistant channel" << std::endl;
 		return ;
 	}
@@ -762,7 +733,7 @@ void	Command::handleInvite(Server &serv, Client *client, std::vector<std::string
 	// FIND CLIENT IN THE CHANNEL
 	if (!client->isCurrentChannel(channel->getName()))
 	{
-		Server::sendClient(client->getFd(), NO_CHNL_ASK);
+		Server::sendClient(client->getFd(), ":localhost 442 " + client->getNick() + " " + channel->getName() + " :You're not on that channel\n");
 		std::cout << "handle INVITE failed => client isn't in the channel" << std::endl;
 		return ;
 	}
@@ -770,7 +741,7 @@ void	Command::handleInvite(Server &serv, Client *client, std::vector<std::string
 	// FIND TARGET IN THE CHANNEL
 	if (target->isCurrentChannel(channel->getName()))
 	{
-		Server::sendClient(client->getFd(), ALRDY_IN_CHNL);
+		Server::sendClient(client->getFd(), ":localhost 443 " + client->getNick() + " " + target->getNick() + " " + channel->getName() + " :is already on channel\n");
 		std::cout << "handle INVITE failed => target already in the channel" << std::endl;
 		return ;
 	}
@@ -781,7 +752,7 @@ void	Command::handleInvite(Server &serv, Client *client, std::vector<std::string
 		// CHECK IF CLIENT IS OP
 		if (!channel->isOpName(target->getUser()))
 		{
-			Server::sendClient(client->getFd(), NO_PERM);
+			Server::sendClient(client->getFd(), ":localhost 482 " + client->getNick() + " " + channel->getName() + " :You're not channel operator\n");
 			std::cout << "handle INVITE failed => client isn't moderator" << std::endl;
 			return ;
 		}
@@ -794,8 +765,8 @@ void	Command::handleInvite(Server &serv, Client *client, std::vector<std::string
 		serv.getBot()->joinChannel(channel);
 	else
 	{
-		Server::sendClient(target->getFd(), client->getNick() + ":" + client->getUser() + " INVITE " + target->getNick() + " " + channel->getName() + "\n");
-		Server::sendClient(client->getFd(), "INVITE " + client->getNick() + " " + target->getUser() + " " + channel->getName() + "\n");
+		Server::sendClient(target->getFd(), ":" + client->getNick() + "!" + client->getUser() + "@localhost INVITE " + target->getNick() + " :" + channel->getName() + "\n");
+		Server::sendClient(client->getFd(), ":localhost 341 " + client->getNick() + " " + target->getNick() + " " + channel->getName() + "\n");
 	}
 	std::cout << "handle INVITE successfuly called" << std::endl;
 }
@@ -806,7 +777,7 @@ void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string>
 	// CHECK IF CLIENT IS AUTH
 	if (!client->getAuth())
 	{
-		Server::sendClient(client->getFd(), ":localhost 451 " + client->getUser() + " :You have not registered\n");
+		Server::sendClient(client->getFd(), ":localhost 451 * :You have not registered\n");
 		std::cout << "handle TOPIC failed => client isn't auth" << std::endl;
 		return ;
 	}
@@ -815,7 +786,7 @@ void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string>
 	if (!args || args->empty() || args->size() > 2)
 	{
 		// 461 <nick> TOPIC :Not enough parameters
-		Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " TOPIC :Not enough parameters");
+		Server::sendClient(client->getFd(), ":localhost 461 " + client->getNick() + " TOPIC :Not enough parameters");
 		std::cout << "handle TOPIC failed => no args" << std::endl;
 		return ;
 	}
@@ -824,7 +795,7 @@ void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string>
 	Channel	*channel = serv.searchChannel(args->at(0));
 	if (!channel)
 	{
-		Server::sendClient(client->getFd(), ":localhost 403 " + client->getUser() + " " + channel->getName() + " :No such channel\n");
+		Server::sendClient(client->getFd(), ":localhost 403 " + client->getNick() + " " + channel->getName() + " :No such channel\n");
 		std::cout << "handle TOPIC failed => channel don't exist" << std::endl;
 		return ;
 	}
@@ -833,11 +804,11 @@ void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string>
 	if (args->size() == 1)
 	{
 		if (channel->getTopic().empty())
-			Server::sendClient(client->getFd(), ":localhost 331 " + client->getUser() + " " + channel->getName() + " :" + NO_TPC + "\n");
+			Server::sendClient(client->getFd(), ":localhost 331 " + client->getNick() + " " + channel->getName() + " :" + NO_TPC);
 		else
 		{
-			Server::sendClient(client->getFd(), ":localhost 332 " + client->getUser() + " " + channel->getName() + " " + channel->getTopic() + "\n");
-			Server::sendClient(client->getFd(), ":localhost 333 " + client->getUser() + " " + channel->getName() + " " + channel->getTopicSetter() + timeToString(channel->getTopicSetTimestamp()) + "\n");
+			Server::sendClient(client->getFd(), ":localhost 332 " + client->getNick() + " " + channel->getName() + " " + channel->getTopic() + "\n");
+			Server::sendClient(client->getFd(), ":localhost 333 " + client->getNick() + " " + channel->getName() + " " + channel->getTopicSetter() + timeToString(channel->getTopicSetTimestamp()) + "\n");
 		}
 	}
 	// SET TOPIC
@@ -846,7 +817,7 @@ void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string>
 		// FIND CLIENT IN THE CHANNEL
 		if (!client->isCurrentChannel(channel->getName()))
 		{
-			Server::sendClient(client->getFd(), ":localhost 442 " + client->getUser() + " " + channel->getName() + " :You're not on that channel\n");
+			Server::sendClient(client->getFd(), ":localhost 442 " + client->getNick() + " " + channel->getName() + " :You're not on that channel\n");
 			std::cout << "handle set TOPIC failed => client isn't in the channel asked" << std::endl;
 			return ;
 		}
@@ -854,7 +825,7 @@ void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string>
 		// CHECK IF CLIENT IS OP
 		if (channel->getLockTopic() && !channel->isOpName(client->getUser()))
 		{
-			Server::sendClient(client->getFd(), ":localhost 482 " + client->getUser() + " " + channel->getName() + " :You're not channel operator\n");
+			Server::sendClient(client->getFd(), ":localhost 482 " + client->getNick() + " " + channel->getName() + " :You're not channel operator\n");
 			std::cout << "handle set TOPIC failed => client isn't moderator" << std::endl;
 			return ;
 		}
@@ -862,42 +833,31 @@ void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string>
 		// CHECK IF THERE IS A ':' IN FRONT OF THE NEW TOPIC // ONLY FOR NC
 		if (args->at(1)[0] != ':')
 		{
-			Server::sendClient(client->getFd(), ":localhost 902 " + client->getUser() + " " + channel->getName() + " :Need a ':' in front of the topic\n");
+			Server::sendClient(client->getFd(), ":localhost 902 " + client->getNick() + " " + channel->getName() + " :Need a ':' in front of the topic\n");
 			std::cout << "handle set TOPIC failed => there is no ':' in front of the topic" << std::endl;
 			return ;
 		}
 
 		// CHECK IF ALL CHARACTERS ARE VALID
-		std::string::iterator it;
-		for (it = args->at(1).begin(); it != args->at(1).end(); ++it)
+		if (isValidString(args->at(1), true))
 		{
-			if (it == args->at(1).begin())
-				it++;
-
-			if (it == args->at(1).end())
-				break ;
-
-			if (!Server::isValidChar(*it))
-			{
-				std::cerr << args->at(1) << std::endl;
-				Server::sendClient(client->getFd(), ":localhost 900 " + client->getUser() + " " + channel->getName() + " :Invalid characters in topic\n");
-				std::cout << "handle set TOPIC failed => there is invalid character" << std::endl;
-				return ;
-			}
+			Server::sendClient(client->getFd(), ":localhost 900 " + client->getNick() + " " + channel->getName() + " :invalid characters in topic\n");
+			std::cout << "handle set TOPIC failed => there is invalid character" << std::endl;
+			return ;
 		}
 
 		// CHECK IF THE TOPIC IS ALREADY SET
 		if (channel->getTopic() == args->at(1))
 		{
-			Server::sendClient(client->getFd(), ":localhost 901 " + client->getUser() + " " + channel->getName() + " :Topic already set\n");
+			Server::sendClient(client->getFd(), ":localhost 901 " + client->getNick() + " " + channel->getName() + " :Topic already set\n");
 			std::cout << "handle set TOPIC failed => topic already set" << std::endl;
 			return ;
 		}
 
 		channel->setTopic(args->at(1));
-		channel->setTopicSetter(client->getUser());
+		channel->setTopicSetter(client->getNick());
 		channel->setTopicSetTimestamp(time(NULL));
-		channel->sendClients("", client->getNick() + ":" + client->getUser() + " TOPIC " + channel->getName() + " " + channel->getTopic() + "\n");
+		channel->sendClients("", ":" + client->getNick() + "!" + client->getUser() + "@localhost TOPIC " + channel->getName() + " " + channel->getTopic() + "\n");
 	}
 
 	std::cout << "handle TOPIC successfully called\n";
@@ -909,7 +869,7 @@ void	Command::handleNames(Server &serv, Client *client, std::vector<std::string>
 	// CHECK IF CLIENT IS AUTH
 	if (!client->getAuth())
 	{
-		Server::sendClient(client->getFd(), NEED_AUTH);
+		Server::sendClient(client->getFd(), ":localhost 451 * :You have not registered\n");
 		std::cout << "handle NAMES failed => client isn't auth" << std::endl;
 		return ;
 	}
@@ -917,7 +877,7 @@ void	Command::handleNames(Server &serv, Client *client, std::vector<std::string>
 	// USAGE: NAMES [<channel>{,<channel>}]
 	if (!args || args->size() > 1)
 	{
-		Server::sendClient(client->getFd(), NAMES_USG);
+		Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " NAMES :Not enough parameters");
 		std::cout << "handle NAMES failed => no args" << std::endl;
 		return ;
 	}
@@ -973,7 +933,7 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 	// CHECK IF CLIENT IS AUTH
 	if (!client->getAuth())
 	{
-		Server::sendClient(client->getFd(), NEED_AUTH);
+		Server::sendClient(client->getFd(), ":localhost 451 * :You have not registered\n");
 		std::cout << "handle MODE failed => client isn't auth" << std::endl;
 		return ;
 	}
@@ -981,7 +941,7 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 	// USAGE: MODE <channel> [<+/-modes>] [<arguments>]
 	if (!args || args->size() < 1)
 	{
-		Server::sendClient(client->getFd(), MODE_USG);
+		Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " MODE :Not enough parameters");
 		std::cout << "handle MODE failed => invalid format" << std::endl;
 		return ;
 	}
@@ -1131,17 +1091,11 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 		}
 
 		// CHECK IF ALL CHARACTERS ARE VALID
-		for (std::string::iterator it = args->at(2).begin(); it != args->at(2).end(); it++)
+		if (this->isValidString(args->at(2), true))
 		{
-			if (it == args->at(2).begin())
-				continue ;
-
-			if (!Server::isValidChar(*it))
-			{
 				Server::sendClient(client->getFd(), INV_PASS_FRMT);
 				std::cout << "handle modify MODE +k failed => invalid password format" << std::endl;
 				return ;
-			}
 		}
 
 		channel->setPwd(args->at(2));
@@ -1296,7 +1250,7 @@ void	Command::handleHelp(Client *client, std::vector<std::string> *args)
 	// CHECK IF CLIENT IS AUTH
 	if (!client->getAuth())
 	{
-		Server::sendClient(client->getFd(), NEED_AUTH);
+		Server::sendClient(client->getFd(), ":localhost 451 * :You have not registered\n");
 		std::cout << "handle HELP failed => client isn't auth" << std::endl;
 		return ;
 	}
@@ -1304,7 +1258,7 @@ void	Command::handleHelp(Client *client, std::vector<std::string> *args)
 	// USAGE: HELP
 	if (!args || args->size() >= 2)
 	{
-		Server::sendClient(client->getFd(), HELP_USG);
+		Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " HELP :Not enough parameters");
 		std::cout << "handle HELP failed => wrong format" << std::endl;
 		return ;
 	}

@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:13 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/07 10:08:07 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/07 11:15:39 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,8 @@ class Command
 
 		// OTHERS MEMBER FUNCTIONS
 		void		parse();
-		bool		parse_arg(std::string arg);
 		bool		is_available(Server &serv, std::string name);
+		bool		isValidString(std::string str, bool skip);
 		int			stringToInt(std::string str);
 		void		deleteChannel(Server &serv, Channel *channel) const;
 		std::string	intToString(int value);

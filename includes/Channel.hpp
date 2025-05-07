@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:48 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/06 20:04:53 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/07 11:58:10 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,6 @@ class Channel
 		void	setLockTopic(bool lockTopic);
 
 
-		void		parseName(std::string name) const;
 		void		delClientName(std::string name);
 		void		delOpName(std::string name);
 		bool		isOpName(std::string name);

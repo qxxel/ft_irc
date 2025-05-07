@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/06 21:17:29 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/07 11:46:46 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,13 +34,13 @@ Server::~Server()
 
 	// DELETE CLIENTS
 	std::vector<Client*>::iterator	it1;
-	for (it1 = this->_clients.begin(); it1 != this->_clients.end(); it1++)
+	for (it1 = this->_clients.begin(); it1 != this->_clients.end(); ++it1)
 		delete *it1;
 
 	// DELETE CHANNELS
 	std::vector<Channel*>::iterator	it2;
-	for (it2 = this->_channels.begin(); it2 != this->_channels.end(); it2++)
-		delete *it2;
+	for (it2 = this->_channels.begin(); it2 != this->_channels.end(); ++it2){ std::cerr << "aa" << std::endl;
+		delete *it2;}
 }
 
 Server::Server(std::string port, std::string password)
@@ -193,7 +193,6 @@ int	Server::acceptClient(int sock, int epfd)
 		_clients.push_back(tp);
 		sendClient(tp->getFd(), SERVER_WELCOME);
 		sendClient(tp->getFd(), ENTER_PWD);
-		sendClient(tp->getFd(), "* > ");
 		std::cout << "\nNew client connected !\n";
 	}
 	catch(const std::exception& e)
@@ -271,8 +270,13 @@ void	Server::clientRequest(int client, int epfd)
 		{
 			tp->getRequest()->split_Request();
 			for (std::vector<Command>::iterator	 it = tp->getRequest()->getArr().begin(); it != tp->getRequest()->getArr().end() ; it++)
+			{
 				Command::executeCommand(*this, tp, &(*it), epfd);
-			tp->getRequest()->clear();
+				if (!this->findClientFd(client))
+					break ;
+			}
+			if (this->findClientFd(client))
+				tp->getRequest()->clear();
 		}
 	}
 	catch(const std::exception& e)
@@ -332,7 +336,6 @@ void	Server::deleteClient(int client)
 		if ((*it)->getFd() == client)
 		{
 			this->_clients.erase(it);
-										std::cerr << "cc" << std::endl;
 			break ;
 		}
 	}
