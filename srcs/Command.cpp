@@ -297,7 +297,7 @@ void	Command::handleNick(Client *client, std::vector<std::string> *args)
 
 void	Command::handleUser(Server &serv, Client *client, std::vector<std::string> *args)
 {
-try
+	try
 	{
 		if (!client->getPwd())
 			return (Server::sendClient(client->getFd(), ENTER_PWD));

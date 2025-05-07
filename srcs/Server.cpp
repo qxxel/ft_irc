@@ -222,10 +222,25 @@ void	Server::disconnectClient(int fd, int epfd)
 
 void	Server::sendClient(int client, std::string msg)
 {
-	if (client == -2)
+	ssize_t		n;
+	ssize_t		total_sent = 0;
+	ssize_t		size = msg.size();
+	const char	*ptr = msg.data();
+
+	if (client == -2 || size == 0)
 		return ;
-	if (send(client, msg.c_str(), msg.size(), 0) == -1)
-		throw (std::runtime_error("Error: sending data to clients failed: " + std::string(strerror(errno))));
+	while (total_sent < size)
+	{
+		n = send(client, ptr + total_sent, size - total_sent, 0);
+		if (n == -1)
+		{
+			if (errno == EAGAIN || errno == EWOULDBLOCK)
+				return ;
+			throw (std::runtime_error("Error: sending data to clients failed: " + std::string(strerror(errno))));
+		}
+		else
+			total_sent += n;
+	}
 }
 
 bool	Server::isValidChar(char c)
@@ -242,40 +257,43 @@ std::string	Server::str_toupper(std::string str)
 
 void	Server::clientRequest(int client, int epfd)
 {
-	char		buffer[MAX_BODY_SIZE + 2];
 	ssize_t		n;
+	ssize_t		total_read = 0;
+	char		buffer[MAX_BODY_SIZE];
 
-	memset(buffer, 0, MAX_BODY_SIZE + 2);
-	n = recv(client, &buffer, MAX_BODY_SIZE + 1, 0);
-	if (n == -1)
-		return (void)(std::cerr << ("Error: recv failed: " + std::string(strerror(errno))));
-
-	// std::cout << "\n------------SERVER RECEIVED-------------\n\n" << buffer << std::endl; //debug
-	try
+	memset(buffer, 0, sizeof(buffer));
+	while (true)
 	{
+		n = recv(client, buffer + total_read, MAX_BODY_SIZE - total_read, 0);
 		if (n == 0)
 			return (disconnectClient(client, epfd));
-		if (strlen(buffer) > MAX_BODY_SIZE)
+		else if (n == -1)
 		{
-			sendClient(client, "Error: input too big (max_body_size = 5000)\n");
-			return (void)(std::cerr << "Error: client request too big: max " << MAX_BODY_SIZE << " characters" << std::endl);
+			if (errno == EAGAIN || errno == EWOULDBLOCK)
+				break ;
+			else
+				return (void)(std::cerr << ("Error: recv failed: " + std::string(strerror(errno))));
 		}
-		Client	*tp = findClientFd(client);
-
-		tp->getRequest()->append(buffer, n);
-		if (buffer[n - 1] == '\n')
+		else
 		{
-			tp->getRequest()->split_Request();
-			for (std::vector<Command>::iterator	 it = tp->getRequest()->getArr().begin(); it != tp->getRequest()->getArr().end() ; it++)
-				Command::executeCommand(*this, tp, &(*it), epfd);
-			tp->getRequest()->clear();
+			if (total_read + n > MAX_BODY_SIZE)
+				return (void)sendClient(client, std::string("Error: message size too big: max 5000 characters\n"));
+			else
+				total_read += n;
 		}
 	}
-	catch(const std::exception& e)
+	// std::cout << "\n------------SERVER RECEIVED-------------\n\n" << buffer << std::endl; //debug
+	Client	*tp = findClientFd(client);
+	tp->getRequest()->append(buffer, total_read);
+	if (total_read > 0 && buffer[total_read - 1] == '\n')
 	{
-		throw ;
+		tp->getRequest()->split_Request();
+		for (std::vector<Command>::iterator	 it = tp->getRequest()->getArr().begin(); it != tp->getRequest()->getArr().end() ; it++)
+			Command::executeCommand(*this, tp, &(*it), epfd);
+		tp->getRequest()->clear();
 	}
 }
+
 
 Client	*Server::findClientFd(int fd)
 {
