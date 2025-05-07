@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 14:50:48 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/28 17:29:04 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/06 21:21:19 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ void Request::split_Request()
 
 	while (!_line.empty() && (del = _line.find('\n')) != std::string::npos)
 	{
-		cmd_raw = _line.substr(0, del + 1);
+		cmd_raw = _line.substr(0, del);
 		Command	tp = Command(cmd_raw);
 		std::cout << tp;
 		_arr.push_back(tp);

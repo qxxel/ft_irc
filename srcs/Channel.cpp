@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:05 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/06 20:05:01 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/06 21:03:16 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ void	Channel::sendClients(std::string exceptionName, std::string message)
 {
 	for (std::vector<Client*>::iterator it = this->_clientsList.begin(); it != this->_clientsList.end(); it++)
 	{
-		if (exceptionName.compare((*it)->getUser()) || (*it)->getFd() == -2)
+		if (exceptionName.compare((*it)->getUser()))
 			Server::sendClient((*it)->getFd(), message);
 	}
 }

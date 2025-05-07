@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/06 16:25:44 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/06 21:17:29 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -224,6 +224,7 @@ void	Server::sendClient(int client, std::string msg)
 {
 	if (client == -2)
 		return ;
+
 	if (send(client, msg.c_str(), msg.size(), 0) == -1)
 		throw (std::runtime_error("Error: sending data to clients failed: " + std::string(strerror(errno))));
 }
@@ -257,7 +258,10 @@ void	Server::clientRequest(int client, int epfd)
 			return (disconnectClient(client, epfd));
 		if (strlen(buffer) > MAX_BODY_SIZE)
 		{
+			while (n > MAX_BODY_SIZE)
+				n = recv(client, &buffer, MAX_BODY_SIZE + 1, 0);
 			sendClient(client, "Error: input too big (max_body_size = 5000)\n");
+			Server::sendClient(client, "------------------------------------------\n");
 			return (void)(std::cerr << "Error: client request too big: max " << MAX_BODY_SIZE << " characters" << std::endl);
 		}
 		Client	*tp = findClientFd(client);
@@ -359,7 +363,7 @@ void	Server::deleteClient(int client)
 					Client	*oldestClient = (*it)->getOldestClient();
 					if (oldestClient)
 						(*it)->getOpList().push_back(oldestClient);
-					}
+				}
 
 				break ;
 			}

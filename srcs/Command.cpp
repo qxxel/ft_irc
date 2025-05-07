@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/06 20:43:45 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/06 21:28:38 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,7 +115,7 @@ void	Command::parse()
 			break;
 		j = i;
 		if (_raw[i] == ':')
-			i = _raw.size();
+			i = _raw.size() - 1;
 		else
 		{
 			while (i < _raw.size() && isascii(_raw[i]) && !isspace(_raw[i]))
@@ -322,7 +322,7 @@ try
 					return (Server::sendClient(client->getFd(), IS_TAKEN ENTER_USER));
 			}
 			else
-				return (Server::sendClient)(client->getFd(), HAS_INVALID_CHARS);
+				return Server::sendClient(client->getFd(), HAS_INVALID_CHARS);
 		}
 		if (!client->getNick().empty() && !client->getUser().empty() && client->getPwd())
 			client->setAuth(true);
@@ -824,7 +824,6 @@ void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string>
 	Channel	*channel = serv.searchChannel(args->at(0));
 	if (!channel)
 	{
-		// 403 <nick> #channel :No such channel
 		Server::sendClient(client->getFd(), ":localhost 403 " + client->getUser() + " " + channel->getName() + " :No such channel\n");
 		std::cout << "handle TOPIC failed => channel don't exist" << std::endl;
 		return ;
