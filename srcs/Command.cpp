@@ -117,7 +117,7 @@ bool	Command::is_available(Server &serv, std::string name)
 	std::vector<Client*>::const_iterator	it;
 	for (it = serv.getClients().begin(); it != serv.getClients().end(); it++)
 	{
-		if (!(*it)->getUser().compare(name))
+		if (!(*it)->getNick().compare(name))
 			return (false);
 	}
 	return (true);
@@ -181,9 +181,9 @@ void Command::executeCommand(Server &serv, Client *client, Command *cmd, int epf
 	if (!cmd->getName().compare("PASS"))
 		cmd->handlePass(serv, client, &args);
 	else if (!cmd->getName().compare("NICK"))
-		cmd->handleNick(client, &args);
+		cmd->handleNick(serv, client, &args);
 	else if (!cmd->getName().compare("USER"))
-		cmd->handleUser(serv, client, &args);
+		cmd->handleUser(client, &args);
 	else if (!cmd->getName().compare("PRIVMSG") || !cmd->getName().compare("MSG"))
 		cmd->handlePrivMsg(serv, client, &args);
 	else if (!cmd->getName().compare("JOIN"))
@@ -208,7 +208,7 @@ void Command::executeCommand(Server &serv, Client *client, Command *cmd, int epf
 	else if (!cmd->getName().compare("HELP"))
 		cmd->handleHelp(client, &args);
 	else
-		Server::sendClient(client->getFd(), ":localhost ??? " + client->getUser() + " :" UKWN_CMD + cmd->getName() + "\n");
+		Server::sendClient(client->getFd(), ":localhost 906 " + client->getUser() + " :" UKWN_CMD + cmd->getName() + "\n");
 	Server::sendClient(client->getFd(), "------------------------------------------\n");
 }
 
@@ -240,16 +240,16 @@ void	Command::handlePass(Server &serv, Client *client, std::vector<std::string> 
 }
 
 //Checks for the 2nd connection step, setting up a Nickname
-void	Command::handleNick(Client *client, std::vector<std::string> *args)
+void	Command::handleNick(Server &serv, Client *client, std::vector<std::string> *args)
 {
 	// IF CLIENT HAS NOT GIVEN THE PASSWORD
 	if (!client->getPwd())
-		return (void)Server::sendClient(client->getFd(), ":localhost 666 " + client->getUser() + " :" ENTER_PWD);
+		return (void)Server::sendClient(client->getFd(), ":localhost 904 " + client->getUser() + " :" ENTER_PWD);
 	// IF CLIENT HAS ALREADY SET A NICKNAME
 	else if (client->getNick().compare(""))
 	{
 		if (client->getUser().empty())
-		Server::sendClient(client->getFd(), ":localhost 667 * :" CANT_NICK);
+		Server::sendClient(client->getFd(), ":localhost 905 * :" CANT_NICK);
 		return ;
 	}
 	// IF BAD ARGUMENTS NUMBER
@@ -260,58 +260,58 @@ void	Command::handleNick(Client *client, std::vector<std::string> *args)
 		// IF GOOD NICKNAME
 		if (isValidString(args->at(0), false))
 		{
-			client->setNick(args->at(0));
-			Server::sendClient(client->getFd(), ":localhost ??? " + client->getUser() + " :" NICK_NAME + client->getNick() + "\n");
+			// IF AVAILABLE USERNAME
+			if (is_available(serv, args->at(0)))
+			{
+				client->setNick(args->at(0));
+				Server::sendClient(client->getFd(), client->getUser() + " :" NICK_NAME + client->getNick() + "\n");
+			}
+			// IF NICKNAME IS TAKEN
+			else
+				return (Server::sendClient(client->getFd(), ":localhost 908 " + client->getUser() + " :" IS_TAKEN ENTER_NICK));
 		}
 		// IF BAD NICKNAME
 		else
-			Server::sendClient(client->getFd(), ":localhost ??? " + client->getUser() + " :" HAS_INVALID_CHARS);
+			Server::sendClient(client->getFd(), ":localhost 900 " + client->getUser() + " :" HAS_INVALID_CHARS);
 	}
 	// SETS AUTH TO TRUE IF AUTH FINISHED
 	if (!client->getNick().empty() && !client->getUser().empty() && client->getPwd())
 		client->setAuth(true);
 	// TELLS THE CLIENTS TO SET A USERNAME
 	else if (!client->getUser().compare(""))
-		return (Server::sendClient(client->getFd(), ":localhost ??? " + client->getUser() + " :" ENTER_USER));
+		return (Server::sendClient(client->getFd(), client->getUser() + " :" ENTER_USER));
 }
 
 //Checks for the 3rd connection step, setting up a username
-void	Command::handleUser(Server &serv, Client *client, std::vector<std::string> *args)
+void	Command::handleUser(Client *client, std::vector<std::string> *args)
 {
 	// IF CLIENT HAS NOT GIVEN THE PASSWORD
 	if (!client->getPwd())
-		return (Server::sendClient(client->getFd(), ":localhost 699 " + client->getUser() + " :" ENTER_PWD));
+		return (Server::sendClient(client->getFd(), ":localhost 904 " + client->getUser() + " :" ENTER_PWD));
 	// IF BAD ARGUMENTS
 	else if (args->size() < 3 || args->size() > 4 || args->at(1).compare("0") || args->at(2).compare("*"))
-		return (Server::sendClient(client->getFd(), ":localhost 699 " + client->getUser() + " :" ENTER_USER));
+		return (Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " :" ENTER_USER));
 	// IF CLIENT HAS ALREADY SET A USERNAME
 	else if (!client->getUser().empty())
-		return (Server::sendClient(client->getFd(), ":localhost ??? " + client->getUser() + " :" CANT_USER USR_NAME + client->getUser() + "\n"));
+		return (Server::sendClient(client->getFd(), ":localhost 905 " + client->getUser() + " :" CANT_USER USR_NAME + client->getUser() + "\n"));
 	else
 	{
 		// IF GOOD USERNAME
 		if (isValidString(args->at(0), false))
 		{
-			// IF AVAILABLE USERNAME
-			if (is_available(serv, args->at(0)))
-			{
-				client->setUser(args->at(0));
-				return (Server::sendClient(client->getFd(), ":localhost ??? " + client->getUser() + " :" USR_NAME + client->getUser() + "\n"));
-			}
-			// IF USERNAME IS TAKEN
-			else
-				return (Server::sendClient(client->getFd(), ":localhost 811 " + client->getUser() + " :" IS_TAKEN ENTER_USER));
+			client->setUser(args->at(0));
+			Server::sendClient(client->getFd(), client->getUser() + " :" USR_NAME + client->getUser() + "\n");
 		}
 		// IF BAD USERNAME
 		else
-			return (Server::sendClient(client->getFd(), ":localhost 007 " + client->getUser() + " :" HAS_INVALID_CHARS));
+			return (Server::sendClient(client->getFd(), ":localhost 900 " + client->getUser() + " :" HAS_INVALID_CHARS));
 	}
 	// IF DONE AUTHENTIFIED
 	if (!client->getNick().empty() && !client->getUser().empty() && client->getPwd())
 		client->setAuth(true);
 	// IF NOT DONE AUTHENTIFIED
 	else if (!client->getNick().compare(""))
-		return (Server::sendClient(client->getFd(), ":localhost ??? " + client->getUser() + " :" ENTER_NICK));
+		return (Server::sendClient(client->getFd(), client->getUser() + " :" ENTER_NICK));
 }
 
 // SEND MESSAGE

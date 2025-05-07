@@ -33,7 +33,7 @@
 # define CANT_NICK "Can not change nickname !\n"
 # define CANT_USER "Can not change username !\n"
 # define HAS_INVALID_CHARS "This field can not contain any of these characters: '\\0', '\\r', '\\a', '\\n', 'space', ',', ';'\n"
-# define IS_TAKEN "This name is unavailable !\n"
+# define IS_TAKEN "This nickname is unavailable !\n"
 # define NEED_AUTH "You need to finish authentication to execute commands\n"
 
 # define PRIVMSG_USG "usage: PRIVMSG <target> :<message>\n"

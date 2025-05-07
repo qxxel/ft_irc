@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "Client.hpp"
+#include "Command.hpp"
 
 Client::Client(int fd) : _fd(fd), _auth(false),  _pwd(false), _user(""), _nick(""), _req(new Request()){ }
 
@@ -102,18 +103,13 @@ void	Client::setUser(std::string user)
 
 void	Client::setAuth(bool auth)
 {
-	try
+	std::vector<std::string> tp;
+	if (auth)
 	{
-		if (auth)
-		{
-			Server::sendClient(this->_fd, AUTHY_GOOD);
-			Server::sendClient(this->_fd, USR_NAME + _user + "\n" + NICK_NAME + _nick + "\n");
-		}
+		Server::sendClient(this->_fd, AUTHY_GOOD);
+		Server::sendClient(this->_fd, USR_NAME + _user + "\n" + NICK_NAME + _nick + "\n\n");
 		_auth = auth;
-	}
-	catch(const std::exception& e)
-	{
-		throw ;
+		Command::handleHelp(&(*this), &tp);
 	}
 }
 

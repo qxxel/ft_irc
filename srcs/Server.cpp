@@ -276,8 +276,6 @@ void	Server::clientRequest(int client, int epfd)
 	while (true)
 	{
 		n = recv(client, buffer + total_read, MAX_BODY_SIZE + 1, 0);
-		std::cerr << n << std::endl;
-		std::cerr << total_read << std::endl;
 		if (n == 0)
 			return (disconnectClient(client, epfd));
 		else if (n == -1)
