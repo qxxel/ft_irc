@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/06 21:17:29 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/07 15:07:47 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,11 +43,12 @@ Server::~Server()
 		delete *it2;
 }
 
+//Simple creation of a server object.
 Server::Server(std::string port, std::string password)
 {
 	try
 	{
-		this->_pwd = simpleHash(password);
+		this->_pwd = simpleHash(password) * 2 % 333 / 4 + 5 * 6;
 		setPort(parsePort(port));
 		this->_bot = new Bot();
 		std::cout << *this;
@@ -58,6 +59,7 @@ Server::Server(std::string port, std::string password)
 	}
 }
 
+//Makes sure the server's port is valid
 int	Server::parsePort(std::string port)
 {
 	for (size_t i = 0; i < port.size(); i++)
@@ -68,14 +70,16 @@ int	Server::parsePort(std::string port)
 	return (atoi(port.c_str()));
 }
 
+//Hashes the password so it's only used once as the raw format (for security reasons)
 long	Server::simpleHash(std::string const &clear_text)
 {
 	long	hash = 0;
 	for (size_t i = 0; i < 	clear_text.length(); i++)
-		hash = 22 * hash + clear_text[i];
+		hash = 818 * hash + clear_text[i];
 	return (hash);
 }
 
+// Creates a socket, setup the server communications, binds and listens on the socket on non-blockable mode
 void	Server::start(void)
 {
 	int	fd_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -123,6 +127,8 @@ void	Server::start(void)
 }
 
 // ---------------------------------------------SERVER RUNNING---------------------------------------------
+
+//Runs the server until it dies (_running should never be false) and checks for events triggered by the clients when connecting/ disconnecting/ requesting
 void	Server::run(int sock)
 {
 	int				epfd = epoll_create1(0);
@@ -169,6 +175,7 @@ void	Server::run(int sock)
 
 // ---------------------------------------------SERVER ACTIONS---------------------------------------------
 
+//Adds a client to the server and defines the events that will be monitored by the server
 int	Server::acceptClient(int sock, int epfd)
 {
 	epoll_event	ev;
@@ -204,6 +211,7 @@ int	Server::acceptClient(int sock, int epfd)
 	return (fd);
 }
 
+//Disconnects a client from the server and removes it's data
 void	Server::disconnectClient(int fd, int epfd)
 {
 	Client	*client = findClientFd(fd);
@@ -220,20 +228,37 @@ void	Server::disconnectClient(int fd, int epfd)
 	std::cout << "Client " << fd << " disconnected" << std::endl;
 }
 
+//Answers the client request by sending it a message proprely.
 void	Server::sendClient(int client, std::string msg)
 {
-	if (client == -2)
-		return ;
+	ssize_t		n;
+	ssize_t		total_sent = 0;
+	ssize_t		size = msg.size();
+	const char	*ptr = msg.data();
 
-	if (send(client, msg.c_str(), msg.size(), 0) == -1)
-		throw (std::runtime_error("Error: sending data to clients failed: " + std::string(strerror(errno))));
+	if (client == -2 || size == 0)
+		return ;
+	while (total_sent < size)
+	{
+		n = send(client, ptr + total_sent, size - total_sent, 0);
+		if (n == -1)
+		{
+			if (errno == EAGAIN || errno == EWOULDBLOCK)
+				return ;
+			throw (std::runtime_error("Error: sending data to clients failed: " + std::string(strerror(errno))));
+		}
+		else
+			total_sent += n;
+	}
 }
 
+//Valid characters in all the <names> used (channels or user/nick names).
 bool	Server::isValidChar(char c)
 {
 	return (!(!isprint(c) || c == ' ' || c == ',' || c == ':' || c == '#'));
 }
 
+//Speaks for itself
 std::string	Server::str_toupper(std::string str)
 {
 	for (std::string::iterator it = str.begin(); it != str.end(); it++)
@@ -241,46 +266,47 @@ std::string	Server::str_toupper(std::string str)
 	return str;
 }
 
+//Reads data from a triggered file descriptor of a client that has been triggered by a EPOLLIN event and creates a request that is usable by the server
 void	Server::clientRequest(int client, int epfd)
 {
-	char		buffer[MAX_BODY_SIZE + 2];
 	ssize_t		n;
+	ssize_t		total_read = 0;
+	char		buffer[MAX_BODY_SIZE];
 
-	memset(buffer, 0, MAX_BODY_SIZE + 2);
-	n = recv(client, &buffer, MAX_BODY_SIZE + 1, 0);
-	if (n == -1)
-		return (void)(std::cerr << ("Error: recv failed: " + std::string(strerror(errno))));
-
-	// std::cout << "\n------------SERVER RECEIVED-------------\n\n" << buffer << std::endl; //debug
-	try
+	memset(buffer, 0, sizeof(buffer));
+	while (true)
 	{
+		n = recv(client, buffer + total_read, MAX_BODY_SIZE - total_read, 0);
 		if (n == 0)
 			return (disconnectClient(client, epfd));
-		if (strlen(buffer) > MAX_BODY_SIZE)
+		else if (n == -1)
 		{
-			while (n > MAX_BODY_SIZE)
-				n = recv(client, &buffer, MAX_BODY_SIZE + 1, 0);
-			sendClient(client, "Error: input too big (max_body_size = 5000)\n");
-			Server::sendClient(client, "------------------------------------------\n");
-			return (void)(std::cerr << "Error: client request too big: max " << MAX_BODY_SIZE << " characters" << std::endl);
+			if (errno == EAGAIN || errno == EWOULDBLOCK)
+				break ;
+			else
+				return (void)(std::cerr << ("Error: recv failed: " + std::string(strerror(errno))));
 		}
-		Client	*tp = findClientFd(client);
-
-		tp->getRequest()->append(buffer, n);
-		if (buffer[n - 1] == '\n')
+		else
 		{
-			tp->getRequest()->split_Request();
-			for (std::vector<Command>::iterator	 it = tp->getRequest()->getArr().begin(); it != tp->getRequest()->getArr().end() ; it++)
-				Command::executeCommand(*this, tp, &(*it), epfd);
-			tp->getRequest()->clear();
+			if (total_read + n > MAX_BODY_SIZE)
+				return (void)sendClient(client, std::string("Error: message size too big: max 5000 characters\n"));
+			else
+				total_read += n;
 		}
 	}
-	catch(const std::exception& e)
+	// std::cout << "\n------------SERVER RECEIVED-------------\n\n" << buffer << std::endl; //debug
+	Client	*tp = findClientFd(client);
+	tp->getRequest()->append(buffer, total_read);
+	if (total_read > 0 && buffer[total_read - 1] == '\n')
 	{
-		throw ;
+		tp->getRequest()->split_Request();
+		for (std::vector<Command>::iterator	 it = tp->getRequest()->getArr().begin(); it != tp->getRequest()->getArr().end() ; it++)
+			Command::executeCommand(*this, tp, &(*it), epfd);
+		tp->getRequest()->clear();
 	}
 }
 
+//Finds a client form its file descriptor in the server's vector of clients and returns it, returns NULL otherwise
 Client	*Server::findClientFd(int fd)
 {
 	std::vector<Client*>::iterator	it;
@@ -293,6 +319,7 @@ Client	*Server::findClientFd(int fd)
 	return (NULL);
 }
 
+//Finds a client form its name in the server's vector of clients and returns it, returns NULL otherwise
 Client	*Server::findClientName(std::string name)
 {
 	std::vector<Client*>::iterator	it;
