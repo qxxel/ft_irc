@@ -6,12 +6,11 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 16:12:51 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/07 19:16:11 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/07 19:57:00 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef DEFINES_HPP
-# define DEFINES_HPP
+#pragma once
 
 # define MAX_EVENTS	4096
 # define MAX_BODY_SIZE	5000
@@ -93,5 +92,3 @@
 // # define CHARS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_#:"
 // # define FIELD_SET "This field has already been set\n"
 // # define LST_CMDS "1. LIST(usage: LIST): displays all available commands\n2. JOIN(usage: JOIN #<chanel_name>): if <channel_name> exists, joins it. creates it and joins it otherwise\n"
-
-#endif

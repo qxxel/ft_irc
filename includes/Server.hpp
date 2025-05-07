@@ -3,32 +3,38 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:07 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/06 20:59:54 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/07 20:30:08 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SERVER_HPP
-# define SERVER_HPP
+#pragma once
 
+# include <cstdlib>
+# include <csignal>
+# include <cstring>
+# include <sys/socket.h>
+# include <fcntl.h>
+# include <netinet/in.h>
+# include <sys/epoll.h>
+# include <cerrno>
+# include <unistd.h>
 # include <exception>
 # include <iostream>
 # include <limits.h>
 # include <map>
 # include <sstream>
 # include <vector>
-# include "Channel.hpp"
-# include "Client.hpp"
-# include "Command.hpp"
+# include <sys/wait.h>
 # include "defines.hpp"
-# include "Request.hpp"
 
+class Bot;
 class Channel;
 class Client;
+class Command;
 class Request;
-class Bot;
 
 class Server
 {
@@ -84,5 +90,3 @@ class Server
 };
 
 std::ostream &	operator<<(std::ostream &o, Server &serv);
-
-#endif

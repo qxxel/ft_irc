@@ -3,15 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   Bot.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 14:55:23 by mreynaud          #+#    #+#             */
-/*   Updated: 2025/05/06 21:24:16 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/07 20:25:43 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-// #include <iostream>
 #include "Bot.hpp"
+#include "Channel.hpp"
+#include "Server.hpp"
 
 Bot::Bot(): Client(-2) {
 	_auth = true;

@@ -3,16 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 14:50:48 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/06 21:21:19 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/07 20:23:49 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "Command.hpp"
 #include "Request.hpp"
-#include "defines.hpp"
-#include <sys/wait.h>
 
 Request::~Request()
 {

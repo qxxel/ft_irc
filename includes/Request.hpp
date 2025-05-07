@@ -6,14 +6,15 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 14:50:56 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/04/30 11:51:17 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/07 20:21:28 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef REQUEST_HPP
-#define REQUEST_HPP
+#pragma once
 
-#include "Command.hpp"
+# include <iostream>
+# include <vector>
+# include "defines.hpp"
 
 class Command;
 
@@ -35,5 +36,3 @@ public:
 	void					setArr(std::vector<Command> arr);
 	std::vector<Command>	&getArr();
 };
-
-#endif

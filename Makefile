@@ -8,7 +8,9 @@ FLAGS = -Wall -Werror -Wextra -std=c++98 -g3
 
 DFLAGS = -MD -MP
 
-SRC = 	main.cpp Server.cpp Client.cpp Request.cpp Command.cpp Channel.cpp signals.cpp Bot.cpp
+SRC = 	main.cpp Server.cpp Client.cpp Request.cpp Command.cpp Channel.cpp signals.cpp Bot.cpp \
+		commands/help.cpp commands/invite.cpp commands/join.cpp commands/kick.cpp commands/mode.cpp commands/names.cpp commands/nick.cpp \
+		commands/part.cpp commands/pass.cpp commands/privmsg.cpp commands/quit.cpp commands/topic.cpp commands/user.cpp
 
 SRC_PATH = srcs/
 

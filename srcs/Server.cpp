@@ -6,21 +6,16 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/07 19:34:47 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/07 20:21:17 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Server.hpp"
-#include <cstdlib>
-#include <csignal>
-#include <cstring>
-#include <sys/socket.h>
-#include <fcntl.h>
-#include <netinet/in.h>
-#include <sys/epoll.h>
-#include <cerrno>
-#include <unistd.h>
 #include "Bot.hpp"
+#include "Channel.hpp"
+#include "Client.hpp"
+#include "Command.hpp"
+#include "Request.hpp"
+#include "Server.hpp"
 
 // ---------------------------------------------SERVER SETUP---------------------------------------------
 

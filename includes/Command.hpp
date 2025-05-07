@@ -6,18 +6,22 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:13 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/07 11:15:39 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/07 20:29:03 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef COMMAND_HPP
-# define COMMAND_HPP
+#pragma once
 
-# include "Server.hpp"
+# include <iostream>
+# include <map>
+# include <vector>
+# include "Bot.hpp"
+# include "defines.hpp"
 
-class Server;
-class Client;
+class Bot;
 class Channel;
+class Client;
+class Server;
 
 class Command
 {
@@ -81,5 +85,3 @@ class Command
 };
 
 std::ostream &	operator<<(std::ostream &o, Command &cmd);
-
-#endif

@@ -6,11 +6,13 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:05 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/07 19:32:00 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/07 20:38:25 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Channel.hpp"
+#include "Client.hpp"
+#include "Server.hpp"
 
 Channel::Channel(std::string name, Client *creator): _oldestClient(NULL), _modeSetTimestamp(time(NULL)), _maxUsers(100), _invOnly(false), _lockTopic(false)
 {
@@ -44,7 +46,6 @@ void	Channel::delClientName(std::string name)
 			return ;
 		}
 	}
-
 }
 
 void	Channel::delOpName(std::string name)

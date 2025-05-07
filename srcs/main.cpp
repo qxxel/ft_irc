@@ -6,11 +6,10 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:16:26 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/05 16:23:44 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/07 20:11:08 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <iostream>
 #include "Server.hpp"
 
 void	setupSignals();
