@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/07 16:59:43 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/07 17:04:53 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -276,8 +276,6 @@ void	Server::clientRequest(int client, int epfd)
 	while (true)
 	{
 		n = recv(client, buffer + total_read, MAX_BODY_SIZE + 1, 0);
-		std::cerr << n << std::endl;
-		std::cerr << total_read << std::endl;
 		if (n == 0)
 			return (disconnectClient(client, epfd));
 		else if (n == -1)

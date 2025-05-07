@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/07 16:59:36 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/07 18:44:34 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -201,7 +201,7 @@ void Command::executeCommand(Server &serv, Client *client, Command *cmd, int epf
 		cmd->handleInvite(serv, client, &args);
 	else if (!cmd->getName().compare("TOPIC"))
 		cmd->handleTopic(serv, client, &args);
-	else if (!cmd->getName().compare("NAMES"))
+	else if (!cmd->getName().compare("NAMES") || !cmd->getName().compare("WHO"))
 		cmd->handleNames(serv, client, &args);
 	else if (!cmd->getName().compare("MODE"))
 		cmd->handleMode(serv, client, &args);
@@ -296,7 +296,7 @@ void	Command::handleUser(Server &serv, Client *client, std::vector<std::string> 
 			if (is_available(serv, args->at(0)))
 			{
 				client->setUser(args->at(0));
-				return (Server::sendClient(client->getFd(), ":localhost ??? " + client->getUser() + " :" USR_NAME + client->getUser() + "\n"));
+				Server::sendClient(client->getFd(), ":localhost ??? " + client->getUser() + " :" USR_NAME + client->getUser() + "\n");
 			}
 			// IF USERNAME IS TAKEN
 			else
@@ -442,9 +442,8 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 				client->getCurrentsChannels().push_back(newChannel);
 				Server::sendClient(client->getFd(), ":" + client->getNick() + "!" + client->getUser() + "@localhost JOIN :" + newChannel->getName() + "\n");
 				Server::sendClient(client->getFd(), ":localhost 331 " + client->getNick() + " " + newChannel->getName() + " :No topic is set\n");
-				Server::sendClient(client->getFd(), ":localhost 353 " + client->getNick() + " " + newChannel->getName() + " :" + newChannel->listClients() + "\n");
-				Server::sendClient(client->getFd(), ":localhost 366 " + client->getNick() + " " + newChannel->getName() + " :End of NAMES list\n");
-				Server::sendClient(client->getFd(), "MODE " + newChannel->getName() + " +l\n"); // a mettre en forme
+				// Server::sendClient(client->getFd(), ":localhost 353 " + client->getNick() + " " + newChannel->getName() + " :" + newChannel->listClients() + "\n");
+				// Server::sendClient(client->getFd(), ":localhost 366 " + client->getNick() + " " + newChannel->getName() + " :End of NAMES list\n");
 				continue ;
 			}
 
@@ -877,8 +876,8 @@ void	Command::handleNames(Server &serv, Client *client, std::vector<std::string>
 		std::vector<Channel*>::iterator	it_chnl;
 		for (it_chnl = serv.getChannels().begin(); it_chnl != serv.getChannels().end(); it_chnl++)
 		{
-			Server::sendClient(client->getFd(), client->getNick() + " " + (*it_chnl)->getName() + " :" + (*it_chnl)->listClients() + "\n");
-			Server::sendClient(client->getFd(), client->getNick() + " " + (*it_chnl)->getName() + " :End of NAMES list\n");
+			Server::sendClient(client->getFd(), ":localhost 353 " + client->getNick() + " " + (*it_chnl)->getName() + " :" + (*it_chnl)->listClients() + "\n");
+			Server::sendClient(client->getFd(), ":localhost 366 " + client->getNick() + " " + (*it_chnl)->getName() + " :End of NAMES list\n");
 		}
 
 		std::cout << "handle NAMES all successfully called" << std::endl;
@@ -894,21 +893,15 @@ void	Command::handleNames(Server &serv, Client *client, std::vector<std::string>
 		{
 			// FIND CHANNEL IN SERVER
 			Channel	*channel = serv.searchChannel(args->at(0));
-			if (!channel)
-			{
-				Server::sendClient(client->getFd(), NO_CHNL);
-				std::cout << "handle NAMES failed => channel don't exist" << std::endl;
-				return ;
-			}
-
-			Server::sendClient(client->getFd(), client->getNick() + " " + channel->getName() + " :" + channel->listClients() + "\n");
-			Server::sendClient(client->getFd(), client->getNick() + " " + channel->getName() + " :End of NAMES list\n");
+			if (channel)
+				Server::sendClient(client->getFd(), ":localhost 353 " + client->getNick() + " " + channel->getName() + " :" + channel->listClients() + "\n");
+			Server::sendClient(client->getFd(), ":localhost 366 " + client->getNick() + " " + args->at(0) + " :End of NAMES list\n");
 		}
 	}
 	catch (splitFailed &)
 	{
-		Server::sendClient(client->getFd(), NAMES_USG);
-		std::cout << "handle NAMES failed => wrong input" << std::endl;
+		Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " NAMES :Not enough parameters");
+		std::cout << "handle NAMES failed => wrong format" << std::endl;
 		return ;
 	}
 
@@ -1234,7 +1227,7 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 }
 
 // DISPLAY ALL COMMANDS USAGES
-void	Command::handleHelp(Client *client, std::vector<std::string> *args)
+void	Command::handleHelp(Client *client, std::vector<std::string> *args) // ONLY FOR NC
 {
 	// CHECK IF CLIENT IS AUTH
 	if (!client->getAuth())
