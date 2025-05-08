@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:39:04 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/07 20:37:12 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/08 16:23:46 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ void	Command::handleUser(Client *client, std::vector<std::string> *args)
 		if (isValidString(args->at(0), false))
 		{
 			client->setUser(args->at(0));
-			Server::sendClient(client->getFd(), "* :" USR_NAME + client->getUser() + "\n");
+			Server::sendClient(client->getFd(), USR_NAME + client->getUser() + "\n");
 		}
 		// IF BAD USERNAME
 		else
@@ -47,5 +47,5 @@ void	Command::handleUser(Client *client, std::vector<std::string> *args)
 
 	// IF NOT DONE AUTHENTIFIED
 	else if (!client->getNick().compare(""))
-		return (Server::sendClient(client->getFd(), "* :" ENTER_NICK));
+		return (Server::sendClient(client->getFd(), ENTER_NICK));
 }

@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:38:57 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/07 20:35:48 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/08 16:23:35 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ void	Command::handleNick(Server &serv, Client *client, std::vector<std::string> 
 			if (is_available(serv, args->at(0)))
 			{
 				client->setNick(args->at(0));
-				Server::sendClient(client->getFd(), "* :" NICK_NAME + client->getNick() + "\n");
+				Server::sendClient(client->getFd(), NICK_NAME + client->getNick() + "\n");
 			}
 
 			// IF NICKNAME IS TAKEN
@@ -61,5 +61,5 @@ void	Command::handleNick(Server &serv, Client *client, std::vector<std::string> 
 
 	// TELLS THE CLIENTS TO SET A USERNAME
 	else if (!client->getUser().compare(""))
-		return (Server::sendClient(client->getFd(), "* :" ENTER_USER));
+		return (Server::sendClient(client->getFd(), ENTER_USER));
 }
