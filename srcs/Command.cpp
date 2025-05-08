@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/08 14:03:52 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/08 15:12:22 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -254,8 +254,8 @@ int	Command::stringToInt(std::string str)
 	long long	num;
 
 	ss >> num;
-	if (ss.fail() || !ss.eof() || num < INT_MIN || num > INT_MAX)
-		throw notIntNumber();
+	if (ss.fail() || !ss.eof() || num < 0 || num > INT_MAX)
+		throw notUnsignedIntNumber();
 
 	return (static_cast<int>(num));
 }

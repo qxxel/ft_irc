@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:39:41 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/07 20:34:51 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/08 15:19:30 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,7 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 			}
 
 			// CHECK IF CHANNEL IS FULL
-			if (channel->getMaxUsers() != 0 && !(channel->getClientsList().size() < (size_t)channel->getMaxUsers()))
+			if (channel->getMaxUsers() != -1 && channel->getClientsList().size() >= (size_t)channel->getMaxUsers())
 			{
 				Server::sendClient(client->getFd(), ":localhost 471 " + client->getNick() + " " + channel->getName() + " :Cannot join channel (+l)");
 				std::cout << "handle JOIN failed => channel full" << std::endl;
