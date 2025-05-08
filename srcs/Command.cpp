@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/08 16:17:08 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/08 16:30:19 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ void	Command::parse()
 			break;
 		j = i;
 		if (_raw[i] == ':')
-			i = _raw.size() - 1;
+			i = _raw.size();
 		else
 		{
 			while (i < _raw.size() && isascii(_raw[i]) && !isspace(_raw[i]))
