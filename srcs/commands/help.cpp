@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:40:46 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/08 15:51:06 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/08 16:21:40 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ void	Command::handleHelp(Client *client, std::vector<std::string> *args) // ONLY
 	{
 		Server::sendClient(client->getFd(), ":localhost 910 " + client->getNick() + " :Available commands: PRIVMSG, JOIN, PART, QUIT, KICK, INVITE, TOPIC, NAMES, WHO, MODE\n");
 		Server::sendClient(client->getFd(), ":localhost 911 " + client->getNick() + " :Use /HELP <command> for help on each.\n");
-		Server::sendClient(client->getFd(), ":localhost 919 " + client->getNick() + " :End of HELP\n");
+		// Server::sendClient(client->getFd(), ":localhost 919 " + client->getNick() + " :End of HELP\n");
 	}
 
 	// SHOW USAGE OF THE ASKED COMMAND
@@ -90,7 +90,7 @@ void	Command::handleHelp(Client *client, std::vector<std::string> *args) // ONLY
 			return ;
 		}
 		
-		Server::sendClient(client->getFd(), ":localhost 919 " + client->getNick() + " :End of HELP\n");
+		// Server::sendClient(client->getFd(), ":localhost 919 " + client->getNick() + " :End of HELP\n");
 	}
 
 	std::cout << "handle HELP successfuly called" << std::endl;

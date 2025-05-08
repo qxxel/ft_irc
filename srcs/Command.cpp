@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/08 16:30:19 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/08 16:36:51 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -221,6 +221,9 @@ void Command::executeCommand(Server &serv, Client *client, Command *cmd, int epf
 		cmd->handleQuit(serv, client, &args, epfd);
 		return ;
 	}
+
+	else if (!cmd->getName().compare("CAP"))
+		;
 
 	else
 	{
