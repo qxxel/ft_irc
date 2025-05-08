@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/07 20:21:17 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/08 18:29:17 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -374,6 +374,7 @@ void	Server::deleteClient(int client)
 			if ((*it_clients)->getFd() == client)
 			{
 				(*it)->getClientsList().erase(it_clients);
+				(*it_clients)->delCurrentChannel(*it);
 				(*it)->sendClients("", (*it_clients)->getNick() + ":" + (*it_clients)->getUser() + " PART " + (*it)->getName() + "\n");
 				break ;
 			}

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:07 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/07 20:30:08 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/08 18:27:32 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,8 +58,8 @@ class Server
 		void	disconnectClient(int client, int epfd);
 		void	clientRequest(int client, int epfd);
 		void	addChannel(Channel *channel);
-		void	deleteClient(int client);
 		void	deleteChannel(Channel *channel);
+		void	deleteClient(int client);
 		void	deleteServer(int sock, int epfd);
 		Client	*findClientFd(int fd);
 		Client	*findClientName(std::string name);
