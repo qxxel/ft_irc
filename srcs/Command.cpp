@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/08 14:18:51 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/08 16:17:08 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -176,39 +176,52 @@ std::ostream &	operator<<(std::ostream &o, Command &cmd)
 	return (o);
 }
 
-//Speaks for itself :)
+// Speaks for itself :)
 void Command::executeCommand(Server &serv, Client *client, Command *cmd, int epfd)
 {
 	std::vector<std::string>	args = cmd->getArgs();
 	if (!cmd->getName().compare("PASS"))
 		cmd->handlePass(serv, client, &args);
+
 	else if (!cmd->getName().compare("NICK"))
 		cmd->handleNick(serv, client, &args);
+
 	else if (!cmd->getName().compare("USER"))
 		cmd->handleUser(client, &args);
-	else if (!cmd->getName().compare("PRIVMSG") || !cmd->getName().compare("MSG"))
+
+	else if (!cmd->getName().compare("PRIVMSG"))
 		cmd->handlePrivMsg(serv, client, &args);
+
 	else if (!cmd->getName().compare("JOIN"))
 		cmd->handleJoin(serv, client, &args);
+
 	else if (!cmd->getName().compare("PART"))
 		cmd->handlePart(serv, client, &args);
+
+	else if (!cmd->getName().compare("KICK"))
+		cmd->handleKick(serv, client, &args);
+
+	else if (!cmd->getName().compare("INVITE"))
+		cmd->handleInvite(serv, client, &args);
+
+	else if (!cmd->getName().compare("TOPIC"))
+		cmd->handleTopic(serv, client, &args);
+
+	else if (!cmd->getName().compare("NAMES") || !cmd->getName().compare("WHO"))
+		cmd->handleNames(serv, client, &args);
+
+	else if (!cmd->getName().compare("MODE"))
+		cmd->handleMode(serv, client, &args);
+
+	else if (!cmd->getName().compare("HELP"))
+		cmd->handleHelp(client, &args);
+
 	else if (!cmd->getName().compare("QUIT"))
 	{
 		cmd->handleQuit(serv, client, &args, epfd);
 		return ;
 	}
-	else if (!cmd->getName().compare("KICK"))
-		cmd->handleKick(serv, client, &args);
-	else if (!cmd->getName().compare("INVITE"))
-		cmd->handleInvite(serv, client, &args);
-	else if (!cmd->getName().compare("TOPIC"))
-		cmd->handleTopic(serv, client, &args);
-	else if (!cmd->getName().compare("NAMES") || !cmd->getName().compare("WHO"))
-		cmd->handleNames(serv, client, &args);
-	else if (!cmd->getName().compare("MODE"))
-		cmd->handleMode(serv, client, &args);
-	else if (!cmd->getName().compare("HELP"))
-		cmd->handleHelp(client, &args);
+
 	else
 	{
 		if (client->getNick().empty())
@@ -217,7 +230,6 @@ void Command::executeCommand(Server &serv, Client *client, Command *cmd, int epf
 			Server::sendClient(client->getFd(), ":localhost 906 " + client->getNick() + " :" UKWN_CMD + cmd->getName() + "\n");
 		std::cout << "Unknown command" << std::endl;
 	}
-	Server::sendClient(client->getFd(), "------------------------------------------\n");
 }
 
 std::string	Command::intToString(int value)
@@ -242,8 +254,8 @@ int	Command::stringToInt(std::string str)
 	long long	num;
 
 	ss >> num;
-	if (ss.fail() || !ss.eof() || num < INT_MIN || num > INT_MAX)
-		throw notIntNumber();
+	if (ss.fail() || !ss.eof() || num < 0 || num > INT_MAX)
+		throw notUnsignedIntNumber();
 
 	return (static_cast<int>(num));
 }

@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:13 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/08 15:55:43 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/08 16:16:51 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ class Command
 			public:
 				const char*	what() const throw() { return ("the split failed"); }
 		};
-		class notIntNumber: public std::exception
+		class notUnsignedIntNumber: public std::exception
 		{
 			public:
 				const char*	what() const throw() { return ("The input must be a integer"); }
