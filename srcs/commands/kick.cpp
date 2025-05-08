@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   kick.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:40:01 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/08 14:34:46 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/08 19:46:14 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	Command::handleKick(Server &serv, Client *client, std::vector<std::string> 
 	// USAGE: KICK <channel> <user> [:<comment>]
 	if (!args || args->size() < 2 || 3 < args->size())
 	{
-		Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " KICK :Not enough parameters");
+		Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " KICK :Not enough parameters\n");
 		std::cout << "handle KICK failed => invalid format" << std::endl;
 		return ;
 	}

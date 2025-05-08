@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   part.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:39:47 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/08 14:14:48 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/08 19:46:14 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> 
 	// USAGE: PART <channel>{,<channel>} [:<message>]
 	if (!args || args->size() < 1)
 	{
-		Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " PART :Not enough parameters");
+		Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " PART :Not enough parameters\n");
 		std::cout << "handle PART failed => wrong format" << std::endl;
 		return ;
 	}
@@ -92,7 +92,7 @@ void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> 
 	// CATCH IF WRONG INPUT IN CHANNELS
 	catch (splitFailed &)
 	{
-		Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " PART :Not enough parameters");
+		Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " PART :Not enough parameters\n");
 		std::cout << "handle PART failed => wrong format" << std::endl;
 		return ;
 	}

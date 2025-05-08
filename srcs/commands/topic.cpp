@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:40:14 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/07 20:36:57 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/08 19:46:14 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string>
 	if (!args || args->empty() || args->size() > 2)
 	{
 		// 461 <nick> TOPIC :Not enough parameters
-		Server::sendClient(client->getFd(), ":localhost 461 " + client->getNick() + " TOPIC :Not enough parameters");
+		Server::sendClient(client->getFd(), ":localhost 461 " + client->getNick() + " TOPIC :Not enough parameters\n");
 		std::cout << "handle TOPIC failed => no args" << std::endl;
 		return ;
 	}

@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:39:54 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/07 20:36:49 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/08 19:46:14 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ void	Command::handleQuit(Server &serv, Client *client, std::vector<std::string> 
 	// USAGE: QUIT [:<message>]
 	if (!args || args->size() > 1)
 	{
-		Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " QUIT :Not enough parameters");
+		Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " QUIT :Not enough parameters\n");
 		std::cout << "handle QUIT failed => wrong format" << std::endl;
 		return ;
 	}

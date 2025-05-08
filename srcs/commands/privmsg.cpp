@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   privmsg.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:39:20 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/08 14:50:12 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/08 19:48:48 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	Command::handlePrivMsg(Server &serv, Client *client, std::vector<std::strin
 	// USAGE: PRIVMSG <target> :<message>
 	if (!args || args->size() != 2)
 	{
-		Server::sendClient(client->getFd(), ":localhost 461 " + client->getNick() + " PRIVMSG :Not enough parameters");
+		Server::sendClient(client->getFd(), ":localhost 461 " + client->getNick() + " PRIVMSG :Not enough parameters\n");
 		std::cout << "handle PRIVMSG failed => invalid format" << std::endl;
 		return ;
 	}
@@ -48,7 +48,7 @@ void	Command::handlePrivMsg(Server &serv, Client *client, std::vector<std::strin
 		Channel	*channel = serv.searchChannel(args->at(0));
 		if (!channel)
 		{
-			Server::sendClient(client->getFd(), ":localhost 401 " + client->getNick() + " :No such nick/channel");
+			Server::sendClient(client->getFd(), ":localhost 401 " + client->getNick() + " :No such nick/channel\n");
 			std::cout << "handle PRIVMSG failed => inexistant channel" << std::endl;
 			return ;
 		}
@@ -72,7 +72,7 @@ void	Command::handlePrivMsg(Server &serv, Client *client, std::vector<std::strin
 		Client	*target = serv.findClientName(args->at(0));
 		if (!target)
 		{
-			Server::sendClient(client->getFd(), ":localhost 401 " + client->getNick() + " :No such nick/channel");
+			Server::sendClient(client->getFd(), ":localhost 401 " + client->getNick() + " :No such nick/channel\n");
 			std::cout << "handle PRIVMSG failed => inexistant target" << std::endl;
 			return ;
 		}

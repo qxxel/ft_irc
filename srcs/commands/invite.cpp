@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   invite.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:40:07 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/08 15:50:34 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/08 19:46:14 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	Command::handleInvite(Server &serv, Client *client, std::vector<std::string
 	// USAGE: INVITE <user> <channel>
 	if (!args || args->empty() || args->size() != 2)
 	{
-		Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " INVITE :Not enough parameters");
+		Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " INVITE :Not enough parameters\n");
 		std::cout << "handle INVITE failed => invalid format" << std::endl;
 		return ;
 	}

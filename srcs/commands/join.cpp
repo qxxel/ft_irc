@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   join.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:39:41 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/08 16:37:04 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/08 19:47:01 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 	// USAGE: JOIN <channel>{,<channel>} [<key>{,<key>}]
 	if (!args || args->size() < 1 || 2 < args->size())
 	{
-		Server::sendClient(client->getFd(), ":localhost 461 " + client->getNick() + " JOIN :Not enough parameters");
+		Server::sendClient(client->getFd(), ":localhost 461 " + client->getNick() + " JOIN :Not enough parameters\n");
 		std::cout << "handle JOIN failed => invalid format" << std::endl;
 		return ;
 	}
@@ -79,7 +79,7 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 			// CHECK IF CLIENT CAN ACCESS
 			if (client->getNick() != "GameBot" && channel->getInvOnly() && !(client->isJoinableChannel(channel) || channel->isOpName(client->getUser())))
 			{
-				Server::sendClient(client->getFd(), ":localhost 473 " + client->getNick() + " " + channel->getName() + " :Cannot join channel (+i)");
+				Server::sendClient(client->getFd(), ":localhost 473 " + client->getNick() + " " + channel->getName() + " :Cannot join channel (+i)\n");
 				std::cout << "handle JOIN failed => client not allowed in this channel" << std::endl;
 				continue ;
 			}
@@ -90,7 +90,7 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 				// CHECK IF PASSWORD IS SENDED AND TRY IT
 				if (it->second.empty() || channel->getPwd() != it->second)
 				{
-					Server::sendClient(client->getFd(), ":localhost 475 " + client->getNick() + " " + channel->getName() + " :Cannot join channel (+k)");
+					Server::sendClient(client->getFd(), ":localhost 475 " + client->getNick() + " " + channel->getName() + " :Cannot join channel (+k)\n");
 					std::cout << "handle JOIN failed => wrong password" << std::endl;
 					continue ;
 				}
@@ -99,7 +99,7 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 			// CHECK IF CHANNEL IS FULL
 			if (channel->getMaxUsers() != -1 && channel->getClientsList().size() >= (size_t)channel->getMaxUsers())
 			{
-				Server::sendClient(client->getFd(), ":localhost 471 " + client->getNick() + " " + channel->getName() + " :Cannot join channel (+l)");
+				Server::sendClient(client->getFd(), ":localhost 471 " + client->getNick() + " " + channel->getName() + " :Cannot join channel (+l)\n");
 				std::cout << "handle JOIN failed => channel full" << std::endl;
 				continue ;
 			}
@@ -121,7 +121,7 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 	// CATCH IF WRONG INPUT IN CHANNELS
 	catch (splitFailed &)
 	{
-		Server::sendClient(client->getFd(), ":localhost 461 " + client->getNick() + " JOIN :Not enough parameters");
+		Server::sendClient(client->getFd(), ":localhost 461 " + client->getNick() + " JOIN :Not enough parameters\n");
 		std::cout << "handle JOIN failed => invalid format" << std::endl;
 	}
 
