@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   mode.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:40:36 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/07 20:35:17 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/08 15:15:56 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,7 +178,7 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 		}
 
 		// CHECK IF ALL CHARACTERS ARE VALID
-		if (this->isValidString(args->at(2), true))
+		if (isValidString(args->at(2), true))
 		{
 				Server::sendClient(client->getFd(), INV_PASS_FRMT);
 				std::cout << "handle modify MODE +k failed => invalid password format" << std::endl;

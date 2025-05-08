@@ -6,13 +6,14 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 14:55:23 by mreynaud          #+#    #+#             */
-/*   Updated: 2025/05/07 23:42:23 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/08 16:07:38 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Bot.hpp"
 #include "Channel.hpp"
 #include "Server.hpp"
+#include "Command.hpp"
 
 Bot::Bot(): Client(-2) {
 	_auth = true;
@@ -24,18 +25,10 @@ Bot::Bot(): Client(-2) {
 
 Bot::~Bot() { }
 
-void	Bot::joinChannel(Channel	*channel)
+void	Bot::joinChannel(Server &serv, Channel *channel)
 {
-	if (channel->getMaxUsers() != 0 && !(channel->getClientsList().size() < (unsigned long)channel->getMaxUsers()))
-	{
-		channel->sendClients("", "the bot (GameBot) cannot rejoin, because the channel is full\n");
-		std::cout << "GameBot JOIN failed => channel full" << std::endl;
-		return ;
-	}
-	this->getCurrentsChannels().push_back(channel);
-	channel->getClientsList().push_back(this);
-	channel->getOpList().push_back(this);
-	channel->sendClients("", ":" + this->getNick() + "!" + this->getUser() + " JOIN :" + channel->getName() + "\n");
+	std::vector<std::string> args = Command("JOIN "  + channel->getName()).getArgs();
+	Command::handleJoin(serv, serv.getBot(), &args);
 }
 
 static void	send_msg_bot(std::string msg, Client *client, Channel *channel)
@@ -59,11 +52,15 @@ static void explain_rule(Client *client, Channel *channel)
 }
 
 
-static void you_lose(std::string my_choice, Client *client, Channel *channel)
+static void you_lose(Server &serv, std::string my_choice, Client *client, Channel *channel)
 {
 	send_msg_bot("I'm choice " + my_choice + "\n", client, channel);
 	send_msg_bot("You lose!\n", client, channel);
-	// /!\ WIP : try to kick
+	if (client && channel && channel->isOpName("GameBot"))
+	{
+		std::vector<std::string> args = Command("KICK " + channel->getName() + " " + client->getNick() + " :Looser!").getArgs();
+		Command::handleKick(serv, serv.getBot(), &args);
+	}
 }
 
 static void no_winner(std::string my_choice, Client *client, Channel *channel)
@@ -72,11 +69,15 @@ static void no_winner(std::string my_choice, Client *client, Channel *channel)
 	send_msg_bot("It's a tie! Go again?\n", client, channel);
 }
 
-static void you_win(std::string my_choice, Client *client, Channel *channel)
+static void you_win(Server &serv, std::string my_choice, Client *client, Channel *channel)
 {
 	send_msg_bot("I'm choice " + my_choice + "\n", client, channel);
 	send_msg_bot("You win! 🏆\n", client, channel);
-	// /!\ WIP : and try to op
+	if (client && channel && channel->isOpName("GameBot") && !channel->isOpName(client->getUser()))
+	{
+		std::vector<std::string> args = Command("MODE " + channel->getName() + " +o " + client->getNick()).getArgs();
+		Command::handleMode(serv, serv.getBot(), &args);
+	}
 }
 
 static std::string	rand_rock_paper_scissors()
@@ -91,7 +92,7 @@ static std::string	rand_rock_paper_scissors()
 		return "SCISSORS";
 }
 
-static void	game_rock_paper_scissors(std::string adverse_choice, Client *client, Channel *channel)
+static void	game_rock_paper_scissors(Server &serv, std::string adverse_choice, Client *client, Channel *channel)
 {
 	std::string my_choice = rand_rock_paper_scissors();
 	if (adverse_choice == "ROCK")
@@ -99,37 +100,39 @@ static void	game_rock_paper_scissors(std::string adverse_choice, Client *client,
 		if (my_choice == "ROCK")
 			no_winner(my_choice, client, channel);
 		else if (my_choice == "PAPER")
-			you_lose(my_choice, client, channel);
+			you_lose(serv, my_choice, client, channel);
 		else
-			you_win(my_choice, client, channel);
+			you_win(serv, my_choice, client, channel);
 	}
 	else if (adverse_choice == "PAPER")
 	{
 		if (my_choice == "ROCK")
-			you_win(my_choice, client, channel);
+			you_win(serv, my_choice, client, channel);
 		else if (my_choice == "PAPER")
 			no_winner(my_choice, client, channel);
 		else
-			you_lose(my_choice, client, channel);
+			you_lose(serv, my_choice, client, channel);
 	}
 	else if (adverse_choice == "SCISSORS")
 	{
 		if (my_choice == "ROCK")
-			you_lose(my_choice, client, channel);
+			you_lose(serv, my_choice, client, channel);
 		else if (my_choice == "PAPER")
-			you_win(my_choice, client, channel);
+			you_win(serv, my_choice, client, channel);
 		else
 			no_winner(my_choice, client, channel);
 	}
 	else if (adverse_choice == "WELL")
-		you_lose("PAPER", client, channel);
+		you_lose(serv, "PAPER", client, channel);
 	else
 		explain_rule(client, channel);
 	return ;
 }
 
-void Bot::handleBot(Channel *channel, Client *client, std::string &arg)
+void Bot::handleBot(Server &serv, Channel *channel, Client *client, std::string &arg)
 {
+	if (channel && arg.find("!GAME") != 1)
+		return ;
 	if (arg.find("!GAME") != 1 || arg.size() <= 7)
 	{
 		explain_rule(client, channel);
@@ -137,5 +140,5 @@ void Bot::handleBot(Channel *channel, Client *client, std::string &arg)
 	}
 	std::string str = arg.substr(7);
 
-	game_rock_paper_scissors(Server::str_toupper(str), client, channel);
+	game_rock_paper_scissors(serv, Server::str_toupper(str), client, channel);
 }

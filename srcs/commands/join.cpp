@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   join.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:39:41 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/07 20:34:51 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/08 16:11:27 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 			}
 
 			// CHECK IF CLIENT CAN ACCESS
-			if (channel->getInvOnly() && !(client->isJoinableChannel(channel) || channel->isOpName(client->getUser())))
+			if (client->getNick() != "GameBot" && channel->getInvOnly() && !(client->isJoinableChannel(channel) || channel->isOpName(client->getUser())))
 			{
 				Server::sendClient(client->getFd(), ":localhost 473 " + client->getNick() + " " + channel->getName() + " :Cannot join channel (+i)");
 				std::cout << "handle JOIN failed => client not allowed in this channel" << std::endl;
@@ -85,7 +85,7 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 			}
 
 			// CHECK PASSWORD
-			if (!channel->getPwd().empty() && !client->isJoinableChannel(channel))
+			if (client->getNick() != "GameBot" && !channel->getPwd().empty() && !client->isJoinableChannel(channel))
 			{
 				// CHECK IF PASSWORD IS SENDED AND TRY IT
 				if (it->second.empty() || channel->getPwd() != it->second)
@@ -114,6 +114,8 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 				Server::sendClient(client->getFd(), ":localhost 332 " + client->getNick() + " " + channel->getName() + " " + channel->getTopic() + "\n");
 			Server::sendClient(client->getFd(), ":localhost 353 " + client->getNick() + " " + channel->getName() + " :" + channel->listClients() + "\n");
 			Server::sendClient(client->getFd(), ":localhost 366 " + client->getNick() + " " + channel->getName() + " :End of NAMES list\n");
+			if (client->getNick() == "GameBot")
+				channel->getOpList().push_back(client);
 		}
 	}
 	// CATCH IF WRONG INPUT IN CHANNELS
