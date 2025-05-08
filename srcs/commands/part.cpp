@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:39:47 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/07 22:18:56 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/08 14:14:48 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> 
 			{
 				client->delCurrentChannel(channel);
 				Server::sendClient(client->getFd(), ":" + client->getNick() + "!" + client->getUser() + "@localhost PART " + Command::joinStrings(*args) + "\n");
-				this->deleteChannel(serv, channel);
+				serv.deleteChannel(channel);
 				continue ;
 			}
 
@@ -85,6 +85,7 @@ void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> 
 
 			channel->delClientName(client->getUser());
 			client->delCurrentChannel(channel);
+			Server::sendClient(client->getFd(), ":" + client->getNick() + "!" + client->getUser() + "@localhost PART " + Command::joinStrings(*args) + "\n");
 			channel->sendClients("", ":" + client->getNick() + "!" + client->getUser() + "@localhost PART " + Command::joinStrings(*args) + "\n");
 		}
 	}

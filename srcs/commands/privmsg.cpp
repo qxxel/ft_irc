@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:39:20 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/07 22:53:18 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/08 14:50:12 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ void	Command::handlePrivMsg(Server &serv, Client *client, std::vector<std::strin
 
 		channel->sendClients(client->getUser(), ":" + client->getNick() + "!" + client->getUser() + " PRIVMSG " + channel->getName() + " " + args->at(1) + "\n");
 		if (serv.getBot()->isCurrentChannel(channel->getName()))
-			Bot::handleBot(channel, client, args->at(1));
+			Bot::handleBot(serv, channel, client, args->at(1));
 	}
 	// CHECK IF THE TARGET IS A CLIENT
 	else
@@ -78,7 +78,7 @@ void	Command::handlePrivMsg(Server &serv, Client *client, std::vector<std::strin
 		}
 
 		if (target->getNick() == "GameBot")
-			Bot::handleBot(NULL, client, args->at(1));
+			Bot::handleBot(serv, NULL, client, args->at(1));
 		else
 			Server::sendClient(target->getFd(), ":" + client->getNick() + "!" + client->getUser() + " PRIVMSG " + target->getNick() + " " + args->at(1) + "\n");
 	}

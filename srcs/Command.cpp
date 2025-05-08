@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/08 15:12:22 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/08 16:16:51 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -258,12 +258,4 @@ int	Command::stringToInt(std::string str)
 		throw notUnsignedIntNumber();
 
 	return (static_cast<int>(num));
-}
-
-void	Command::deleteChannel(Server &serv, Channel *channel) const
-{
-	if (!channel)
-		return ;
-	serv.deleteChannel(channel);
-	// /!\ delete channel;
 }
