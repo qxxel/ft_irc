@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 14:55:23 by mreynaud          #+#    #+#             */
-/*   Updated: 2025/05/08 16:07:38 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/08 20:33:10 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,31 +31,37 @@ void	Bot::joinChannel(Server &serv, Channel *channel)
 	Command::handleJoin(serv, serv.getBot(), &args);
 }
 
-static void	send_msg_bot(std::string msg, Client *client, Channel *channel)
+static void	send_msg_bot(Server &serv, std::string msg, Client *client, Channel *channel)
 {
-	if (channel)
-		channel->sendClients("", ":GameBot!GameBot PRIVMSG " + channel->getName() + " " + msg);
-	else
-		Server::sendClient(client->getFd(), ":GameBot!GameBot PRIVMSG " + client->getNick() + " " + msg);
+	if (channel && client)
+	{
+		std::vector<std::string> args = Command("PRIVMSG " + channel->getName() + " :" + msg).getArgs();
+		Command::handlePrivMsg(serv, serv.getBot(), &args);
+	}
+	else if (client)
+	{
+		std::vector<std::string> args = Command("PRIVMSG " + client->getNick() + " :" + msg).getArgs();
+		Command::handleJoin(serv, serv.getBot(), &args);
+	}
 }
 
-static void explain_rule(Client *client, Channel *channel)
+static void explain_rule(Server &serv, Client *client, Channel *channel)
 {
-	send_msg_bot("GAME RULE:\n", client, channel);
-	send_msg_bot("Rock-Paper-Scissors is a game where two players each choose one of three shapes (Rock, Paper and Scissors):\n", client, channel);
-	send_msg_bot("The rules are simple:\n", client, channel);
-	send_msg_bot(" - Rock beats scissors\n", client, channel);
-	send_msg_bot(" - Scissors beats paper\n", client, channel);
-	send_msg_bot(" - Paper beats rock\n", client, channel);
-	send_msg_bot("If both players choose the same shape, it's a tie.\n", client, channel);
-	send_msg_bot("To try :\t!GAME [rock|paper|scissors]\n", client, channel);
+	send_msg_bot(serv, "GAME RULE:\n", client, channel);
+	send_msg_bot(serv, "Rock-Paper-Scissors is a game where two players each choose one of three shapes (Rock, Paper and Scissors):\n", client, channel);
+	send_msg_bot(serv, "The rules are simple:\n", client, channel);
+	send_msg_bot(serv, " - Rock beats scissors\n", client, channel);
+	send_msg_bot(serv, " - Scissors beats paper\n", client, channel);
+	send_msg_bot(serv, " - Paper beats rock\n", client, channel);
+	send_msg_bot(serv, "If both players choose the same shape, it's a tie.\n", client, channel);
+	send_msg_bot(serv, "To try :\t!GAME [rock|paper|scissors]\n", client, channel);
 }
 
 
 static void you_lose(Server &serv, std::string my_choice, Client *client, Channel *channel)
 {
-	send_msg_bot("I'm choice " + my_choice + "\n", client, channel);
-	send_msg_bot("You lose!\n", client, channel);
+	send_msg_bot(serv, "I'm choice " + my_choice + "\n", client, channel);
+	send_msg_bot(serv, "You lose!\n", client, channel);
 	if (client && channel && channel->isOpName("GameBot"))
 	{
 		std::vector<std::string> args = Command("KICK " + channel->getName() + " " + client->getNick() + " :Looser!").getArgs();
@@ -63,16 +69,16 @@ static void you_lose(Server &serv, std::string my_choice, Client *client, Channe
 	}
 }
 
-static void no_winner(std::string my_choice, Client *client, Channel *channel)
+static void no_winner(Server &serv, std::string my_choice, Client *client, Channel *channel)
 {
-	send_msg_bot("I'm choice " + my_choice + "\n", client, channel);
-	send_msg_bot("It's a tie! Go again?\n", client, channel);
+	send_msg_bot(serv, "I'm choice " + my_choice + "\n", client, channel);
+	send_msg_bot(serv, "It's a tie! Go again?\n", client, channel);
 }
 
 static void you_win(Server &serv, std::string my_choice, Client *client, Channel *channel)
 {
-	send_msg_bot("I'm choice " + my_choice + "\n", client, channel);
-	send_msg_bot("You win! 🏆\n", client, channel);
+	send_msg_bot(serv, "I'm choice " + my_choice + "\n", client, channel);
+	send_msg_bot(serv, "You win! 🏆\n", client, channel);
 	if (client && channel && channel->isOpName("GameBot") && !channel->isOpName(client->getUser()))
 	{
 		std::vector<std::string> args = Command("MODE " + channel->getName() + " +o " + client->getNick()).getArgs();
@@ -98,7 +104,7 @@ static void	game_rock_paper_scissors(Server &serv, std::string adverse_choice, C
 	if (adverse_choice == "ROCK")
 	{
 		if (my_choice == "ROCK")
-			no_winner(my_choice, client, channel);
+			no_winner(serv, my_choice, client, channel);
 		else if (my_choice == "PAPER")
 			you_lose(serv, my_choice, client, channel);
 		else
@@ -109,7 +115,7 @@ static void	game_rock_paper_scissors(Server &serv, std::string adverse_choice, C
 		if (my_choice == "ROCK")
 			you_win(serv, my_choice, client, channel);
 		else if (my_choice == "PAPER")
-			no_winner(my_choice, client, channel);
+			no_winner(serv, my_choice, client, channel);
 		else
 			you_lose(serv, my_choice, client, channel);
 	}
@@ -120,12 +126,12 @@ static void	game_rock_paper_scissors(Server &serv, std::string adverse_choice, C
 		else if (my_choice == "PAPER")
 			you_win(serv, my_choice, client, channel);
 		else
-			no_winner(my_choice, client, channel);
+			no_winner(serv, my_choice, client, channel);
 	}
 	else if (adverse_choice == "WELL")
 		you_lose(serv, "PAPER", client, channel);
 	else
-		explain_rule(client, channel);
+		explain_rule(serv, client, channel);
 	return ;
 }
 
@@ -135,7 +141,7 @@ void Bot::handleBot(Server &serv, Channel *channel, Client *client, std::string 
 		return ;
 	if (arg.find("!GAME") != 1 || arg.size() <= 7)
 	{
-		explain_rule(client, channel);
+		explain_rule(serv, client, channel);
 		return ;
 	}
 	std::string str = arg.substr(7);

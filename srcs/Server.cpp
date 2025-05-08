@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/08 18:29:17 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/08 22:17:31 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -264,38 +264,24 @@ std::string	Server::str_toupper(std::string str)
 void	Server::clientRequest(int client, int epfd)
 {
 	ssize_t		n;
-	ssize_t		total_read = 0;
-	char		buffer[MAX_BODY_SIZE + 2];
+	char		buffer[MAX_BODY_SIZE + 1];
 
 	memset(buffer, 0, sizeof(buffer));
-	while (true)
+	n = recv(client, buffer, MAX_BODY_SIZE + 1, 0);
+	if (n == 0)
+		return (disconnectClient(client, epfd));
+	else if (n == -1)
+		return (void)(std::cerr << ("Error: recv failed: " + std::string(strerror(errno))));
+	else if (n > MAX_BODY_SIZE)
 	{
-		n = recv(client, buffer + total_read, MAX_BODY_SIZE + 1, 0);
-		if (n == 0)
-			return (disconnectClient(client, epfd));
-		else if (n == -1)
-		{
-			if (errno == EAGAIN || errno == EWOULDBLOCK)
-				break ;
-			else
-				return (void)(std::cerr << ("Error: recv failed: " + std::string(strerror(errno))));
-		}
-		else
-		{
-			if (total_read + n > MAX_BODY_SIZE)
-			{
-				while (n > 0)
-					n = recv(client, buffer + total_read, MAX_BODY_SIZE, 0);
-				return (void)sendClient(client, std::string("Error: message size too big: max 5000 characters\n"));
-			}
-			else
-				total_read += n;
-		}
+		while (n > MAX_BODY_SIZE)
+			n = recv(client, NULL, MAX_BODY_SIZE, 0);
+		return (void)sendClient(client, std::string("Error: message size too big: max 5000 characters\n"));
 	}
-	// std::cout << "\n------------SERVER RECEIVED-------------\n\n" << buffer << std::endl; //debug
+
 	Client	*tp = findClientFd(client);
-	tp->getRequest()->append(buffer, total_read);
-	if (total_read > 0 && buffer[total_read - 1] == '\n')
+	tp->getRequest()->append(buffer, n);
+	if (n > 0 && buffer[n - 1] == '\n')
 	{
 		tp->getRequest()->split_Request();
 		for (std::vector<Command>::iterator	it = tp->getRequest()->getArr().begin(); it != tp->getRequest()->getArr().end() ; it++)

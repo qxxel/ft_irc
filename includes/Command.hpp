@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:13 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/08 16:36:42 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/08 20:36:54 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,16 +54,17 @@ class Command
 		static void			handleJoin(Server &serv, Client *client, std::vector<std::string> *args);
 		static void			handleKick(Server &serv, Client *client, std::vector<std::string> *args);
 		static void			handleMode(Server &serv, Client *client, std::vector<std::string> *args);
+		static void			handlePrivMsg(Server &serv, Client *client, std::vector<std::string> *args);
 
 		// OTHERS MEMBER FUNCTIONS
 		void		parse();
+		std::string	clear(std::string raw);
 		bool		is_available(Server &serv, std::string name);
 		void		handleInvite(Server &serv, Client *client, std::vector<std::string> *args);
 		void		handleNames(Server &serv, Client *client, std::vector<std::string> *args);
 		void		handleNick(Server &serv, Client *client, std::vector<std::string> *args);
 		void		handlePart(Server &serv, Client *client, std::vector<std::string> *args);
 		void		handlePass(Server &serv, Client *client, std::vector<std::string> *args);
-		void		handlePrivMsg(Server &serv, Client *client, std::vector<std::string> *args);
 		void		handleQuit(Server &serv, Client *client, std::vector<std::string> *args, int epfd);
 		void		handleTopic(Server &serv, Client *client, std::vector<std::string> *args);
 		void		handleUser(Client *client, std::vector<std::string> *args);
