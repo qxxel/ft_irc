@@ -34,6 +34,14 @@ void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string>
 		return ;
 	}
 
+	// IF ARG ISNT A CHANNEL
+	if (args->at(0).find("#") == std::string::npos)
+	{
+		Server::sendClient(client->getFd(), ":localhost 403 " + client->getNick() + " " + args->at(0) + " :Not a channel\n");
+		std::cout << "handle TOPIC failed => Not a channel" << std::endl;
+		return ;
+	}
+
 	// FIND CHANNEL IN SERVER
 	Channel	*channel = serv.searchChannel(args->at(0));
 	if (!channel)
