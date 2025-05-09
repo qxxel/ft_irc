@@ -86,11 +86,3 @@
 # define INV_PASS_FRMT "The password is invalid\n"
 # define LST_MODES "MODE flags are -+iktop one by one\n"
 # define NO_CMD "Command not found\n"
-
-
-
-// # define ERR_USR "Enter a username: USER <username>\n"
-// # define ERR_NCK "Enter a nickname: NICK <nickname>\n"
-// # define CHARS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_#:"
-// # define FIELD_SET "This field has already been set\n"
-// # define LST_CMDS "1. LIST"LIST): displays all available commands\n2. JOIN"JOIN #<chanel_name>): if <channel_name> exists, joins it. creates it and joins it otherwise\n"
