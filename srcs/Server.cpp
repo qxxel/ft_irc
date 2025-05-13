@@ -1,13 +1,13 @@
 /* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Server.cpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/13 17:14:17 by mreynaud         ###   ########.fr       */
-/*                                                                            */
+/*																			*/
+/*														:::	  ::::::::   */
+/*   Server.cpp										 :+:	  :+:	:+:   */
+/*													+:+ +:+		 +:+	 */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>	  +#+  +:+	   +#+		*/
+/*												+#+#+#+#+#+   +#+		   */
+/*   Created: 2025/03/26 15:18:46 by ibjean-b		  #+#	#+#			 */
+/*   Updated: 2025/05/13 17:14:17 by mreynaud		 ###   ########.fr	   */
+/*																			*/
 /* ************************************************************************** */
 
 #include "Bot.hpp"
@@ -262,62 +262,46 @@ std::string	Server::str_toupper(std::string str)
 
 
 //Reads data from a triggered file descriptor of a client that has been triggered by a EPOLLIN event and creates a request that is usable by the server
-void    Server::clientRequest(int client, int epfd)
+void	Server::clientRequest(int client, int epfd)
 {
-    ssize_t        n;
-    ssize_t        total_read = 0;
-    char        buffer[MAX_BODY_SIZE + 2];
+	ssize_t		n;
+	char		buffer[MAX_BODY_SIZE + 1];
 
-    memset(buffer, 0, sizeof(buffer));
-    while (true)
-    {
-        //reads data from user until no more datas
-        n = recv(client, buffer + total_read, MAX_BODY_SIZE + 1, 0);
-        //if client disconected during process
-        if (n == 0)
-            return (disconnectClient(client, epfd));
-        else if (n == -1)
-        {
-            //if a problem occured with recv
-            if (errno == EAGAIN || errno == EWOULDBLOCK)
-                break ;
-            else
-                return (void)(std::cerr << ("Error: recv failed: " + std::string(strerror(errno))));
-        }
-        else
-        {
-            //if client sent too much datas
-            if (total_read + n > MAX_BODY_SIZE)
-            {
-                //if rend datas until the end to stop the EPOLLIN event
-                while (n > 0)
-                    n = recv(client, buffer + total_read, MAX_BODY_SIZE, 0);
-                //sends an error to the client
-                return (void)sendClient(client, std::string("Error: message size too big: max 5000 characters\n"));
-            }
-            else
-                total_read += n;
-        }
-    }
+	memset(buffer, 0, sizeof(buffer));
+	//reads data from user until no more datas
+	n = recv(client, buffer, MAX_BODY_SIZE + 1, 0);
+	//if client disconected during process
+	if (n == 0)
+		return (disconnectClient(client, epfd));
+	else if (n == -1)
+		return (void)(std::cerr << ("Error: recv failed: " + std::string(strerror(errno))));
+	else if (n > MAX_BODY_SIZE) //if client sent too much datas
+	{
+		//if rend datas until the end to stop the EPOLLIN event
+		while (n > 0)
+			n = recv(client, buffer, MAX_BODY_SIZE, 0);
+		//sends an error to the client
+		return (void)sendClient(client, std::string("Error: message size too big: max 5000 characters\n"));
+	}
 
-    //Find the client that triggered the event
-    Client    *tp = findClientFd(client);
-    //creates a request for that client
-    tp->getRequest()->append(buffer, total_read);
-    if (total_read > 0 && buffer[total_read - 1] == '\n')
-    {
-        //if client sent more than one command, splits it into different ones
-        tp->getRequest()->split_Request();
-        for (std::vector<Command>::iterator    it = tp->getRequest()->getArr().begin(); it != tp->getRequest()->getArr().end() ; it++)
-        {
-            //treats the commands and executes them
-            Command::executeCommand(*this, tp, &(*it), epfd);
-            if (!this->findClientFd(client))
-                return ;
-        }
-        //frees the request when done
-        tp->getRequest()->clear();
-    }
+	//Find the client that triggered the event
+	Client	*tp = findClientFd(client);
+	//creates a request for that client
+	tp->getRequest()->append(buffer, n);
+	if (n > 0 && buffer[n - 1] == '\n')
+	{
+		//if client sent more than one command, splits it into different ones
+		tp->getRequest()->split_Request();
+		for (std::vector<Command>::iterator	it = tp->getRequest()->getArr().begin(); it != tp->getRequest()->getArr().end() ; it++)
+		{
+			//treats the commands and executes them
+			Command::executeCommand(*this, tp, &(*it), epfd);
+			if (!this->findClientFd(client))
+				return ;
+		}
+		//frees the request when done
+		tp->getRequest()->clear();
+	}
 }
 
 
