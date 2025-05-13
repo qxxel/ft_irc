@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 14:55:23 by mreynaud          #+#    #+#             */
-/*   Updated: 2025/05/08 20:33:10 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/13 15:46:13 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ static void	send_msg_bot(Server &serv, std::string msg, Client *client, Channel 
 	else if (client)
 	{
 		std::vector<std::string> args = Command("PRIVMSG " + client->getNick() + " :" + msg).getArgs();
-		Command::handleJoin(serv, serv.getBot(), &args);
+		Command::handlePrivMsg(serv, serv.getBot(), &args);
 	}
 }
 
