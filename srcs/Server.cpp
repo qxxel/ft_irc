@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/13 17:22:25 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/13 17:36:11 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -218,7 +218,7 @@ void	Server::disconnectClient(int fd, int epfd)
 	this->deleteClient(fd);
 	delete client;
 
-	std::cout << "Client " << fd << " disconnected" << std::endl;
+	std::cout << "\nClient " << fd << " disconnected" << std::endl;
 }
 
 //Answers the client request by sending it a message proprely.
@@ -519,6 +519,6 @@ std::ostream &	operator<<(std::ostream &o, Server &serv)
 {
 	o << "-----------------SERVER-----------------"<< std::endl;
 	o << "\tport: " << serv.getPort() << "\n\tpwd: " << serv.getPwd() << std::endl;
-	o << "----------------------------------------\n"<< std::endl;
+	o << "----------------------------------------"<< std::endl;
 	return (o);
 }

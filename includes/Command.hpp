@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:13 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/08 20:36:54 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/13 17:29:08 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ class Command
 		~Command();
 
 		//SETTERS AND GETTERS
+		std::string					getRaw();
 		std::string					getName();
 		std::vector<std::string>	getArgs();
 		void						setName(std::string name);

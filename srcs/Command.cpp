@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/08 21:21:45 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/13 17:37:04 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,6 +155,11 @@ std::vector<std::string>	Command::getArgs()
 	return (_args);
 }
 
+std::string	Command::getRaw()
+{
+	return (this->_raw);
+}
+
 std::string	Command::getName()
 {
 	return (_name);
@@ -172,19 +177,8 @@ void	Command::setArgs(std::vector<std::string> args)
 
 std::ostream &	operator<<(std::ostream &o, Command &cmd)
 {
-	o << "--------------COMMAND--------------\n";
-	o << "name: " << cmd.getName() << std::endl;
-	if (!cmd.getArgs().empty())
-		o << "args: ";
-	std::vector<std::string>	vec = cmd.getArgs();
-	for (size_t i = 0; i < vec.size(); i++)
-	{
-		if (i)
-			o << "\t";
-		o << i << ": " << vec[i] << std::endl;
-	}
-	if (0 == vec.size())
-		o << std::endl;
+	o << "\n--------------SERVER RECEIVED--------------\n";
+	o << "Command: " << cmd.getRaw() << std::endl;
 	return (o);
 }
 
