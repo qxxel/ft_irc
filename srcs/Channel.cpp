@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:05 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/07 20:38:25 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/13 16:04:58 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ Client	*Channel::findClientName(std::string name)
 
 	for (it = this->_clientsList.begin(); it != this->_clientsList.end(); it++)
 	{
-		if ((*it)->getUser() == name)
+		if ((*it)->getNick() == name)
 			return ((*it));
 	}
 	return (NULL);
@@ -40,7 +40,7 @@ void	Channel::delClientName(std::string name)
 {
 	for (std::vector<Client*>::iterator it = this->_clientsList.begin(); it != this->_clientsList.end(); it++)
 	{
-		if ((*it)->getUser() == name)
+		if ((*it)->getNick() == name)
 		{
 			this->_clientsList.erase(it);
 			return ;
@@ -52,7 +52,7 @@ void	Channel::delOpName(std::string name)
 {
 	for (std::vector<Client*>::iterator it = this->_opList.begin(); it != this->_opList.end(); it++)
 	{
-		if ((*it)->getUser() == name)
+		if ((*it)->getNick() == name)
 		{
 			this->_opList.erase(it);
 			return ;
@@ -66,7 +66,7 @@ bool	Channel::isOpName(std::string name)
 
 	for (it = this->_opList.begin(); it != this->_opList.end(); it++)
 	{
-		if ((*it)->getUser() == name)
+		if ((*it)->getNick() == name)
 			return (true);
 	}
 	return (false);
@@ -76,7 +76,7 @@ void	Channel::sendClients(std::string exceptionName, std::string message)
 {
 	for (std::vector<Client*>::iterator it = this->_clientsList.begin(); it != this->_clientsList.end(); it++)
 	{
-		if (exceptionName.compare((*it)->getUser()))
+		if (exceptionName.compare((*it)->getNick()))
 			Server::sendClient((*it)->getFd(), message);
 	}
 }
@@ -89,7 +89,7 @@ std::string	Channel::listClients()
 	{
 		if (!list.empty())
 			list += " ";
-		if (this->isOpName((*it)->getUser()))
+		if (this->isOpName((*it)->getNick()))
 			list += "@";
 		list += (*it)->getNick();
 	}
@@ -116,7 +116,7 @@ Client	*Channel::getOldestClient()
 
 	for (it = this->_clientsList.begin(); it != this->_clientsList.end(); it++)
 	{
-		if (!this->isOpName((*it)->getUser()))
+		if (!this->isOpName((*it)->getNick()))
 			return (*it);
 	}
 

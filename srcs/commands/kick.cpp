@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:40:01 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/08 19:46:14 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/13 16:08:10 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	Command::handleKick(Server &serv, Client *client, std::vector<std::string> 
 	// USAGE: KICK <channel> <user> [:<comment>]
 	if (!args || args->size() < 2 || 3 < args->size())
 	{
-		Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " KICK :Not enough parameters\n");
+		Server::sendClient(client->getFd(), ":localhost 461 " + client->getNick() + " KICK :Not enough parameters\n");
 		std::cout << "handle KICK failed => invalid format" << std::endl;
 		return ;
 	}
@@ -60,7 +60,7 @@ void	Command::handleKick(Server &serv, Client *client, std::vector<std::string> 
 	}
 
 	// CHECK IF CLIENT IS OP
-	if (!channel->isOpName(client->getUser()))
+	if (!channel->isOpName(client->getNick()))
 	{
 		Server::sendClient(client->getFd(), ":localhost 482 " + client->getNick() + " " + channel->getName() + " :You're not channel operator\n");
 		std::cout << "handle KICK failed => client isn't moderator" << std::endl;
@@ -70,7 +70,7 @@ void	Command::handleKick(Server &serv, Client *client, std::vector<std::string> 
 	// CHECK IF CLIENT IS TRING TO KICK HIMSELF
 	if (client == target)
 	{
-		Server::sendClient(client->getFd(), ":localhost 903 " + client->getUser() + " " + channel->getName() + " :You cannot kick yourself\n");
+		Server::sendClient(client->getFd(), ":localhost 903 " + client->getNick() + " " + channel->getName() + " :You cannot kick yourself\n");
 		std::cout << "handle KICK failed => the client cannot kick himself" << std::endl;
 		return ;
 	}
@@ -78,7 +78,7 @@ void	Command::handleKick(Server &serv, Client *client, std::vector<std::string> 
 	// CHECK IF THERE IS A ':' IN FRONT OF THE COMMENT // ONLY FOR NC
 	if (args->size() == 3 && args->at(2)[0] != ':')
 	{
-		Server::sendClient(client->getFd(), ":localhost 902 " + client->getUser() + " " + channel->getName() + " :Need a ':' in front of the comment\n");
+		Server::sendClient(client->getFd(), ":localhost 902 " + client->getNick() + " " + channel->getName() + " :Need a ':' in front of the comment\n");
 		std::cout << "handle KICK failed => there is no ':' in front of the comment" << std::endl;
 		return ;
 	}
@@ -88,12 +88,12 @@ void	Command::handleKick(Server &serv, Client *client, std::vector<std::string> 
 		target->delJoinableChannel(channel);
 
 	// HANDLE IF TARGET IS OP
-	if (channel->isOpName(target->getUser()))
-		channel->delOpName(target->getUser());
+	if (channel->isOpName(target->getNick()))
+		channel->delOpName(target->getNick());
 
 	channel->sendClients("", ":" + client->getNick() + "!" + client->getUser() + "@localhost KICK " + Command::joinStrings(*args) + "\n");
 	target->delCurrentChannel(channel);
-	channel->delClientName(target->getUser());
+	channel->delClientName(target->getNick());
 
 	std::cout << "handle KICK successfully called" << std::endl;
 }

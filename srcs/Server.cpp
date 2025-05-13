@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/08 18:29:17 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/13 16:05:27 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -341,10 +341,10 @@ Client	*Server::findClientName(std::string name)
 
 	for (it = this->_clients.begin(); it != this->_clients.end(); it++)
 	{
-		if ((*it)->getUser() == name)
+		if ((*it)->getNick() == name)
 			return ((*it));
 	}
-	if (name == _bot->getUser())
+	if (name == _bot->getNick())
 		return (_bot);
 	return (NULL);
 }
