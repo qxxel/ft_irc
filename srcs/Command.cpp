@@ -225,7 +225,7 @@ void Command::executeCommand(Server &serv, Client *client, Command *cmd, int epf
 	else if (!cmd->getName().compare("MODE"))
 		cmd->handleMode(serv, client, &args);
 
-	else if (!cmd->getName().compare("HELP"))
+	else if (!cmd->getName().compare("HELP") || !cmd->getName().compare("/HELP"))
 		cmd->handleHelp(client, &args);
 
 	else if (!cmd->getName().compare("QUIT"))

@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:39:41 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/08 19:47:01 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/13 16:07:20 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 			}
 
 			// CHECK IF CLIENT CAN ACCESS
-			if (client->getNick() != "GameBot" && channel->getInvOnly() && !(client->isJoinableChannel(channel) || channel->isOpName(client->getUser())))
+			if (client->getNick() != "GameBot" && channel->getInvOnly() && !(client->isJoinableChannel(channel) || channel->isOpName(client->getNick())))
 			{
 				Server::sendClient(client->getFd(), ":localhost 473 " + client->getNick() + " " + channel->getName() + " :Cannot join channel (+i)\n");
 				std::cout << "handle JOIN failed => client not allowed in this channel" << std::endl;

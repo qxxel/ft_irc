@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:39:20 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/08 19:48:48 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/13 16:10:32 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ void	Command::handlePrivMsg(Server &serv, Client *client, std::vector<std::strin
 			return ;
 		}
 
-		channel->sendClients(client->getUser(), ":" + client->getNick() + "!" + client->getUser() + " PRIVMSG " + channel->getName() + " " + args->at(1) + "\n");
+		channel->sendClients(client->getNick(), ":" + client->getNick() + "!" + client->getUser() + " PRIVMSG " + channel->getName() + " " + args->at(1) + "\n");
 		if (serv.getBot()->isCurrentChannel(channel->getName()))
 			Bot::handleBot(serv, channel, client, args->at(1));
 	}

@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:40:46 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/08 19:41:41 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/13 16:06:27 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void	Command::handleHelp(Client *client, std::vector<std::string> *args) // ONLY
 	// USAGE: HELP
 	if (!args || args->size() >= 2)
 	{
-		Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " HELP :Not enough parameters\n");
+		Server::sendClient(client->getFd(), ":localhost 461 " + client->getNick() + " HELP :Not enough parameters\n");
 		std::cout << "handle HELP failed => wrong format" << std::endl;
 		return ;
 	}

@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/08 22:17:31 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/13 17:14:17 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -260,39 +260,67 @@ std::string	Server::str_toupper(std::string str)
 	return str;
 }
 
+
 //Reads data from a triggered file descriptor of a client that has been triggered by a EPOLLIN event and creates a request that is usable by the server
-void	Server::clientRequest(int client, int epfd)
+void    Server::clientRequest(int client, int epfd)
 {
-	ssize_t		n;
-	char		buffer[MAX_BODY_SIZE + 1];
+    ssize_t        n;
+    ssize_t        total_read = 0;
+    char        buffer[MAX_BODY_SIZE + 2];
 
-	memset(buffer, 0, sizeof(buffer));
-	n = recv(client, buffer, MAX_BODY_SIZE + 1, 0);
-	if (n == 0)
-		return (disconnectClient(client, epfd));
-	else if (n == -1)
-		return (void)(std::cerr << ("Error: recv failed: " + std::string(strerror(errno))));
-	else if (n > MAX_BODY_SIZE)
-	{
-		while (n > MAX_BODY_SIZE)
-			n = recv(client, NULL, MAX_BODY_SIZE, 0);
-		return (void)sendClient(client, std::string("Error: message size too big: max 5000 characters\n"));
-	}
+    memset(buffer, 0, sizeof(buffer));
+    while (true)
+    {
+        //reads data from user until no more datas
+        n = recv(client, buffer + total_read, MAX_BODY_SIZE + 1, 0);
+        //if client disconected during process
+        if (n == 0)
+            return (disconnectClient(client, epfd));
+        else if (n == -1)
+        {
+            //if a problem occured with recv
+            if (errno == EAGAIN || errno == EWOULDBLOCK)
+                break ;
+            else
+                return (void)(std::cerr << ("Error: recv failed: " + std::string(strerror(errno))));
+        }
+        else
+        {
+            //if client sent too much datas
+            if (total_read + n > MAX_BODY_SIZE)
+            {
+                //if rend datas until the end to stop the EPOLLIN event
+                while (n > 0)
+                    n = recv(client, buffer + total_read, MAX_BODY_SIZE, 0);
+                //sends an error to the client
+                return (void)sendClient(client, std::string("Error: message size too big: max 5000 characters\n"));
+            }
+            else
+                total_read += n;
+        }
+    }
 
-	Client	*tp = findClientFd(client);
-	tp->getRequest()->append(buffer, n);
-	if (n > 0 && buffer[n - 1] == '\n')
-	{
-		tp->getRequest()->split_Request();
-		for (std::vector<Command>::iterator	it = tp->getRequest()->getArr().begin(); it != tp->getRequest()->getArr().end() ; it++)
-		{
-			Command::executeCommand(*this, tp, &(*it), epfd);
-			if (!this->findClientFd(client))
-				return ;
-		}
-		tp->getRequest()->clear();
-	}
+    //Find the client that triggered the event
+    Client    *tp = findClientFd(client);
+    //creates a request for that client
+    tp->getRequest()->append(buffer, total_read);
+    if (total_read > 0 && buffer[total_read - 1] == '\n')
+    {
+        //if client sent more than one command, splits it into different ones
+        tp->getRequest()->split_Request();
+        for (std::vector<Command>::iterator    it = tp->getRequest()->getArr().begin(); it != tp->getRequest()->getArr().end() ; it++)
+        {
+            //treats the commands and executes them
+            Command::executeCommand(*this, tp, &(*it), epfd);
+            if (!this->findClientFd(client))
+                return ;
+        }
+        //frees the request when done
+        tp->getRequest()->clear();
+    }
 }
+
+
 
 //Finds a client form its file descriptor in the server's vector of clients and returns it, returns NULL otherwise
 Client	*Server::findClientFd(int fd)
@@ -314,19 +342,21 @@ Client	*Server::findClientName(std::string name)
 
 	for (it = this->_clients.begin(); it != this->_clients.end(); it++)
 	{
-		if ((*it)->getUser() == name)
+		if ((*it)->getNick() == name)
 			return ((*it));
 	}
-	if (name == _bot->getUser())
+	if (name == _bot->getNick())
 		return (_bot);
 	return (NULL);
 }
 
+//Stops the server, this function is called when a signals is sent to the server to stop it
 void	Server::exit(void)
 {
 	Server::_running = false;
 }
 
+//Adds a channel to the server list of channels
 void	Server::addChannel(Channel *channel)
 {
 	if (!channel)
@@ -336,6 +366,7 @@ void	Server::addChannel(Channel *channel)
 	this->_channels.push_back(channel);
 }
 
+//deletes a client from the list of the server's clients
 void	Server::deleteClient(int client)
 {
 	if (client < 3)
@@ -392,6 +423,7 @@ void	Server::deleteClient(int client)
 	}
 }
 
+//Deletes a channel from the server's list of channels
 void	Server::deleteChannel(Channel *channel)
 {
 	if (!channel)
@@ -422,6 +454,7 @@ void	Server::deleteChannel(Channel *channel)
 	}
 }
 
+//frees all data and closes all fd in the server
 void	Server::deleteServer(int sock, int epfd)
 {
 	// DELETE ALL CLIENTS IN EPOLL AND CLOSE THEM
@@ -441,6 +474,7 @@ void	Server::deleteServer(int sock, int epfd)
 	close(epfd);
 }
 
+//Finds a channel in the server's list of channels
 Channel	*Server::searchChannel(std::string name)
 {
 	for (std::vector<Channel*>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)

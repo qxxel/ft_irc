@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 16:12:51 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/08 19:44:00 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/08 15:45:14 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 # define PWD_GOOD "Good password !\n"
 # define INV_PWD "Invalid password !\n"
 # define NOT_ALW "You're not allowed to enter this channel\n"
-# define AUTHY_GOOD "\nFinished authentification !\n\n"
+# define AUTHY_GOOD "Finished authentification !\n\n"
 # define ENTER_NCK_USR "Please enter a username or a nickname: USER <username> <0> <*> or NICK <nickname>\n"
 # define UKWN_CMD "Unknown command: "
 # define ENTER_NICK "Enter a server nickname: NICK <nickname>\n"
@@ -35,26 +35,27 @@
 # define IS_TAKEN "This nickname is unavailable !\n"
 # define NEED_AUTH "You need to finish authentication to execute commands\n"
 
-# define PRIVMSG_USG "PRIVMSG <target> :<message>"
+# define PRIVMSG_USG "PRIVMSG <target> :<message>\n"
 # define PRIVMSG_DESC "Send messages to users or channels\n"
-# define JOIN_USG "JOIN <channel>{,<channel>} [<key>{,<key>}]"
+# define JOIN_USG "JOIN <channel>{,<channel>} [<key>{,<key>}]\n"
 # define JOIN_DESC "Join one or more channels, optionally with a key\n"
-# define PART_USG "PART <channel>{,<channel>} [:<message>]"
+# define PART_USG "PART <channel>{,<channel>} [:<message>]\n"
 # define PART_DESC "Quit one or more channels, optionally with a message\n"
-# define QUIT_USG "QUIT [:<message>]"
+# define QUIT_USG "QUIT [:<message>]\n"
 # define QUIT_DESC "Quit the server\n"
-# define KICK_USG "KICK <channel> <user> [:<comment>]"
+# define KICK_USG "KICK <channel> <user> [:<comment>]\n"
 # define KICK_DESC "Kick a user of a channel\n"
-# define INVITE_USG "INVITE <user> <channel>"
+# define INVITE_USG "INVITE <user> <channel>\n"
 # define INVITE_DESC "Invite a user to a channel\n"
-# define TOPIC_USG "TOPIC <channel> [:<new_topic>]"
+# define TOPIC_USG "TOPIC <channel> [:<new_topic>]\n"
 # define TOPIC_DESC "Change or view the topic of a channel\n"
-# define NAMES_USG "NAMES <channel>{,<channel>}"
+# define NAMES_USG "NAMES <channel>{,<channel>}\n"
 # define NAMES_DESC "View clients in a channel\n"
-# define WHO_USG "WHO <channel>{,<channel>}"
+# define WHO_USG "WHO <channel>{,<channel>}\n"
 # define WHO_DESC "View clients in a channel\n"
-# define MODE_USG "MODE <channel> [<+/-modes>] [<arguments>]"
+# define MODE_USG "MODE <channel> [<+/-modes>] [<arguments>]\n"
 # define MODE_DESC "Change or view the modes of a channel\n"
+# define HELP_USG "HELP [<command>]\n"
 
 # define MSG_RULE "You have to put a ':' in front of your message\n"
 # define TPC_RULE "You have to put a ':' in front of your topic\n"
@@ -85,11 +86,3 @@
 # define INV_PASS_FRMT "The password is invalid\n"
 # define LST_MODES "MODE flags are -+iktop one by one\n"
 # define NO_CMD "Command not found\n"
-
-
-
-// # define ERR_USR "Enter a username: USER <username>\n"
-// # define ERR_NCK "Enter a nickname: NICK <nickname>\n"
-// # define CHARS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_#:"
-// # define FIELD_SET "This field has already been set\n"
-// # define LST_CMDS "1. LIST"LIST): displays all available commands\n2. JOIN"JOIN #<chanel_name>): if <channel_name> exists, joins it. creates it and joins it otherwise\n"

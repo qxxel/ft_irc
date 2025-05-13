@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:40:14 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/08 19:46:14 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/13 16:11:19 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,14 @@ void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string>
 		// 461 <nick> TOPIC :Not enough parameters
 		Server::sendClient(client->getFd(), ":localhost 461 " + client->getNick() + " TOPIC :Not enough parameters\n");
 		std::cout << "handle TOPIC failed => no args" << std::endl;
+		return ;
+	}
+
+	// IF ARG ISNT A CHANNEL
+	if (args->at(0).find("#") == std::string::npos)
+	{
+		Server::sendClient(client->getFd(), ":localhost 403 " + client->getNick() + " " + args->at(0) + " :Not a channel\n");
+		std::cout << "handle TOPIC failed => Not a channel" << std::endl;
 		return ;
 	}
 
@@ -66,7 +74,7 @@ void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string>
 		}
 
 		// CHECK IF CLIENT IS OP
-		if (channel->getLockTopic() && !channel->isOpName(client->getUser()))
+		if (channel->getLockTopic() && !channel->isOpName(client->getNick()))
 		{
 			Server::sendClient(client->getFd(), ":localhost 482 " + client->getNick() + " " + channel->getName() + " :You're not channel operator\n");
 			std::cout << "handle set TOPIC failed => client isn't moderator" << std::endl;

@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:39:47 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/08 19:46:14 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/13 16:10:18 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> 
 	// USAGE: PART <channel>{,<channel>} [:<message>]
 	if (!args || args->size() < 1)
 	{
-		Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " PART :Not enough parameters\n");
+		Server::sendClient(client->getFd(), ":localhost 461 " + client->getNick() + " PART :Not enough parameters\n");
 		std::cout << "handle PART failed => wrong format" << std::endl;
 		return ;
 	}
@@ -58,7 +58,7 @@ void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> 
 			}
 
 			// CHECK IF THERE IS NO OP AFTER CLIENT QUIT
-			if (channel->getOpList().size() == 1 && channel->isOpName(client->getUser()))
+			if (channel->getOpList().size() == 1 && channel->isOpName(client->getNick()))
 			{
 				// SEARCH FOR THE OLDEST CLIENT NOT OP TO OP HIM
 				Client	*oldestClient = channel->getOldestClient();
@@ -80,10 +80,10 @@ void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> 
 				client->delJoinableChannel(channel);
 
 			// HANDLE IF TARGET IS OP
-			if (channel->isOpName(client->getUser()))
-				channel->delOpName(client->getUser());
+			if (channel->isOpName(client->getNick()))
+				channel->delOpName(client->getNick());
 
-			channel->delClientName(client->getUser());
+			channel->delClientName(client->getNick());
 			client->delCurrentChannel(channel);
 			Server::sendClient(client->getFd(), ":" + client->getNick() + "!" + client->getUser() + "@localhost PART " + Command::joinStrings(*args) + "\n");
 			channel->sendClients("", ":" + client->getNick() + "!" + client->getUser() + "@localhost PART " + Command::joinStrings(*args) + "\n");
@@ -92,7 +92,7 @@ void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> 
 	// CATCH IF WRONG INPUT IN CHANNELS
 	catch (splitFailed &)
 	{
-		Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " PART :Not enough parameters\n");
+		Server::sendClient(client->getFd(), ":localhost 461 " + client->getNick() + " PART :Not enough parameters\n");
 		std::cout << "handle PART failed => wrong format" << std::endl;
 		return ;
 	}

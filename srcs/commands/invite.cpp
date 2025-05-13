@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:40:07 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/08 19:46:14 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/13 16:06:52 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	Command::handleInvite(Server &serv, Client *client, std::vector<std::string
 	// USAGE: INVITE <user> <channel>
 	if (!args || args->empty() || args->size() != 2)
 	{
-		Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " INVITE :Not enough parameters\n");
+		Server::sendClient(client->getFd(), ":localhost 461 " + client->getNick() + " INVITE :Not enough parameters\n");
 		std::cout << "handle INVITE failed => invalid format" << std::endl;
 		return ;
 	}
@@ -71,7 +71,7 @@ void	Command::handleInvite(Server &serv, Client *client, std::vector<std::string
 	if (channel->getInvOnly())
 	{
 		// CHECK IF CLIENT IS OP
-		if (!channel->isOpName(target->getUser()))
+		if (!channel->isOpName(target->getNick()))
 		{
 			Server::sendClient(client->getFd(), ":localhost 482 " + client->getNick() + " " + channel->getName() + " :You're not channel operator\n");
 			std::cout << "handle INVITE failed => client isn't moderator" << std::endl;
@@ -82,7 +82,7 @@ void	Command::handleInvite(Server &serv, Client *client, std::vector<std::string
 		target->getJoinableChannels().push_back(channel);
 	}
 
-	if (target->getUser() == "GameBot")
+	if (target->getNick() == "GameBot")
 		serv.getBot()->joinChannel(serv, channel);
 	else
 	{

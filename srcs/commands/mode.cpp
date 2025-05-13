@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   mode.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:40:36 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/08 16:37:10 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/13 16:09:16 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 	}
 
 	// CHECK IF CLIENT IS OP
-	if (!channel->isOpName(client->getUser()))
+	if (!channel->isOpName(client->getNick()))
 	{
 		Server::sendClient(client->getFd(), ":localhost 482 " + client->getNick() + " " + channel->getName() + " :You're not channel operator\n");
 		std::cout << "handle modify MODE failed => client isn't moderator" << std::endl;
@@ -256,11 +256,11 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 		}
 
 		// CHECK IF TARGET ISN'T OP
-		if (!channel->isOpName(target->getUser()))
+		if (!channel->isOpName(target->getNick()))
 			channel->getOpList().push_back(target);
 
 		channel->setModeSetTimestamp(time(NULL));
-		channel->sendClients("", ":" + client->getNick() + "!" + client->getUser() + "@localhost MODE " + channel->getName() + " +o " + target->getUser() + "\n");
+		channel->sendClients("", ":" + client->getNick() + "!" + client->getUser() + "@localhost MODE " + channel->getName() + " +o " + target->getNick() + "\n");
 	}
 	// UNSET OP TARGET
 	else if (args->at(1) == "-o")
@@ -283,11 +283,11 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 		}
 
 		// CHECK IF TARGET IS OP
-		if (channel->isOpName(target->getUser()))
-			channel->delOpName(target->getUser());
+		if (channel->isOpName(target->getNick()))
+			channel->delOpName(target->getNick());
 
 		channel->setModeSetTimestamp(time(NULL));
-		channel->sendClients("", ":" + client->getNick() + "!" + client->getUser() + "@localhost MODE " + channel->getName() + " -o " + target->getUser() + "\n");
+		channel->sendClients("", ":" + client->getNick() + "!" + client->getUser() + "@localhost MODE " + channel->getName() + " -o " + target->getNick() + "\n");
 	}
 
 	// ADD USER LIMIT MODE

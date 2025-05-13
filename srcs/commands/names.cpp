@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:40:21 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/08 19:46:14 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/13 16:09:34 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	Command::handleNames(Server &serv, Client *client, std::vector<std::string>
 	// USAGE: NAMES [<channel>{,<channel>}]
 	if (!args || args->size() > 1)
 	{
-		Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " NAMES :Not enough parameters\n");
+		Server::sendClient(client->getFd(), ":localhost 461 " + client->getNick() + " NAMES :Not enough parameters\n");
 		std::cout << "handle NAMES failed => no args" << std::endl;
 		return ;
 	}
@@ -63,7 +63,7 @@ void	Command::handleNames(Server &serv, Client *client, std::vector<std::string>
 	}
 	catch (splitFailed &)
 	{
-		Server::sendClient(client->getFd(), ":localhost 461 " + client->getUser() + " NAMES :Not enough parameters\n");
+		Server::sendClient(client->getFd(), ":localhost 461 " + client->getNick() + " NAMES :Not enough parameters\n");
 		std::cout << "handle NAMES failed => wrong format" << std::endl;
 		return ;
 	}
