@@ -6,11 +6,12 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 16:03:22 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/07 20:28:23 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/26 17:23:41 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
+#ifndef CLIENT_HPP
+# define CLIENT_HPP
 
 # include <iostream>
 # include <vector>
@@ -60,3 +61,5 @@ class Client
 };
 
 std::ostream &	operator<<(std::ostream &o, Client &client);
+
+#endif

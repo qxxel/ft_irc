@@ -6,11 +6,12 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 16:12:51 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/08 15:45:14 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/26 17:24:38 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
+#ifndef DEFINES_HPP
+# define DEFINES_HPP
 
 # define MAX_EVENTS	4096
 # define MAX_BODY_SIZE	5000
@@ -86,3 +87,5 @@
 # define INV_PASS_FRMT "The password is invalid\n"
 # define LST_MODES "MODE flags are -+iktop one by one\n"
 # define NO_CMD "Command not found\n"
+
+#endif

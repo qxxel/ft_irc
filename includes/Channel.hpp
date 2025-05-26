@@ -6,11 +6,12 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:48 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/07 20:28:05 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/26 17:23:45 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
+#ifndef CHANNEL_HPP
+# define CHANNEL_HPP
 
 # include <exception>
 # include <iostream>
@@ -79,3 +80,5 @@ class Channel
 		};
 
 };
+
+#endif

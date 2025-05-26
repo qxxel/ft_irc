@@ -6,11 +6,12 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 14:50:56 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/07 20:21:28 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/26 17:25:03 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
+#ifndef REQUEST_HPP
+# define REQUEST_HPP
 
 # include <iostream>
 # include <vector>
@@ -36,3 +37,5 @@ public:
 	void					setArr(std::vector<Command> arr);
 	std::vector<Command>	&getArr();
 };
+
+#endif

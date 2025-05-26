@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   Command.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:13 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/13 17:29:08 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/26 17:24:10 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
+#ifndef COMMAND_HPP
+# define COMMAND_HPP
 
 # include <iostream>
 # include <map>
@@ -85,3 +86,5 @@ class Command
 };
 
 std::ostream &	operator<<(std::ostream &o, Command &cmd);
+
+#endif

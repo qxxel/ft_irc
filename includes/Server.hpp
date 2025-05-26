@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:07 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/08 18:27:32 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/26 17:25:25 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
+#ifndef SERVER_HPP
+# define SERVER_HPP
 
 # include <cstdlib>
 # include <csignal>
@@ -90,3 +91,5 @@ class Server
 };
 
 std::ostream &	operator<<(std::ostream &o, Server &serv);
+
+#endif

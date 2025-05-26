@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   Bot.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/16 17:48:51 by mreynaud          #+#    #+#             */
-/*   Updated: 2025/05/08 15:50:09 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/26 17:23:48 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
+#ifndef BOT_HPP
+# define BOT_HPP
 
 # include <cstring>
 # include <cerrno>
@@ -35,3 +36,5 @@ class Bot: public Client
 
 		void	joinChannel(Server &serv, Channel *channel);
 };
+
+#endif
