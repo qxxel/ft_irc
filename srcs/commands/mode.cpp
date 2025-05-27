@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   mode.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:40:36 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/13 16:09:16 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/27 18:43:21 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 
 		Server::sendClient(client->getFd(), ":localhost 324 " + client->getNick() + " " + channel->getName() + modes + modesArgs + "\n");
 		Server::sendClient(client->getFd(), ":localhost 329 " + client->getNick() + " " + channel->getName() + " " + timeToString(channel->getModeSetTimestamp()) + "\n");
-		std::cout << "handle ask MODE successfuly called\n";
+		std::cout << "handle ask MODE successfuly called" << std::endl;
 		return ;
 	}
 
@@ -86,6 +86,7 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 		std::cout << "handle modify MODE failed => client isn't moderator" << std::endl;
 		return ;
 	}
+
 
 	// ADD INVITE ONLY MODE
 	if (args->at(1) == "+i")
@@ -112,7 +113,7 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 		channel->sendClients("", ":" + client->getNick() + "!" + client->getUser() + "@localhost MODE " + channel->getName() + " +i\n");
 	}
 	// SUPP INVITE ONLY MODE
-	if (args->at(1) == "-i")
+	else if (args->at(1) == "-i")
 	{
 		// USAGE: MODE <channel> -i
 		if (args->size() != 2)
@@ -146,7 +147,7 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 	}
 
 	// ADD LOCKED TOPIC MODE
-	if (args->at(1) == "+t")
+	else if (args->at(1) == "+t")
 	{
 		// USAGE: MODE <channel> +t
 		if (args->size() != 2)
@@ -343,5 +344,5 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 		return ;
 	}
 
-	std::cout << "handle modify MODE " << args->at(1) << " successfuly called\n";
+	std::cout << "handle modify MODE " << args->at(1) << " successfuly called" << std::endl;
 }

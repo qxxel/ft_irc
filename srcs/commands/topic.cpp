@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   topic.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:40:14 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/13 16:11:19 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/27 18:43:45 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,5 +111,5 @@ void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string>
 		channel->sendClients("", ":" + client->getNick() + "!" + client->getUser() + "@localhost TOPIC " + channel->getName() + " " + channel->getTopic() + "\n");
 	}
 
-	std::cout << "handle TOPIC successfully called\n";
+	std::cout << "handle TOPIC successfully called" << std::endl;
 }

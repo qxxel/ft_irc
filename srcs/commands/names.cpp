@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   names.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:40:21 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/13 16:09:34 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/27 18:43:30 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,5 +68,5 @@ void	Command::handleNames(Server &serv, Client *client, std::vector<std::string>
 		return ;
 	}
 
-	std::cout << "handle NAMES successfully called\n";
+	std::cout << "handle NAMES successfully called" << std::endl;
 }
