@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   mode.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:40:36 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/27 18:43:21 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/27 21:39:27 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,19 +50,19 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 
 		if (channel->getInvOnly())
 			modes += "i";
-		else if (!channel->getTopic().empty())
+		if (!channel->getTopic().empty())
 		{
 			modes += "t";
 			modesArgs += " " + channel->getTopic();
 		}
-		else if (!channel->getPwd().empty())
+		if (!channel->getPwd().empty())
 			modes += "k";
-		else if (channel->getMaxUsers())
+		if (channel->getMaxUsers())
 		{
 			modes += "l";
 			modesArgs += " " + intToString(channel->getMaxUsers());
 		}
-		else
+		if (modes == " +")
 			modes = "";
 
 		Server::sendClient(client->getFd(), ":localhost 324 " + client->getNick() + " " + channel->getName() + modes + modesArgs + "\n");
