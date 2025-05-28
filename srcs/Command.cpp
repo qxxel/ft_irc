@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/13 17:37:04 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 18:21:54 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,13 +137,13 @@ bool	Command::is_available(Server &serv, std::string name)
 	return (true);
 }
 
-bool	Command::isValidString(std::string str, bool skip)
+bool	Command::isValidString(std::string str, bool skip, bool acceptSpace)
 {
 	for (std::string::iterator it = str.begin(); it != str.end(); it++)
 	{
 		if (skip && it == str.begin())
 			continue ;
-		if (!Server::isValidChar(*it))
+		if (!Server::isValidChar(*it, acceptSpace))
 			return (false);
 	}
 	return (true);

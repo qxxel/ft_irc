@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:40:14 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/28 17:45:51 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 18:23:26 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string>
 		}
 
 		// CHECK IF ALL CHARACTERS ARE VALID
-		if (!isValidString(args->at(1), true))
+		if (!isValidString(args->at(1), true, true))
 		{
 			Server::sendClient(client->getFd(), ":localhost 900 " + client->getNick() + " " + channel->getName() + " :invalid characters in topic\n");
 			std::cout << "handle set TOPIC failed => there is invalid character" << std::endl;

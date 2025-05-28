@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:40:36 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/28 17:54:14 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 18:22:51 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -192,7 +192,7 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 		}
 
 		// CHECK IF ALL CHARACTERS ARE VALID
-		if (isValidString(args->at(2), true))
+		if (isValidString(args->at(2), true, false))
 		{
 			Server::sendClient(client->getFd(), ":localhost 900 " + client->getNick() + " " + channel->getName() + " :invalid characters in password\n");
 			std::cout << "handle modify MODE +k failed => invalid password format" << std::endl;

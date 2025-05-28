@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:39:41 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/13 16:07:20 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 18:22:39 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 			}
 
 			// CHECK IF THE NAME IS VALID
-			if (it->first.size() < 2 || 50 < it->first.size() || it->first[0] != '#' || !isValidString(it->first, true))
+			if (it->first.size() < 2 || 50 < it->first.size() || it->first[0] != '#' || !isValidString(it->first, true, false))
 			{
 				Server::sendClient(client->getFd(), ":localhost 476 " + client->getNick() + " " + it->first + " :Bad Channel Mask\n");
 				std::cout << "handle JOIN failed => invalid name" << std::endl;

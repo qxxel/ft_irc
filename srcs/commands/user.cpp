@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:39:04 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/08 16:23:46 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 18:23:33 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ void	Command::handleUser(Client *client, std::vector<std::string> *args)
 	else
 	{
 		// IF GOOD USERNAME
-		if (isValidString(args->at(0), false))
+		if (isValidString(args->at(0), false, false))
 		{
 			client->setUser(args->at(0));
 			Server::sendClient(client->getFd(), USR_NAME + client->getUser() + "\n");

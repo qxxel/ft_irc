@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:07 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/26 17:25:25 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 18:21:29 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ class Server
 		Channel	*searchChannel(std::string name);
 
 		static void			exit(void);
-		static bool			isValidChar(char c);
+		static bool			isValidChar(char c, bool acceptSpace);
 		static std::string	str_toupper(std::string str);
 		static void			sendClient(int client, std::string msg);
 		static long			simpleHash(std::string const &clear_text);
