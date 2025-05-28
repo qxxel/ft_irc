@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:40:36 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/28 18:22:51 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 18:38:34 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -192,7 +192,7 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 		}
 
 		// CHECK IF ALL CHARACTERS ARE VALID
-		if (isValidString(args->at(2), true, false))
+		if (!isValidString(args->at(2), true, false))
 		{
 			Server::sendClient(client->getFd(), ":localhost 900 " + client->getNick() + " " + channel->getName() + " :invalid characters in password\n");
 			std::cout << "handle modify MODE +k failed => invalid password format" << std::endl;
@@ -204,24 +204,16 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 			channel->setPwd(args->at(2));
 
 		channel->setModeSetTimestamp(time(NULL));
-		channel->sendClients("", ":" + client->getNick() + "!" + client->getUser() + "@localhost MODE " + channel->getName() + " +k\n");
+		channel->sendClients("", ":" + client->getNick() + "!" + client->getUser() + "@localhost MODE " + channel->getName() + " +k " + args->at(2) + "\n");
 	}
 	// SUPP PASSWORD MODE
 	else if (args->at(1) == "-k")
 	{
 		// USAGE: MODE <channel> -k <actual_password>
-		if (args->size() != 3)
+		if (args->size() != 2)
 		{
 			Server::sendClient(client->getFd(), ":localhost 461 " + client->getNick() + " MODE :Not enough parameters\n");
 			std::cout << "handle modify MODE -k failed => invalid format" << std::endl;
-			return ;
-		}
-
-		// CHECK IF THE PASSWORD IS GOOD
-		if (args->at(2) != channel->getPwd())
-		{
-			Server::sendClient(client->getFd(), ":localhost 467 " + client->getNick() + " " + channel->getName() + " :Key mismatch\n");
-			std::cout << "handle modify MODE -k failed => wrong password" << std::endl;
 			return ;
 		}
 
