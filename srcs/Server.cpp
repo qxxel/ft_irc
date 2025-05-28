@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/28 16:20:36 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 16:37:40 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -380,7 +380,7 @@ void	Server::deleteClient(int client)
 			}
 		}
 		// DELETE THE CLIENT IN THE OP LIST
-		for (std::vector<Client*>::iterator it_ops = (*it)->getOpList().begin(); it_ops != (*it)->getOpList().end(); it_ops++) // PROBLEM
+		for (std::vector<Client*>::iterator it_ops = (*it)->getOpList().begin(); it_ops != (*it)->getOpList().end(); it_ops++)
 		{
 			if ((*it_ops)->getFd() == client)
 			{
@@ -451,7 +451,6 @@ void	Server::deleteServer(int sock, int epfd)
 	// CLOSE SOCKET
 	epoll_ctl(epfd, EPOLL_CTL_DEL, sock, NULL);
 	close(sock);
-	// (void)sock;
 
 	// CLOSE EPOLL
 	close(epfd);

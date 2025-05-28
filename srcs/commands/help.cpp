@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   help.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:40:46 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/13 16:06:27 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 16:39:54 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,8 +89,6 @@ void	Command::handleHelp(Client *client, std::vector<std::string> *args) // ONLY
 			std::cout << "handle HELP failed => command not found" << std::endl;
 			return ;
 		}
-		
-		// Server::sendClient(client->getFd(), ":localhost 919 " + client->getNick() + " :End of HELP\n");
 	}
 
 	std::cout << "handle HELP successfuly called" << std::endl;
