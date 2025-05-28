@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   part.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:39:47 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/13 16:10:18 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 16:11:40 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> 
 			if (channel->getClientsList().size() == 1)
 			{
 				client->delCurrentChannel(channel);
-				Server::sendClient(client->getFd(), ":" + client->getNick() + "!" + client->getUser() + "@localhost PART " + Command::joinStrings(*args) + "\n");
+				Server::sendClient(client->getFd(), ":" + client->getNick() + "!" + client->getUser() + "@localhost PART " + channel->getName() + "\n");
 				serv.deleteChannel(channel);
 				continue ;
 			}
@@ -85,8 +85,8 @@ void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> 
 
 			channel->delClientName(client->getNick());
 			client->delCurrentChannel(channel);
-			Server::sendClient(client->getFd(), ":" + client->getNick() + "!" + client->getUser() + "@localhost PART " + Command::joinStrings(*args) + "\n");
-			channel->sendClients("", ":" + client->getNick() + "!" + client->getUser() + "@localhost PART " + Command::joinStrings(*args) + "\n");
+			Server::sendClient(client->getFd(), ":" + client->getNick() + "!" + client->getUser() + "@localhost PART " + channel->getName() + "\n");
+			channel->sendClients("", ":" + client->getNick() + "!" + client->getUser() + "@localhost PART " + channel->getName() + "\n");
 		}
 	}
 	// CATCH IF WRONG INPUT IN CHANNELS
