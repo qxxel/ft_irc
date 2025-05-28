@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/13 17:36:11 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 14:43:49 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,8 @@ Server::~Server()
 
 	// DELETE CHANNELS
 	std::vector<Channel*>::iterator	it2;
-	for (it2 = this->_channels.begin(); it2 != this->_channels.end(); ++it2){ std::cerr << "aa" << std::endl;
-		delete *it2;}
+	for (it2 = this->_channels.begin(); it2 != this->_channels.end(); ++it2)
+		delete *it2;
 }
 
 //Simple creation of a server object.
