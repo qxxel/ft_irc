@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:39:20 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/28 18:03:38 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 18:30:47 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ void	Command::handlePrivMsg(Server &serv, Client *client, std::vector<std::strin
 			return ;
 		}
 
-		if (target->getFd() == -2)
+		if (target->getFd() == FD_GAMEBOT)
 			Bot::handleBot(serv, NULL, client, args->at(1));
 		else
 			Server::sendClient(target->getFd(), ":" + client->getNick() + "!" + client->getUser() + " PRIVMSG " + target->getNick() + " " + args->at(1) + "\n");

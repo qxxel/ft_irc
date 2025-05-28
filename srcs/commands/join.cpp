@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:39:41 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/28 18:26:23 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 18:30:54 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 			}
 
 			// CHECK IF CLIENT CAN ACCESS
-			if (client->getFd() <= -2 && channel->getInvOnly() && !(client->isJoinableChannel(channel) || channel->isOpClient(client->getFd())))
+			if (client->getFd() == FD_GAMEBOT && channel->getInvOnly() && !(client->isJoinableChannel(channel) || channel->isOpClient(client->getFd())))
 			{
 				Server::sendClient(client->getFd(), ":localhost 473 " + client->getNick() + " " + channel->getName() + " :Cannot join channel (+i)\n");
 				std::cout << "handle JOIN failed => client not allowed in this channel" << std::endl;
@@ -85,7 +85,7 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 			}
 
 			// CHECK PASSWORD
-			if (client->getFd() <= -2 && !channel->getPwd().empty() && !client->isJoinableChannel(channel))
+			if (client->getFd() == FD_GAMEBOT && !channel->getPwd().empty() && !client->isJoinableChannel(channel))
 			{
 				// CHECK IF PASSWORD IS SENDED AND TRY IT
 				if (it->second.empty() || channel->getPwd() != it->second)
@@ -114,7 +114,7 @@ void	Command::handleJoin(Server &serv, Client *client, std::vector<std::string> 
 				Server::sendClient(client->getFd(), ":localhost 332 " + client->getNick() + " " + channel->getName() + " " + channel->getTopic() + "\n");
 			Server::sendClient(client->getFd(), ":localhost 353 " + client->getNick() + " " + channel->getName() + " :" + channel->listClients() + "\n");
 			Server::sendClient(client->getFd(), ":localhost 366 " + client->getNick() + " " + channel->getName() + " :End of NAMES list\n");
-			if (client->getFd() == -2)
+			if (client->getFd() == FD_GAMEBOT)
 				channel->getOpList().push_back(client);
 		}
 	}

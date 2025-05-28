@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/28 18:21:13 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 18:30:22 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -229,7 +229,7 @@ void	Server::sendClient(int client, std::string msg)
 	ssize_t		size = msg.size();
 	const char	*ptr = msg.data();
 
-	if (client == -2 || size == 0)
+	if (client == FD_GAMEBOT || size == 0)
 		return ;
 	while (total_sent < size)
 	{

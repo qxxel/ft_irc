@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:40:07 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/28 17:45:47 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 18:31:08 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ void	Command::handleInvite(Server &serv, Client *client, std::vector<std::string
 		target->getJoinableChannels().push_back(channel);
 	}
 
-	if (target->getFd() == -2)
+	if (target->getFd() == FD_GAMEBOT)
 		serv.getBot()->joinChannel(serv, channel);
 	else
 	{
