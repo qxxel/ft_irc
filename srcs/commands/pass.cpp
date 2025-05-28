@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pass.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:38:32 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/07 20:36:20 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 18:18:34 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void	Command::handlePass(Server &serv, Client *client, std::vector<std::string> 
 		{
 			client->setPwd(true);
 			Server::sendClient(client->getFd(), PWD_GOOD);
-			if (!client->getAuth() && client->getNick().compare("") && client->getUser().compare(""))
+			if (!client->getAuth() && !client->getNick().empty() && client->getUser().compare(""))
 				return (client->setAuth(true));
 			else
 				return (Server::sendClient(client->getFd(), ENTER_NCK_USR));

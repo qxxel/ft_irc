@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   kick.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:40:01 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/13 16:08:10 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 17:59:00 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ void	Command::handleKick(Server &serv, Client *client, std::vector<std::string> 
 	}
 
 	// CHECK IF CLIENT IS OP
-	if (!channel->isOpName(client->getNick()))
+	if (!channel->isOpClient(client->getFd()))
 	{
 		Server::sendClient(client->getFd(), ":localhost 482 " + client->getNick() + " " + channel->getName() + " :You're not channel operator\n");
 		std::cout << "handle KICK failed => client isn't moderator" << std::endl;
@@ -88,12 +88,12 @@ void	Command::handleKick(Server &serv, Client *client, std::vector<std::string> 
 		target->delJoinableChannel(channel);
 
 	// HANDLE IF TARGET IS OP
-	if (channel->isOpName(target->getNick()))
-		channel->delOpName(target->getNick());
+	if (channel->isOpClient(target->getFd()))
+		channel->delOpClient(target->getFd());
 
 	channel->sendClients("", ":" + client->getNick() + "!" + client->getUser() + "@localhost KICK " + Command::joinStrings(*args) + "\n");
 	target->delCurrentChannel(channel);
-	channel->delClientName(target->getNick());
+	channel->delClient(target->getFd());
 
 	std::cout << "handle KICK successfully called" << std::endl;
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   mode.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:40:36 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/27 21:39:27 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 17:59:58 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 	}
 
 	// CHECK IF CLIENT IS OP
-	if (!channel->isOpName(client->getNick()))
+	if (!channel->isOpClient(client->getFd()))
 	{
 		Server::sendClient(client->getFd(), ":localhost 482 " + client->getNick() + " " + channel->getName() + " :You're not channel operator\n");
 		std::cout << "handle modify MODE failed => client isn't moderator" << std::endl;
@@ -257,7 +257,7 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 		}
 
 		// CHECK IF TARGET ISN'T OP
-		if (!channel->isOpName(target->getNick()))
+		if (!channel->isOpClient(target->getFd()))
 			channel->getOpList().push_back(target);
 
 		channel->setModeSetTimestamp(time(NULL));
@@ -284,8 +284,8 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 		}
 
 		// CHECK IF TARGET IS OP
-		if (channel->isOpName(target->getNick()))
-			channel->delOpName(target->getNick());
+		if (channel->isOpClient(target->getFd()))
+			channel->delOpClient(target->getFd());
 
 		channel->setModeSetTimestamp(time(NULL));
 		channel->sendClients("", ":" + client->getNick() + "!" + client->getUser() + "@localhost MODE " + channel->getName() + " -o " + target->getNick() + "\n");

@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:39:47 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/28 16:11:40 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 18:02:22 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> 
 			}
 
 			// CHECK IF THERE IS NO OP AFTER CLIENT QUIT
-			if (channel->getOpList().size() == 1 && channel->isOpName(client->getNick()))
+			if (channel->getOpList().size() == 1 && channel->isOpClient(client->getFd()))
 			{
 				// SEARCH FOR THE OLDEST CLIENT NOT OP TO OP HIM
 				Client	*oldestClient = channel->getOldestClient();
@@ -80,10 +80,10 @@ void	Command::handlePart(Server &serv, Client *client, std::vector<std::string> 
 				client->delJoinableChannel(channel);
 
 			// HANDLE IF TARGET IS OP
-			if (channel->isOpName(client->getNick()))
-				channel->delOpName(client->getNick());
+			if (channel->isOpClient(client->getFd()))
+				channel->delOpClient(client->getFd());
 
-			channel->delClientName(client->getNick());
+			channel->delClient(client->getFd());
 			client->delCurrentChannel(channel);
 			Server::sendClient(client->getFd(), ":" + client->getNick() + "!" + client->getUser() + "@localhost PART " + channel->getName() + "\n");
 			channel->sendClients("", ":" + client->getNick() + "!" + client->getUser() + "@localhost PART " + channel->getName() + "\n");

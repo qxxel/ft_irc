@@ -6,20 +6,18 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/01 14:50:48 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/08 16:29:08 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 18:13:14 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Command.hpp"
 #include "Request.hpp"
 
-Request::~Request()
-{
-}
+Request::~Request() { }
 
-Request::Request() : _line(), _arr() {}
+Request::Request(): _line(), _arr() { }
 
-Request::Request(char *raw) : _line(raw), _arr()
+Request::Request(char *raw): _line(raw), _arr()
 {
 	this->split_Request();
 }

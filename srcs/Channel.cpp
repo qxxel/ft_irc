@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:05 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/27 21:32:28 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 17:58:49 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,11 +36,11 @@ Client	*Channel::findClientName(std::string name)
 	return (NULL);
 }
 
-void	Channel::delClientName(std::string name)
+void	Channel::delClient(int fdClient)
 {
 	for (std::vector<Client*>::iterator it = this->_clientsList.begin(); it != this->_clientsList.end(); it++)
 	{
-		if ((*it)->getNick() == name)
+		if ((*it)->getFd() == fdClient)
 		{
 			this->_clientsList.erase(it);
 			return ;
@@ -48,11 +48,11 @@ void	Channel::delClientName(std::string name)
 	}
 }
 
-void	Channel::delOpName(std::string name)
+void	Channel::delOpClient(int fdClient)
 {
 	for (std::vector<Client*>::iterator it = this->_opList.begin(); it != this->_opList.end(); it++)
 	{
-		if ((*it)->getNick() == name)
+		if ((*it)->getFd() == fdClient)
 		{
 			this->_opList.erase(it);
 			return ;
@@ -60,13 +60,13 @@ void	Channel::delOpName(std::string name)
 	}
 }
 
-bool	Channel::isOpName(std::string name)
+bool	Channel::isOpClient(int fdClient)
 {
 	std::vector<Client*>::iterator	it;
 
 	for (it = this->_opList.begin(); it != this->_opList.end(); it++)
 	{
-		if ((*it)->getNick() == name)
+		if ((*it)->getFd() == fdClient)
 			return (true);
 	}
 	return (false);
@@ -89,7 +89,7 @@ std::string	Channel::listClients()
 	{
 		if (!list.empty())
 			list += " ";
-		if (this->isOpName((*it)->getNick()))
+		if (this->isOpClient((*it)->getFd()))
 			list += "@";
 		list += (*it)->getNick();
 	}
@@ -116,7 +116,7 @@ Client	*Channel::getOldestClient()
 
 	for (it = this->_clientsList.begin(); it != this->_clientsList.end(); it++)
 	{
-		if (!this->isOpName((*it)->getNick()))
+		if (!this->isOpClient((*it)->getFd()))
 			return (*it);
 	}
 
