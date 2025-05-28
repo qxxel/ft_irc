@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:38:57 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/28 18:24:16 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 18:26:27 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ void	Command::handleNick(Server &serv, Client *client, std::vector<std::string> 
 	else
 	{
 		// IF GOOD NICKNAME
-		if (isValidString(args->at(0), false))
+		if (isValidString(args->at(0), false, false))
 		{
 			// IF AVAILABLE USERNAME
 			if (is_available(serv, args->at(0)))

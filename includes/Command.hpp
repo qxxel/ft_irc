@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:13 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/26 17:24:10 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 18:22:09 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ class Command
 
 		// STATIC MEMBER FUNCTIONS
 		static std::map<std::string, std::string>	splitChannelsPasswords(std::string str1, std::string str2, char del);
-		static bool			isValidString(std::string str, bool skip);
+		static bool			isValidString(std::string str, bool skip, bool acceptSpace);
 		static int			stringToInt(std::string str);
 		static std::string	intToString(int value);
 		static std::string	joinStrings(const std::vector<std::string>& vec);

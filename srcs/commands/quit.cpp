@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:39:54 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/13 16:11:05 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 18:23:14 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ void	Command::handleQuit(Server &serv, Client *client, std::vector<std::string> 
 	std::string	message = ":Client quit";
 	if (args->size() == 1 && args->at(0).size() > 1)
 	{
-		if (isValidString(args->at(0), true))
+		if (isValidString(args->at(0), true, true))
 			message = args->at(0);
 	}
 

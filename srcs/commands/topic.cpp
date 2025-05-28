@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:40:14 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/28 18:04:13 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 18:26:31 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string>
 		else
 		{
 			Server::sendClient(client->getFd(), ":localhost 332 " + client->getNick() + " " + channel->getName() + " " + channel->getTopic() + "\n");
-			Server::sendClient(client->getFd(), ":localhost 333 " + client->getNick() + " " + channel->getName() + " " + channel->getTopicSetter() + timeToString(channel->getTopicSetTimestamp()) + "\n");
+			Server::sendClient(client->getFd(), ":localhost 333 " + client->getNick() + " " + channel->getName() + " " + channel->getTopicSetter()+ " " + timeToString(channel->getTopicSetTimestamp()) + "\n");
 		}
 	}
 	// SET TOPIC
@@ -89,7 +89,7 @@ void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string>
 		}
 
 		// CHECK IF ALL CHARACTERS ARE VALID
-		if (!isValidString(args->at(1), true))
+		if (!isValidString(args->at(1), true, true))
 		{
 			Server::sendClient(client->getFd(), ":localhost 900 " + client->getNick() + " " + channel->getName() + " :invalid characters in topic\n");
 			std::cout << "handle set TOPIC failed => there is invalid character" << std::endl;

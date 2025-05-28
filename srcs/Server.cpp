@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/28 16:37:40 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 18:21:13 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -246,9 +246,14 @@ void	Server::sendClient(int client, std::string msg)
 }
 
 //Valid characters in all the <names> used (channels or user/nick names).
-bool	Server::isValidChar(char c)
+bool	Server::isValidChar(char c, bool acceptSpace)
 {
-	return (!(!isprint(c) || c == ' ' || c == ',' || c == ':' || c == '#'));
+	bool	isValid = !(!isprint(c) || c == ',' || c == ':' || c == '#');
+
+	if (!acceptSpace && c == ' ')
+		isValid = false;
+
+	return (isValid);
 }
 
 //Speaks for itself
