@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   topic.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:40:14 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/28 16:41:45 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 17:45:51 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ void	Command::handleTopic(Server &serv, Client *client, std::vector<std::string>
 		else
 		{
 			Server::sendClient(client->getFd(), ":localhost 332 " + client->getNick() + " " + channel->getName() + " " + channel->getTopic() + "\n");
-			Server::sendClient(client->getFd(), ":localhost 333 " + client->getNick() + " " + channel->getName() + " " + channel->getTopicSetter() + timeToString(channel->getTopicSetTimestamp()) + "\n");
+			Server::sendClient(client->getFd(), ":localhost 333 " + client->getNick() + " " + channel->getName() + " " + channel->getTopicSetter()+ " " + timeToString(channel->getTopicSetTimestamp()) + "\n");
 		}
 	}
 	// SET TOPIC
