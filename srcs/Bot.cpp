@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 14:55:23 by mreynaud          #+#    #+#             */
-/*   Updated: 2025/05/13 17:09:24 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 18:30:58 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include "Server.hpp"
 #include "Command.hpp"
 
-Bot::Bot(): Client(-2) {
+Bot::Bot(): Client(FD_GAMEBOT) {
 	_auth = true;
 	_pwd = true;
 	_user = "GameBot";
@@ -62,7 +62,7 @@ static void you_lose(Server &serv, std::string my_choice, Client *client, Channe
 {
 	send_msg_bot(serv, "I'm choice " + my_choice + "\n", client, channel);
 	send_msg_bot(serv, "You lose!\n", client, channel);
-	if (client && channel && channel->isOpName("GameBot"))
+	if (client && channel && channel->isOpClient(FD_GAMEBOT))
 	{
 		std::vector<std::string> args = Command("KICK " + channel->getName() + " " + client->getNick() + " :Looser!").getArgs();
 		Command::handleKick(serv, serv.getBot(), &args);
@@ -79,7 +79,7 @@ static void you_win(Server &serv, std::string my_choice, Client *client, Channel
 {
 	send_msg_bot(serv, "I'm choice " + my_choice + "\n", client, channel);
 	send_msg_bot(serv, "You win! 🏆\n", client, channel);
-	if (client && channel && channel->isOpName("GameBot") && !channel->isOpName(client->getNick()))
+	if (client && channel && channel->isOpClient(FD_GAMEBOT) && !channel->isOpClient(client->getFd()))
 	{
 		std::vector<std::string> args = Command("MODE " + channel->getName() + " +o " + client->getNick()).getArgs();
 		Command::handleMode(serv, serv.getBot(), &args);

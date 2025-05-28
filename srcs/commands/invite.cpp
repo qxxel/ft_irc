@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:40:07 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/27 21:33:30 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 18:31:08 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ void	Command::handleInvite(Server &serv, Client *client, std::vector<std::string
 	if (channel->getInvOnly())
 	{
 		// CHECK IF CLIENT IS OP
-		if (!channel->isOpName(client->getNick()))
+		if (!channel->isOpClient(client->getFd()))
 		{
 			Server::sendClient(client->getFd(), ":localhost 482 " + client->getNick() + " " + channel->getName() + " :You're not channel operator\n");
 			std::cout << "handle INVITE failed => client isn't moderator" << std::endl;
@@ -82,7 +82,7 @@ void	Command::handleInvite(Server &serv, Client *client, std::vector<std::string
 		target->getJoinableChannels().push_back(channel);
 	}
 
-	if (target->getNick() == "GameBot")
+	if (target->getFd() == FD_GAMEBOT)
 		serv.getBot()->joinChannel(serv, channel);
 	else
 	{

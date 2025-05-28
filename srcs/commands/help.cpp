@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:40:46 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/28 16:39:54 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 17:11:05 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,6 @@ void	Command::handleHelp(Client *client, std::vector<std::string> *args) // ONLY
 	{
 		Server::sendClient(client->getFd(), ":localhost 910 " + client->getNick() + " :Available commands: PRIVMSG, JOIN, PART, QUIT, KICK, INVITE, TOPIC, NAMES, WHO, MODE\n");
 		Server::sendClient(client->getFd(), ":localhost 911 " + client->getNick() + " :Use /HELP <command> for help on each.\n");
-		// Server::sendClient(client->getFd(), ":localhost 919 " + client->getNick() + " :End of HELP\n");
 	}
 
 	// SHOW USAGE OF THE ASKED COMMAND

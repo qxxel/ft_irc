@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Command.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/28 18:21:54 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 18:26:43 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -219,14 +219,11 @@ void Command::executeCommand(Server &serv, Client *client, Command *cmd, int epf
 	else if (!cmd->getName().compare("MODE"))
 		cmd->handleMode(serv, client, &args);
 
-	else if (!cmd->getName().compare("HELP") || !cmd->getName().compare("/HELP"))
+	else if (!cmd->getName().compare("HELP"))
 		cmd->handleHelp(client, &args);
 
 	else if (!cmd->getName().compare("QUIT"))
-	{
 		cmd->handleQuit(serv, client, &args, epfd);
-		return ;
-	}
 
 	else if (!cmd->getName().compare("CAP"))
 		;

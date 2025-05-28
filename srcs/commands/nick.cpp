@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   nick.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:38:57 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/28 18:22:55 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 18:26:27 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,9 @@ void	Command::handleNick(Server &serv, Client *client, std::vector<std::string> 
 		return (void)Server::sendClient(client->getFd(), ":localhost 904 * :" ENTER_PWD);
 
 	// IF CLIENT HAS ALREADY SET A NICKNAME
-	else if (client->getNick().compare(""))
+	else if (!client->getNick().empty())
 	{
-		if (client->getUser().empty())
-			Server::sendClient(client->getFd(), ":localhost 905 * :" CANT_NICK);
-		else
-			Server::sendClient(client->getFd(), ":localhost 905 * :" CANT_NICK);
+		Server::sendClient(client->getFd(), ":localhost 905 * :" CANT_NICK);
 		return ;
 	}
 
@@ -60,6 +57,6 @@ void	Command::handleNick(Server &serv, Client *client, std::vector<std::string> 
 		client->setAuth(true);
 
 	// TELLS THE CLIENTS TO SET A USERNAME
-	else if (!client->getUser().compare(""))
+	else if (client->getUser().empty())
 		return (Server::sendClient(client->getFd(), ENTER_USER));
 }

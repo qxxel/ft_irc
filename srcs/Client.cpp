@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 16:04:15 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/28 16:19:08 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 18:06:34 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,8 @@ Client::~Client()
 	std::vector<Channel*>::iterator	it;
 	for (it = this->_currentsChannels.begin(); it != this->_currentsChannels.end(); it++)
 	{
-		(*it)->delClientName(this->_nick);
-		(*it)->delOpName(this->_nick);
+		(*it)->delClient(this->_fd);
+		(*it)->delOpClient(this->_fd);
 	}
 }
 

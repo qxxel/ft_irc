@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 18:18:48 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/26 17:23:45 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 18:16:21 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,9 +65,9 @@ class Channel
 		void	setLockTopic(bool lockTopic);
 
 
-		void		delClientName(std::string name);
-		void		delOpName(std::string name);
-		bool		isOpName(std::string name);
+		void		delClient(int fdClient);
+		void		delOpClient(int fdClient);
+		bool		isOpClient(int fdClient);
 		void		sendClients(std::string exceptionName, std::string message);
 		Client		*getOldestClient();
 		Client		*findClientName(std::string name);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   defines.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 16:12:51 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/26 17:24:38 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 18:29:37 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # define MAX_EVENTS	4096
 # define MAX_BODY_SIZE	5000
+# define FD_GAMEBOT	-2
 
 # define SERVER_WELCOME "Welcome to cri_ft !\n"
 # define INV_FORMAT "Invalid format !\n"
