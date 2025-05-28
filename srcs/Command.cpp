@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:30:49 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/28 18:26:43 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 22:23:55 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,25 +15,12 @@
 #include "Command.hpp"
 #include "Server.hpp"
 
-Command::Command(std::string raw) : _raw(clear(raw)), _name("")
+Command::Command(std::string raw) : _raw(raw), _name("")
 {
 	parse();
 }
 
 Command::~Command() { }
-
-std::string	Command::clear(std::string raw)
-{
-	for (std::string::iterator it = raw.begin(); it != raw.end(); )
-	{
-		if (!isprint(*it))
-			it = raw.erase(it);
-		else
-			++it;
-	}
-	return raw;
-}
-
 
 std::string Command::joinStrings(const std::vector<std::string>& vec)
 {

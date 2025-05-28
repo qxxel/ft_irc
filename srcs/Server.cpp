@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 15:18:46 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/28 18:30:22 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 22:17:47 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -341,7 +341,7 @@ Client	*Server::findClientName(std::string name)
 //Stops the server, this function is called when a signals is sent to the server to stop it
 void	Server::exit(void)
 {
-	Server::_running = false;
+	_running = false;
 }
 
 //Adds a channel to the server list of channels
@@ -378,9 +378,9 @@ void	Server::deleteClient(int client)
 		{
 			if ((*it_clients)->getFd() == client)
 			{
-				(*it)->getClientsList().erase(it_clients);
 				(*it_clients)->delCurrentChannel(*it);
-				(*it)->sendClients("", (*it_clients)->getNick() + ":" + (*it_clients)->getUser() + " PART " + (*it)->getName() + "\n");
+				(*it)->sendClients((*it_clients)->getNick(), (*it_clients)->getNick() + ":" + (*it_clients)->getUser() + " PART " + (*it)->getName() + "\n");
+				(*it)->getClientsList().erase(it_clients);
 				break ;
 			}
 		}

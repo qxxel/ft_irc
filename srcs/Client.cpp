@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/27 16:04:15 by ibjean-b          #+#    #+#             */
-/*   Updated: 2025/05/28 18:06:34 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 21:16:50 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ void	Client::delCurrentChannel(Channel *channel)
 	{
 		if ((*it) == channel)
 		{
+			std::cout << "supr channel : " << (*it)->getName() << " du client : " << _nick << std::endl; // /!\ supr
 			this->_currentsChannels.erase(it);
 			return ;
 		}

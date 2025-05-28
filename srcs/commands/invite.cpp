@@ -6,7 +6,7 @@
 /*   By: mreynaud <mreynaud@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:40:07 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/28 18:31:08 by mreynaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 20:59:47 by mreynaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ void	Command::handleInvite(Server &serv, Client *client, std::vector<std::string
 	Client	*target = serv.findClientName(args->at(0));
 	if (!target)
 	{
-		Server::sendClient(client->getFd(), ":localhost 401 " + client->getNick() + " " + target->getNick() + " :No such nick/channel\n");
+		Server::sendClient(client->getFd(), ":localhost 401 " + client->getNick() + " " + args->at(0) + " :No such nick/channel\n");
 		std::cout << "handle INVITE failed => target don't exist" << std::endl;
 		return ;
 	}
@@ -54,6 +54,9 @@ void	Command::handleInvite(Server &serv, Client *client, std::vector<std::string
 	// FIND CLIENT IN THE CHANNEL
 	if (!client->isCurrentChannel(channel->getName()))
 	{
+		std::cout << " start : " << client->getCurrentsChannels().size() << std::endl; // /!\ supr
+		for (unsigned long i = 0; i < client->getCurrentsChannels().size(); ++i)
+			std::cout << " " << i << "==> " << client->getCurrentsChannels().at(i)->getName() << std::endl; // /!\ supr
 		Server::sendClient(client->getFd(), ":localhost 442 " + client->getNick() + " " + channel->getName() + " :You're not on that channel\n");
 		std::cout << "handle INVITE failed => client isn't in the channel" << std::endl;
 		return ;
