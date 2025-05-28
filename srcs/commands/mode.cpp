@@ -6,7 +6,7 @@
 /*   By: agerbaud <agerbaud@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 19:40:36 by agerbaud          #+#    #+#             */
-/*   Updated: 2025/05/27 21:39:27 by agerbaud         ###   ########.fr       */
+/*   Updated: 2025/05/28 17:54:14 by agerbaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,11 +50,8 @@ void	Command::handleMode(Server &serv, Client *client, std::vector<std::string> 
 
 		if (channel->getInvOnly())
 			modes += "i";
-		if (!channel->getTopic().empty())
-		{
+		if (channel->getLockTopic())
 			modes += "t";
-			modesArgs += " " + channel->getTopic();
-		}
 		if (!channel->getPwd().empty())
 			modes += "k";
 		if (channel->getMaxUsers())
